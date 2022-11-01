@@ -1,13 +1,14 @@
 package graphplotter;
 import java.awt.BasicStroke;
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 
 import javax.swing.JComponent;
 
 @SuppressWarnings("serial")
-public class ReferencialGraphic extends JComponent {
+public class ReferentialGraphic extends JComponent {
 	
 	private int width, height;
 	private Graphics2D g2d;
@@ -45,6 +46,10 @@ public class ReferencialGraphic extends JComponent {
 			g2d.drawLine(xFrameCoord-5, yFrameCoord, xFrameCoord+5, yFrameCoord);
 			g2d.drawString(String.valueOf(i), xFrameCoord-20, yFrameCoord+5);
 		}
+		
+		g2d.setFont(new Font("", Font.PLAIN, 20));
+		g2d.drawString("X", width-20, height/2-10);
+		g2d.drawString("Y", width/2+10, 20);
 	}
 	
 }
