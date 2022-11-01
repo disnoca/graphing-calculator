@@ -7,12 +7,23 @@ import java.awt.Polygon;
 
 import javax.swing.JComponent;
 
+import net.objecthunter.exp4j.Expression;
+import net.objecthunter.exp4j.ExpressionBuilder;
+
 @SuppressWarnings("serial")
 public class FunctionGraphic extends JComponent {
 	
 	private int width, height;
 	private Graphics2D g2d;
+	private Color color;
+	private Expression function;
 	
+	
+	public FunctionGraphic(String expression, Color color) {
+		super();
+		this.color = color;
+		this.function = new ExpressionBuilder(expression).variable("x").build();
+	}
 	
 	public void paintComponent(Graphics g) {
 		this.width = this.getWidth();
@@ -20,7 +31,7 @@ public class FunctionGraphic extends JComponent {
 		
 		g2d = (Graphics2D) g;
 		g2d.setStroke(new BasicStroke(2));
-		g2d.setColor(Color.black);
+		g2d.setColor(this.color);
 
 		drawFunction();
 	}
@@ -32,12 +43,11 @@ public class FunctionGraphic extends JComponent {
 			pol.addPoint(pt.getXFrameCoord(-10, 10), pt.getYFrameCoord(-10, 10));
 		}
 		
-		g2d.setColor(Color.RED);
 		g2d.drawPolyline(pol.xpoints, pol.ypoints, pol.npoints);
 	}
 	
 	private double f(double x) {
-		return Math.cos(x);
+		return function.setVariable("x", x).evaluate();
 	}
 	
 }
