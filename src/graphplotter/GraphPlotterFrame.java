@@ -134,7 +134,8 @@ public class GraphPlotterFrame extends JFrame implements ActionListener {
 				return;
 			}
 			
-			String expression = (String)JOptionPane.showInputDialog(this ,"Enter the function's expression:", "Add Function", JOptionPane.PLAIN_MESSAGE);;
+			String expression = (String)JOptionPane.showInputDialog(this ,"Enter the function's expression:", "Add Function", JOptionPane.PLAIN_MESSAGE);
+			System.out.println(expression);
 			
 			if(expression != null)
 				this.drawFunction(expression);
