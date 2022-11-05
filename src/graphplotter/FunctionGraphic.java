@@ -21,8 +21,8 @@ public class FunctionGraphic extends JComponent {
 	
 	public FunctionGraphic(String expression, Color color) {
 		super();
+		this.function = new ExpressionBuilder(expression).build();
 		this.color = color;
-		this.function = new ExpressionBuilder(expression).variable("x").build();
 	}
 	
 	public void paintComponent(Graphics g) {

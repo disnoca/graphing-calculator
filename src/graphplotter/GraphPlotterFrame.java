@@ -11,6 +11,8 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 
+import net.objecthunter.exp4j.tokenizer.UnknownFunctionOrVariableException;
+
 @SuppressWarnings("serial")
 public class GraphPlotterFrame extends JFrame implements ActionListener {
 	
@@ -28,7 +30,7 @@ public class GraphPlotterFrame extends JFrame implements ActionListener {
 	
 
 	public GraphPlotterFrame() {
-		super();
+		super("Graph Plotter");
 		
 	    this.setSize(1000, 1000);
 	    this.setTitle("Graph Plotter");
@@ -118,7 +120,7 @@ public class GraphPlotterFrame extends JFrame implements ActionListener {
 			this.add(fg);
 			this.setVisible(true);
 		}
-		catch(Exception e) {
+		catch(IllegalArgumentException e) {
 			this.showErrorMessage("Invalid function");
 		}
 	}
@@ -126,14 +128,16 @@ public class GraphPlotterFrame extends JFrame implements ActionListener {
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		
-		// TODO: error for adding more than MAX_FUNCTIONS, make cancel button work, make the window not close when a function was not written or was invalid
 		if(e.getSource() == mfuncAdd) {
-			String expression = (String)JOptionPane.showInputDialog(this ,"Enter the function expression:", "Add Function", JOptionPane.PLAIN_MESSAGE);;
+			if(functionGraphics.size() >= MAX_FUNCTIONS) {
+				showErrorMessage("Maximum functions limit reached. Remove a function before adding a new one.");
+				return;
+			}
 			
-			if(expression != null && expression.length() > 0)
+			String expression = (String)JOptionPane.showInputDialog(this ,"Enter the function's expression:", "Add Function", JOptionPane.PLAIN_MESSAGE);;
+			
+			if(expression != null)
 				this.drawFunction(expression);
-			else
-				this.showErrorMessage("Please enter a function");
 		}
 		
 		if(e.getSource() == mfuncRemove) {
