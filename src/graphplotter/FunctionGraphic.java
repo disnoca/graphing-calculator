@@ -16,11 +16,13 @@ public class FunctionGraphic extends JComponent {
 	private int width, height;
 	private Graphics2D g2d;
 	private Color color;
+	private String expression;
 	private Expression function;
 	
 	
 	public FunctionGraphic(String expression, Color color) {
 		super();
+		this.expression = expression;
 		this.function = new ExpressionBuilder(expression).variable("x").build();
 		this.color = color;
 	}
@@ -48,6 +50,10 @@ public class FunctionGraphic extends JComponent {
 	
 	private double f(double x) {
 		return function.setVariable("x", x).evaluate();
+	}
+	
+	public String getExpression() {
+		return expression;
 	}
 	
 }
