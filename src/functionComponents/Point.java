@@ -1,4 +1,4 @@
-package graphplotter;
+package functionComponents;
 
 public class Point {
 

@@ -6,14 +6,17 @@ import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.Frame;
 import java.util.ArrayList;
+import java.util.Stack;
 
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
+
+import functionComponents.Function;
+import graphplotter.popupWindows.RemoveFunctionFrame;
 
 @SuppressWarnings("serial")
 public class GraphPlotterFrame extends JFrame implements ActionListener, WindowListener {
@@ -30,12 +33,11 @@ public class GraphPlotterFrame extends JFrame implements ActionListener, WindowL
 	
 	private final int MAX_FUNCTIONS = 5;
 	
-	private final Color[] functionColors = {Color.BLUE, Color.RED, Color.GREEN, Color.MAGENTA, Color.CYAN};
+	private Stack<Color> functionColors;
 	
 
 	public GraphPlotterFrame() {
 		super("Graph Plotter");
-		
 	    this.setSize(1000, 1000);
 	    this.setTitle("Graph Plotter");
 	    this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -44,10 +46,20 @@ public class GraphPlotterFrame extends JFrame implements ActionListener, WindowL
 	    this.setVisible(true);
 	    
 	    functionGraphics = new ArrayList<>();
+	    initFunctionColors();
 	    
 		addMenuBar();
 		drawReferential();
-		initSecondaryFrames();
+		initSecondaryWindows();
+	}
+	
+	private void initFunctionColors() {
+		functionColors = new Stack<>();
+		functionColors.push(Color.CYAN);
+		functionColors.push(Color.MAGENTA);
+		functionColors.push(Color.GREEN);
+		functionColors.push(Color.RED);
+		functionColors.push(Color.BLUE);
 	}
 	
 	private void addMenuBar() {
@@ -121,8 +133,9 @@ public class GraphPlotterFrame extends JFrame implements ActionListener, WindowL
 	
 	private void drawFunction(String expression) {
 		try {
-			Color color = functionColors[functionGraphics.size()];
-			FunctionGraphic fg = new FunctionGraphic(expression, color);
+			Color color = functionColors.pop();
+			Function f = new Function(referentialGraphic.getSize(), expression, color);
+			FunctionGraphic fg = new FunctionGraphic(f);
 			functionGraphics.add(fg);
 			
 			this.add(fg);
@@ -135,7 +148,7 @@ public class GraphPlotterFrame extends JFrame implements ActionListener, WindowL
 		}
 	}
 	
-	private void initSecondaryFrames() {
+	private void initSecondaryWindows() {
 		removeFunctionFrame = new RemoveFunctionFrame(this);
 		removeFunctionFrame.addWindowListener(this);
 	}
@@ -276,8 +289,9 @@ public class GraphPlotterFrame extends JFrame implements ActionListener, WindowL
 		for(int i = toRemove.length-1; i >= 0; i--)
 			if(toRemove[i]) {
 				FunctionGraphic fg = functionGraphics.get(i);
-				this.remove(fg);
+				functionColors.add(fg.getColor());
 				functionGraphics.remove(i);
+				this.remove(fg);
 			}
 		
 		// checks if any functions were removed

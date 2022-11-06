@@ -7,6 +7,8 @@ import java.awt.Graphics2D;
 
 import javax.swing.JComponent;
 
+import functionComponents.Point;
+
 @SuppressWarnings("serial")
 public class ReferentialGraphic extends JComponent {
 	
