@@ -7,6 +7,7 @@ import java.awt.event.WindowListener;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Stack;
 
 import javax.swing.JFrame;
@@ -16,6 +17,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 
 import functionComponents.Function;
+import graphplotter.popupWindows.ListFunctionsFrame;
 import graphplotter.popupWindows.RemoveFunctionFrame;
 
 @SuppressWarnings("serial")
@@ -30,10 +32,13 @@ public class GraphPlotterFrame extends JFrame implements ActionListener, WindowL
 	private ArrayList<FunctionGraphic> functionGraphics;
 	
 	private RemoveFunctionFrame removeFunctionFrame;
+	private ListFunctionsFrame listFunctionsFrame;
 	
-	private final int MAX_FUNCTIONS = 5;
+	private final int MAX_FUNCTIONS = 6;
 	
-	private Stack<Color> functionColors;
+	private final Color[] functionColors = {Color.BLUE, Color.RED, Color.GREEN, Color.CYAN, Color.MAGENTA, Color.ORANGE};
+	private Stack<Color> colorStack;
+	private HashMap<Color, Integer> colorIdsMap;
 	
 
 	public GraphPlotterFrame() {
@@ -54,12 +59,14 @@ public class GraphPlotterFrame extends JFrame implements ActionListener, WindowL
 	}
 	
 	private void initFunctionColors() {
-		functionColors = new Stack<>();
-		functionColors.push(Color.CYAN);
-		functionColors.push(Color.MAGENTA);
-		functionColors.push(Color.GREEN);
-		functionColors.push(Color.RED);
-		functionColors.push(Color.BLUE);
+		colorStack = new Stack<>();
+		colorIdsMap = new HashMap<>();
+		
+		for(int i = 0; i < MAX_FUNCTIONS; i++) {
+			// colors must be pushed in reverse order for stack
+			colorStack.push(functionColors[MAX_FUNCTIONS-1-i]);
+			colorIdsMap.put(functionColors[i], i);
+		}
 	}
 	
 	private void addMenuBar() {
@@ -133,7 +140,7 @@ public class GraphPlotterFrame extends JFrame implements ActionListener, WindowL
 	
 	private void drawFunction(String expression) {
 		try {
-			Color color = functionColors.pop();
+			Color color = colorStack.pop();
 			Function f = new Function(referentialGraphic.getSize(), expression, color);
 			FunctionGraphic fg = new FunctionGraphic(f);
 			functionGraphics.add(fg);
@@ -151,6 +158,8 @@ public class GraphPlotterFrame extends JFrame implements ActionListener, WindowL
 	private void initSecondaryWindows() {
 		removeFunctionFrame = new RemoveFunctionFrame(this);
 		removeFunctionFrame.addWindowListener(this);
+		listFunctionsFrame = new ListFunctionsFrame(this);
+		listFunctionsFrame.addWindowListener(this);
 	}
 
 	@Override
@@ -171,16 +180,17 @@ public class GraphPlotterFrame extends JFrame implements ActionListener, WindowL
 		}
 		
 		if(e.getSource() == mfuncRemove) {
-			if(functionGraphics.size() == 0) {
-				showErrorMessage("There are no functions no remove.");
-				return;
-			}
-			
-			removeFunctionFrame.showWindow(getFunctionExpressions());
+			if(functionGraphics.size() == 0)
+				showErrorMessage("There are no functions to remove.");
+			else
+				removeFunctionFrame.showWindow(getFunctionExpressions());
 		}
 		
 		if(e.getSource() == mfuncList) {
-			
+			if(functionGraphics.size() == 0)
+				showErrorMessage("There are no functions to list.");
+			else
+				listFunctionsFrame.showWindow(getFunctionExpressions(), getColorIds());
 		}
 		
 		if(e.getSource() == vwDefault) {
@@ -240,6 +250,13 @@ public class GraphPlotterFrame extends JFrame implements ActionListener, WindowL
 		
 		return functionExpressions;
 	}
+	
+	private int[] getColorIds() {
+		int[] colorIds = new int[functionGraphics.size()];
+		for(int i = 0; i < functionGraphics.size(); i++)
+			colorIds[i] = colorIdsMap.get(functionGraphics.get(i).getColor());
+		return colorIds;
+	}
 
 	
 	// these WindowListener functions are listening to the secondary windows' window changes, not itself
@@ -289,7 +306,7 @@ public class GraphPlotterFrame extends JFrame implements ActionListener, WindowL
 		for(int i = toRemove.length-1; i >= 0; i--)
 			if(toRemove[i]) {
 				FunctionGraphic fg = functionGraphics.get(i);
-				functionColors.add(fg.getColor());
+				colorStack.add(fg.getColor());
 				functionGraphics.remove(i);
 				this.remove(fg);
 			}
