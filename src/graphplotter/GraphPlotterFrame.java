@@ -156,9 +156,9 @@ public class GraphPlotterFrame extends JFrame implements ActionListener, WindowL
 	}
 	
 	private void initSecondaryWindows() {
-		removeFunctionFrame = new RemoveFunctionFrame(this);
+		removeFunctionFrame = new RemoveFunctionFrame(this, "Remove Functions");
 		removeFunctionFrame.addWindowListener(this);
-		listFunctionsFrame = new ListFunctionsFrame(this);
+		listFunctionsFrame = new ListFunctionsFrame(this, "Functions List");
 		listFunctionsFrame.addWindowListener(this);
 	}
 

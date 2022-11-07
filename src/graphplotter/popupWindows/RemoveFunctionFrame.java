@@ -4,7 +4,6 @@ import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.util.ArrayList;
@@ -19,32 +18,24 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 @SuppressWarnings("serial")
-public class RemoveFunctionFrame extends JFrame implements ActionListener {
-	
-	private JFrame parent;
+public class RemoveFunctionFrame extends PopupWindow {
 	
 	private ArrayList<JCheckBox> checkboxes;
 	private boolean[] activeCheckboxes, functionsToRemove;
 	private JButton removeButton, cancelButton;
 	
 	
-	public RemoveFunctionFrame(JFrame parent) {
-		super("Remove Functions");
-		this.parent = parent;
-		this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		this.setResizable(false);
+	public RemoveFunctionFrame(JFrame parent, String title) {
+		super(parent, title);
 	}
 	
-	public void showWindow(String[] expressions) {
+	public void showWindow(String[] expressions) {	
 		Container contentPane = getContentPane();
 		contentPane.removeAll();
 		addComponents(contentPane, expressions);
 		functionsToRemove = null;
 		
-		parent.setEnabled(false);
-		this.pack();
-		this.setLocationRelativeTo(parent);
-		this.setVisible(true);
+		this.showWindow(300);
 	}
 	
 	private void addComponents(Container contentPane, String[] expressions) {
@@ -58,7 +49,7 @@ public class RemoveFunctionFrame extends JFrame implements ActionListener {
 		JPanel listPane = new JPanel();
 		listPane.setLayout(new BoxLayout(listPane, BoxLayout.PAGE_AXIS));
 		
-		JLabel label = new JLabel("Select functions to remove:                                     ");
+		JLabel label = new JLabel("Select functions to remove:");
 		listPane.add(label);
 		listPane.add(Box.createRigidArea(new Dimension(0,10)));
 		JPanel checkboxPane = createCheckboxPane(expressions);
@@ -75,15 +66,6 @@ public class RemoveFunctionFrame extends JFrame implements ActionListener {
 		contentPane.add(buttonPane, BorderLayout.PAGE_END);
 		
 		evenButtonsWidth(removeButton, cancelButton);
-	}
-	
-	private void evenButtonsWidth(JButton b1, JButton b2) {
-		int width = Math.max(b1.getPreferredSize().width, b2.getPreferredSize().width);
-		int height = b1.getPreferredSize().height;
-		Dimension buttonsSize = new Dimension(width, height);
-		
-		b1.setPreferredSize(buttonsSize);
-		b2.setPreferredSize(buttonsSize);
 	}
 	
 	private JPanel createCheckboxPane(String[] expressions) {

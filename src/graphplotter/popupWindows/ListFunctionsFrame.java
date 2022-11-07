@@ -2,6 +2,7 @@ package graphplotter.popupWindows;
 
 import java.awt.Container;
 import java.awt.Dimension;
+import java.awt.event.ActionEvent;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -12,15 +13,10 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 @SuppressWarnings("serial")
-public class ListFunctionsFrame extends JFrame {
-
-	private JFrame parent;
+public class ListFunctionsFrame extends PopupWindow {
 	
-	public ListFunctionsFrame(JFrame parent) {
-		super("Functions List");
-		this.parent = parent;
-		this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		this.setResizable(false);
+	public ListFunctionsFrame(JFrame parent, String title) {
+		super(parent, title);
 	}
 	
 	public void showWindow(String[] expressions, int[] colorIds) {
@@ -28,10 +24,7 @@ public class ListFunctionsFrame extends JFrame {
 		contentPane.removeAll();
 		addComponents(contentPane, expressions, colorIds);
 		
-		parent.setEnabled(false);
-		this.pack();
-		this.setLocationRelativeTo(parent);
-		this.setVisible(true);
+		super.showWindow(300);
 	}
 	
 	private void addComponents(Container contentPane, String[] expressions, int[] colorIds) {
@@ -39,7 +32,7 @@ public class ListFunctionsFrame extends JFrame {
 		JPanel basePane = new JPanel();
 		basePane.setLayout(new BoxLayout(basePane, BoxLayout.PAGE_AXIS));
 		
-		JLabel label = new JLabel("Functions list:                                                   ");
+		JLabel label = new JLabel("Functions list:");
 		basePane.add(label);
 		basePane.add(Box.createRigidArea(new Dimension(0,5)));
 		basePane.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
@@ -61,6 +54,12 @@ public class ListFunctionsFrame extends JFrame {
 		
 		basePane.add(listPane);
 		contentPane.add(basePane);
+	}
+
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		// TODO Auto-generated method stub
+		
 	}
 	
 }
