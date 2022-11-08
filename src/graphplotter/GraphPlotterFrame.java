@@ -6,7 +6,6 @@ import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.awt.Color;
 import java.awt.Dimension;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Stack;
 
@@ -17,19 +16,21 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 
 import functionComponents.Function;
+import graphplotter.graphics.GraphicsDrawer;
 import graphplotter.popupWindows.ListFunctionsFrame;
 import graphplotter.popupWindows.RemoveFunctionFrame;
 
 @SuppressWarnings("serial")
 public class GraphPlotterFrame extends JFrame implements ActionListener, WindowListener {
 	
+	private JMenuBar menubar;
 	private JMenu menuFunc, menuVW, menuGS;
 	private JMenuItem mfuncAdd, mfuncRemove, mfuncList;
 	private JMenuItem vwDefault, vwSetValues, vwZoomIn, vwZoomOut;
 	private JMenuItem gsRoot, gsMax, gsMin, gsYIntersect, gsIntersect, gsYCalc, gsXCalc, gsIntegral;
 	
-	private ReferentialGraphic referentialGraphic;
-	private ArrayList<FunctionGraphic> functionGraphics;
+	private Dimension graphicsSize;
+	private GraphicsDrawer graphicsDrawer;
 	
 	private RemoveFunctionFrame removeFunctionFrame;
 	private ListFunctionsFrame listFunctionsFrame;
@@ -40,22 +41,27 @@ public class GraphPlotterFrame extends JFrame implements ActionListener, WindowL
 	private Stack<Color> colorStack;
 	private HashMap<Color, Integer> colorIdsMap;
 	
+	private int functionCount;
+	
 
 	public GraphPlotterFrame() {
 		super("Graph Plotter");
-	    this.setSize(1000, 1000);
 	    this.setTitle("Graph Plotter");
 	    this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-	    this.setLocationRelativeTo(null);
 	    this.setResizable(false);
-	    this.setVisible(true);
 	    
-	    functionGraphics = new ArrayList<>();
+	    graphicsSize = new Dimension(900,900);
+	    functionCount = 0;
+	    
 	    initFunctionColors();
-	    
+	    initSecondaryWindows();
 		addMenuBar();
-		drawReferential();
-		initSecondaryWindows();
+		initGraphics();
+		
+		this.setSize(graphicsSize);
+		adjustSize();
+		this.setLocationRelativeTo(null);
+		this.setVisible(true);
 	}
 	
 	private void initFunctionColors() {
@@ -70,7 +76,7 @@ public class GraphPlotterFrame extends JFrame implements ActionListener, WindowL
 	}
 	
 	private void addMenuBar() {
-		JMenuBar menubar = new JMenuBar();
+		menubar = new JMenuBar();
 		
 		menuFunc = new JMenu("Function");
 	    menuVW = new JMenu("View Window");
@@ -132,20 +138,18 @@ public class GraphPlotterFrame extends JFrame implements ActionListener, WindowL
 	    this.setJMenuBar(menubar);
 	}
 	
-	private void drawReferential() {
-		referentialGraphic = new ReferentialGraphic();
-		this.add(referentialGraphic);
-		updateContents();
+	private void initGraphics() {
+		graphicsDrawer = new GraphicsDrawer(graphicsSize);
+		graphicsDrawer.setReferentialGraphic();
+		this.add(graphicsDrawer);
 	}
 	
-	private void drawFunction(String expression) {
+	private void addFunction(String expression) {
 		try {
 			Color color = colorStack.pop();
-			Function f = new Function(referentialGraphic.getSize(), expression, color);
-			FunctionGraphic fg = new FunctionGraphic(f);
-			functionGraphics.add(fg);
-			
-			this.add(fg);
+			Function function = new Function(graphicsSize, expression, color);
+			graphicsDrawer.addFunctionGraphic(function);
+			functionCount++;
 			updateContents();
 		}
 		
@@ -153,6 +157,31 @@ public class GraphPlotterFrame extends JFrame implements ActionListener, WindowL
 		catch(IllegalArgumentException e) {
 			this.showErrorMessage("Invalid function");
 		}
+	}
+	
+	private void removeFunctions() {
+		boolean[] toRemove = removeFunctionFrame.getRemovedFunctions();
+		
+		// if Cancel button was pressed
+		if(toRemove == null) return;
+		
+		// started with functionsNo functions before removal
+		int oldFunctionCount = functionCount;
+		
+		// for loop must be done in reverse because removing an element changes the indexes of the ones following it
+		for(int i = toRemove.length-1; i >= 0; i--)
+			if(toRemove[i]) {
+				Color color = graphicsDrawer.getFunctionColor(i);
+				colorStack.add(color);
+				graphicsDrawer.remove(i);
+				functionCount--;
+			}
+		
+		// checks if any functions were removed
+		if(oldFunctionCount > functionCount)
+			updateContents();
+		else
+			showErrorMessage("No functions were selected.");
 	}
 	
 	private void initSecondaryWindows() {
@@ -166,7 +195,7 @@ public class GraphPlotterFrame extends JFrame implements ActionListener, WindowL
 	public void actionPerformed(ActionEvent e) {
 		
 		if(e.getSource() == mfuncAdd) {		//TODO: verify if function is not duplicate
-			if(functionGraphics.size() >= MAX_FUNCTIONS) {
+			if(functionCount >= MAX_FUNCTIONS) {
 				showErrorMessage("Maximum functions limit reached. Remove a function before adding a new one.");
 				return;
 			}
@@ -176,18 +205,18 @@ public class GraphPlotterFrame extends JFrame implements ActionListener, WindowL
 			
 			// expression is null if user pressed Cancel or closed pop-up, in which case does nothing
 			if(expression != null)
-				this.drawFunction(expression);
+				this.addFunction(expression);
 		}
 		
 		if(e.getSource() == mfuncRemove) {
-			if(functionGraphics.size() == 0)
+			if(functionCount == 0)
 				showErrorMessage("There are no functions to remove.");
 			else
 				removeFunctionFrame.showWindow(getFunctionExpressions());
 		}
 		
 		if(e.getSource() == mfuncList) {
-			if(functionGraphics.size() == 0)
+			if(functionCount == 0)
 				showErrorMessage("There are no functions to list.");
 			else
 				listFunctionsFrame.showWindow(getFunctionExpressions(), getColorIds());
@@ -244,17 +273,17 @@ public class GraphPlotterFrame extends JFrame implements ActionListener, WindowL
 	}
 	
 	private String[] getFunctionExpressions() {
-		String[] functionExpressions = new String[functionGraphics.size()];
-		for(int i = 0; i < functionGraphics.size(); i++)
-			functionExpressions[i] = functionGraphics.get(i).getExpression();
+		String[] functionExpressions = new String[functionCount];
+		for(int i = 0; i < functionCount; i++)
+			functionExpressions[i] = graphicsDrawer.getFunctionExpression(i);
 		
 		return functionExpressions;
 	}
 	
 	private int[] getColorIds() {
-		int[] colorIds = new int[functionGraphics.size()];
-		for(int i = 0; i < functionGraphics.size(); i++)
-			colorIds[i] = colorIdsMap.get(functionGraphics.get(i).getColor());
+		int[] colorIds = new int[functionCount];
+		for(int i = 0; i < functionCount; i++)
+			colorIds[i] = colorIdsMap.get(graphicsDrawer.getFunctionColor(i));
 		return colorIds;
 	}
 
@@ -294,30 +323,6 @@ public class GraphPlotterFrame extends JFrame implements ActionListener, WindowL
 	@Override
 	public void windowDeactivated(WindowEvent e) {}
 	
-	private void removeFunctions() {
-		boolean[] toRemove = removeFunctionFrame.getRemovedFunctions();
-		// if Cancel button was pressed
-		if(toRemove == null) return;
-		
-		// started with functionsNo functions before removal
-		int oldFunctionsCount = functionGraphics.size();
-		
-		// for loop must be done in reverse because removing an element changes the indexs of the ones following it
-		for(int i = toRemove.length-1; i >= 0; i--)
-			if(toRemove[i]) {
-				FunctionGraphic fg = functionGraphics.get(i);
-				colorStack.add(fg.getColor());
-				functionGraphics.remove(i);
-				this.remove(fg);
-			}
-		
-		// checks if any functions were removed
-		if(oldFunctionsCount > functionGraphics.size())
-			updateContents();
-		else
-			showErrorMessage("No functions were selected.");
-	}
-	
 	// for some reason the frame must be set as non visible and then visible or be resized for its contents to be updated
 	// since changing visible values creates visual problems, this method resizes the frame
 	private void updateContents() {
@@ -327,6 +332,15 @@ public class GraphPlotterFrame extends JFrame implements ActionListener, WindowL
 		Dimension tempSize = new Dimension(width+1, height+1);
 		
 		this.setSize(tempSize);
+		this.setSize(size);
+	}
+	
+	// for some reason the frame's size does not match the graphic's size visually, even though the values are the same
+	// this function adjust the frame's size with a bias that makes it visually the same as the graphic's
+	private void adjustSize() {
+		Dimension size = this.getSize();
+		size.width += 21;
+		size.height += 63;
 		this.setSize(size);
 	}
 	

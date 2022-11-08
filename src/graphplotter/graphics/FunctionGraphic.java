@@ -1,37 +1,32 @@
-package graphplotter;
+package graphplotter.graphics;
 import java.awt.BasicStroke;
 import java.awt.Color;
-import java.awt.Graphics;
+import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.Polygon;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
-
-import javax.swing.JComponent;
 
 import functionComponents.Function;
 import functionComponents.Point;
 
-@SuppressWarnings("serial")
-public class FunctionGraphic extends JComponent {
+public class FunctionGraphic extends BufferedImage {
 	
 	private Graphics2D g2d;
 	private Function function;
 	
 	
-	public FunctionGraphic(Function function) {
-		super();
+	public FunctionGraphic(Dimension size, Function function) {
+		super(size.width, size.height, BufferedImage.TYPE_INT_ARGB);
 		this.function = function;
-	}
-	
-	public void paintComponent(Graphics g) {
-		g2d = (Graphics2D) g;
-		g2d.setStroke(new BasicStroke(2));
-		g2d.setColor(function.getColor());
-
+		g2d = this.createGraphics();
 		drawFunction();
 	}
 	
 	public void drawFunction() {
+		g2d.setStroke(new BasicStroke(2));
+		g2d.setColor(function.getColor());
+
 		Polygon pol = new Polygon();
 		ArrayList<Point> points = function.getPoints();
 		points.forEach(point -> pol.addPoint(point.getXFrameCoord(-10, 10), point.getYFrameCoord(-10, 10)));

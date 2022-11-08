@@ -1,30 +1,32 @@
-package graphplotter;
+package graphplotter.graphics;
 import java.awt.BasicStroke;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Font;
-import java.awt.Graphics;
 import java.awt.Graphics2D;
-
-import javax.swing.JComponent;
+import java.awt.image.BufferedImage;
 
 import functionComponents.Point;
 
-@SuppressWarnings("serial")
-public class ReferentialGraphic extends JComponent {
+public class ReferentialGraphic extends BufferedImage {
 	
 	private int width, height;
 	private Graphics2D g2d;
 	
 	
-	public void paintComponent(Graphics g) {
+	public ReferentialGraphic(Dimension size) {
+		super(size.width, size.height, BufferedImage.TYPE_INT_ARGB);
 		this.width = this.getWidth();
 		this.height = this.getHeight();
+		g2d = this.createGraphics();
 		
-		g2d = (Graphics2D) g;
+		drawReferential();
+	}
+	
+	private void drawReferential() {
 		g2d.setStroke(new BasicStroke(2));
 		g2d.setColor(Color.black);
 		
-		// draw X and Y axis
 		g2d.drawLine(0 , height/2, width, height/2);
 		g2d.drawLine(width/2 ,0, width/2, height);
 		g2d.drawString("0", width/2+5, height/2+15);
