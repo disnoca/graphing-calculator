@@ -1,11 +1,13 @@
 package graphplotter.popupWindows;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
+import java.util.Stack;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -16,11 +18,16 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import graphplotter.graphics.GraphicsDrawer;
+
 @SuppressWarnings("serial")
 public class ListFunctionsFrame extends PopupWindow {
 	
 	private ArrayList<JButton> upButtons;
 	private ArrayList<JButton> downButtons;
+	
+	private GraphicsDrawer graphicsDrawer;
+	private Stack<Color> colorStack;
 	
 	private Dimension buttonSize;
 	
@@ -30,15 +37,15 @@ public class ListFunctionsFrame extends PopupWindow {
 		buttonSize = new Dimension(20,20);
 	}
 	
-	public void showWindow(String[] expressions, int[] colorIds) {
+	public void showWindow() {
 		Container contentPane = getContentPane();
 		contentPane.removeAll();
-		addComponents(contentPane, expressions, colorIds);
+		addComponents(contentPane);
 		
 		super.showWindow(300);
 	}
 	
-	private void addComponents(Container contentPane, String[] expressions, int[] colorIds) {
+	private void addComponents(Container contentPane) {
 		upButtons = new ArrayList<>(expressions.length);
 		downButtons = new ArrayList<>(expressions.length);
 		

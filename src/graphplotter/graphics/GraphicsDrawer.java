@@ -49,4 +49,11 @@ public class GraphicsDrawer extends JComponent {
 		return functionGraphics.get(pos).getColor();
 	}
 	
+	public String[] getFunctionExpressions() {
+		String[] functionExpressions = new String[functionGraphics.size()];
+		for(int i = 0; i < functionGraphics.size(); i++)
+			functionExpressions[i] = functionGraphics.get(i).getExpression();
+		return functionExpressions;
+	}
+	
 }

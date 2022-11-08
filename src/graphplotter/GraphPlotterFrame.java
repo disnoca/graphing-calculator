@@ -2,8 +2,6 @@ package graphplotter;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.util.HashMap;
@@ -21,7 +19,7 @@ import graphplotter.popupWindows.ListFunctionsFrame;
 import graphplotter.popupWindows.RemoveFunctionFrame;
 
 @SuppressWarnings("serial")
-public class GraphPlotterFrame extends JFrame implements ActionListener, WindowListener {
+public class GraphPlotterFrame extends JFrame implements ActionListener {
 	
 	private JMenuBar menubar;
 	private JMenu menuFunc, menuVW, menuGS;
@@ -54,9 +52,9 @@ public class GraphPlotterFrame extends JFrame implements ActionListener, WindowL
 	    functionCount = 0;
 	    
 	    initFunctionColors();
-	    initSecondaryWindows();
 		addMenuBar();
 		initGraphics();
+		initSecondaryWindows();
 		
 		this.setSize(graphicsSize);
 		adjustSize();
@@ -73,6 +71,11 @@ public class GraphPlotterFrame extends JFrame implements ActionListener, WindowL
 			colorStack.push(functionColors[MAX_FUNCTIONS-1-i]);
 			colorIdsMap.put(functionColors[i], i);
 		}
+	}
+	
+	private void initSecondaryWindows() {
+		removeFunctionFrame = new RemoveFunctionFrame(this, "Remove Functions", graphicsDrawer, colorStack);
+		listFunctionsFrame = new ListFunctionsFrame(this, "Functions List");
 	}
 	
 	private void addMenuBar() {
@@ -150,45 +153,13 @@ public class GraphPlotterFrame extends JFrame implements ActionListener, WindowL
 			Function function = new Function(graphicsSize, expression, color);
 			graphicsDrawer.addFunctionGraphic(function);
 			functionCount++;
-			updateContents();
+			SwingFunctions.updateFrameContents(this);
 		}
 		
 		// exception caught if expression has unknown symbols or is an empty string
 		catch(IllegalArgumentException e) {
-			this.showErrorMessage("Invalid function");
+			SwingFunctions.showErrorMessage(this, "Invalid function");
 		}
-	}
-	
-	private void removeFunctions() {
-		boolean[] toRemove = removeFunctionFrame.getRemovedFunctions();
-		
-		// if Cancel button was pressed
-		if(toRemove == null) return;
-		
-		// started with functionsNo functions before removal
-		int oldFunctionCount = functionCount;
-		
-		// for loop must be done in reverse because removing an element changes the indexes of the ones following it
-		for(int i = toRemove.length-1; i >= 0; i--)
-			if(toRemove[i]) {
-				Color color = graphicsDrawer.getFunctionColor(i);
-				colorStack.add(color);
-				graphicsDrawer.remove(i);
-				functionCount--;
-			}
-		
-		// checks if any functions were removed
-		if(oldFunctionCount > functionCount)
-			updateContents();
-		else
-			showErrorMessage("No functions were selected.");
-	}
-	
-	private void initSecondaryWindows() {
-		removeFunctionFrame = new RemoveFunctionFrame(this, "Remove Functions");
-		removeFunctionFrame.addWindowListener(this);
-		listFunctionsFrame = new ListFunctionsFrame(this, "Functions List");
-		listFunctionsFrame.addWindowListener(this);
 	}
 
 	@Override
@@ -196,7 +167,7 @@ public class GraphPlotterFrame extends JFrame implements ActionListener, WindowL
 		
 		if(e.getSource() == mfuncAdd) {		//TODO: verify if function is not duplicate
 			if(functionCount >= MAX_FUNCTIONS) {
-				showErrorMessage("Maximum functions limit reached. Remove a function before adding a new one.");
+				SwingFunctions.showErrorMessage(this, "Maximum functions limit reached. Remove a function before adding a new one.");
 				return;
 			}
 			
@@ -210,16 +181,16 @@ public class GraphPlotterFrame extends JFrame implements ActionListener, WindowL
 		
 		if(e.getSource() == mfuncRemove) {
 			if(functionCount == 0)
-				showErrorMessage("There are no functions to remove.");
+				SwingFunctions.showErrorMessage(this, "There are no functions to remove.");
 			else
-				removeFunctionFrame.showWindow(getFunctionExpressions());
+				removeFunctionFrame.showWindow();
 		}
 		
 		if(e.getSource() == mfuncList) {
 			if(functionCount == 0)
-				showErrorMessage("There are no functions to list.");
+				SwingFunctions.showErrorMessage(this, "There are no functions to list.");
 			else
-				listFunctionsFrame.showWindow(getFunctionExpressions(), getColorIds());
+				listFunctionsFrame.showWindow();
 		}
 		
 		if(e.getSource() == vwDefault) {
@@ -272,69 +243,6 @@ public class GraphPlotterFrame extends JFrame implements ActionListener, WindowL
 		
 	}
 	
-	private String[] getFunctionExpressions() {
-		String[] functionExpressions = new String[functionCount];
-		for(int i = 0; i < functionCount; i++)
-			functionExpressions[i] = graphicsDrawer.getFunctionExpression(i);
-		
-		return functionExpressions;
-	}
-	
-	private int[] getColorIds() {
-		int[] colorIds = new int[functionCount];
-		for(int i = 0; i < functionCount; i++)
-			colorIds[i] = colorIdsMap.get(graphicsDrawer.getFunctionColor(i));
-		return colorIds;
-	}
-
-	
-	// these WindowListener functions are listening to the secondary windows' window changes, not itself
-	
-	@Override
-	public void windowOpened(WindowEvent e) {
-		this.setEnabled(false);
-	}
-
-	// only activates when the X button is pressed
-	@Override
-	public void windowClosing(WindowEvent e) {
-		this.setEnabled(true);
-	}
-	
-	// setEnabled is done inside secondary window when button is pressed
-	@Override
-	public void windowClosed(WindowEvent e) {
-		String source = e.getSource().getClass().getSimpleName();
-		
-		switch(source) {
-		case("RemoveFunctionFrame"): removeFunctions(); break;
-		}
-	}
-
-	@Override
-	public void windowIconified(WindowEvent e) {}
-
-	@Override
-	public void windowDeiconified(WindowEvent e) {}
-
-	@Override
-	public void windowActivated(WindowEvent e) {}
-
-	@Override
-	public void windowDeactivated(WindowEvent e) {}
-	
-	// for some reason the frame must be set as non visible and then visible or be resized for its contents to be updated
-	// since changing visible values creates visual problems, this method resizes the frame
-	private void updateContents() {
-		Dimension size = this.getSize();
-		int width = size.width;
-		int height = size.height;
-		Dimension tempSize = new Dimension(width+1, height+1);
-		
-		this.setSize(tempSize);
-		this.setSize(size);
-	}
-	
 	// for some reason the frame's size does not match the graphic's size visually, even though the values are the same
 	// this function adjust the frame's size with a bias that makes it visually the same as the graphic's
 	private void adjustSize() {
@@ -344,7 +252,8 @@ public class GraphPlotterFrame extends JFrame implements ActionListener, WindowL
 		this.setSize(size);
 	}
 	
-	private void showErrorMessage(String message) {
-		JOptionPane.showMessageDialog(this, message, "Error", JOptionPane.ERROR_MESSAGE);
+	public static void main(String[] args) {
+		new GraphPlotterFrame();
 	}
+	
 }

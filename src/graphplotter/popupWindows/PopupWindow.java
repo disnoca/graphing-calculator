@@ -28,17 +28,8 @@ public abstract class PopupWindow extends JFrame implements ActionListener {
 	
 	private void setWidth(int width) {
 		Dimension size = this.getSize();
-		size.width = width;
+		size.width = Math.max(size.width, width);
 		this.setSize(size);
-	}
-	
-	protected void evenButtonsWidth(JButton b1, JButton b2) {
-		int width = Math.max(b1.getPreferredSize().width, b2.getPreferredSize().width);
-		int height = b1.getPreferredSize().height;
-		Dimension buttonsSize = new Dimension(width, height);
-		
-		b1.setPreferredSize(buttonsSize);
-		b2.setPreferredSize(buttonsSize);
 	}
 	
 }

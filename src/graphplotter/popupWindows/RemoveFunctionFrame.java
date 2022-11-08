@@ -1,12 +1,14 @@
 package graphplotter.popupWindows;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.util.ArrayList;
+import java.util.Stack;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -17,23 +19,28 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import graphplotter.SwingFunctions;
+import graphplotter.graphics.GraphicsDrawer;
+
 @SuppressWarnings("serial")
 public class RemoveFunctionFrame extends PopupWindow {
 	
 	private ArrayList<JCheckBox> checkboxes;
-	private boolean[] activeCheckboxes, functionsToRemove;
+	private boolean[] activeCheckboxes;
 	private JButton removeButton, cancelButton;
 	
+	private GraphicsDrawer graphicsDrawer;
+	private Stack<Color> colorStack;
 	
-	public RemoveFunctionFrame(JFrame parent, String title) {
+	
+	public RemoveFunctionFrame(JFrame parent, String title, GraphicsDrawer graphicsDrawer, Stack<Color> colorStack) {
 		super(parent, title);
 	}
 	
-	public void showWindow(String[] expressions) {	
+	public void showWindow() {
 		Container contentPane = getContentPane();
 		contentPane.removeAll();
-		addComponents(contentPane, expressions);
-		functionsToRemove = null;
+		addComponents(contentPane, graphicsDrawer.getFunctionExpressions());
 		
 		this.showWindow(300);
 	}
@@ -65,7 +72,7 @@ public class RemoveFunctionFrame extends PopupWindow {
 		contentPane.add(listPane, BorderLayout.CENTER);
 		contentPane.add(buttonPane, BorderLayout.PAGE_END);
 		
-		evenButtonsWidth(removeButton, cancelButton);
+		SwingFunctions.evenButtonsWidth(removeButton, cancelButton);
 	}
 	
 	private JPanel createCheckboxPane(String[] expressions) {
@@ -99,16 +106,30 @@ public class RemoveFunctionFrame extends PopupWindow {
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		
-		if(e.getSource() == removeButton) {
-			functionsToRemove = activeCheckboxes;
-		}
+		if(e.getSource() == removeButton)
+			removeFunctions();
 		
 		parent.setEnabled(true);
 		this.dispose();
 	}
 	
-	public boolean[] getRemovedFunctions() {
-		return functionsToRemove;
+	private void removeFunctions() {
+		boolean removed = false;
+		
+		// for loop must be done in reverse because removing an element changes the indexes of the ones following it
+		for(int i = activeCheckboxes.length-1; i >= 0; i--)
+			if(activeCheckboxes[i]) {
+				Color color = graphicsDrawer.getFunctionColor(i);
+				colorStack.add(color);
+				graphicsDrawer.remove(i);
+				removed = true;
+			}
+		
+		// checks if any functions were removed
+		if(removed)
+			SwingFunctions.updateFrameContents(parent);
+		else
+			SwingFunctions.showErrorMessage(this, "No functions were selected.");
 	}
 	
 }
