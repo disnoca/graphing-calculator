@@ -5,6 +5,7 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import java.util.Collections;
 
 import javax.swing.JComponent;
 
@@ -14,8 +15,8 @@ import functionComponents.Function;
 public class GraphicsDrawer extends JComponent {
 	
 	private Dimension size;
-	BufferedImage referentialGraphic;
-	ArrayList<FunctionGraphic> functionGraphics;
+	private BufferedImage referentialGraphic;
+	private ArrayList<FunctionGraphic> functionGraphics;
 	
 
 	public GraphicsDrawer(Dimension size) {
@@ -27,9 +28,21 @@ public class GraphicsDrawer extends JComponent {
 		referentialGraphic = new ReferentialGraphic(size);
 	}
 	
-	public void addFunctionGraphic(Function function) {
+	public void addFunction(Function function) {
 		FunctionGraphic functionGraphic = new FunctionGraphic(size, function);
 		functionGraphics.add(functionGraphic);
+	}
+	
+	public void removeFunction(int pos) {
+		functionGraphics.remove(pos);
+	}
+	
+	public void swapFunctions(int pos1, int pos2) {
+		Collections.swap(functionGraphics, pos1, pos2);
+	}
+	
+	public int getFunctionCount() {
+		return functionGraphics.size();
 	}
 	
 	@Override

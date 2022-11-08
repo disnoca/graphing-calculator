@@ -7,6 +7,7 @@ import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 import java.util.Stack;
 
@@ -35,17 +36,13 @@ public class RemoveFunctionFrame extends PopupWindow {
 	
 	public RemoveFunctionFrame(JFrame parent, String title, GraphicsDrawer graphicsDrawer, Stack<Color> colorStack) {
 		super(parent, title);
+		this.graphicsDrawer = graphicsDrawer;
+		this.colorStack = colorStack;
 	}
 	
-	public void showWindow() {
-		Container contentPane = getContentPane();
-		contentPane.removeAll();
-		addComponents(contentPane, graphicsDrawer.getFunctionExpressions());
+	protected void addComponents(Container contentPane) {
+		String[] expressions = graphicsDrawer.getFunctionExpressions();
 		
-		this.showWindow(300);
-	}
-	
-	private void addComponents(Container contentPane, String[] expressions) {
 		removeButton = new JButton("Remove");
 		removeButton.setFocusable(false);
 		removeButton.addActionListener(this);
@@ -102,34 +99,62 @@ public class RemoveFunctionFrame extends PopupWindow {
 		
 		return checkboxPane;
 	}
-
-	@Override
-	public void actionPerformed(ActionEvent e) {
-		
-		if(e.getSource() == removeButton)
-			removeFunctions();
-		
-		parent.setEnabled(true);
-		this.dispose();
-	}
 	
-	private void removeFunctions() {
+	// returns true if at least one function was removed
+	private boolean removeFunctions() {
 		boolean removed = false;
 		
 		// for loop must be done in reverse because removing an element changes the indexes of the ones following it
 		for(int i = activeCheckboxes.length-1; i >= 0; i--)
 			if(activeCheckboxes[i]) {
 				Color color = graphicsDrawer.getFunctionColor(i);
-				colorStack.add(color);
-				graphicsDrawer.remove(i);
+				colorStack.push(color);
+				graphicsDrawer.removeFunction(i);
 				removed = true;
 			}
 		
-		// checks if any functions were removed
 		if(removed)
 			SwingFunctions.updateFrameContents(parent);
 		else
 			SwingFunctions.showErrorMessage(this, "No functions were selected.");
+		
+		return removed;
 	}
+	
+	
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		// always closes window after a button is pressed unless user tried to remove no functions
+		// in which case exits this method and window remains open
+		if(e.getSource() == removeButton)
+			if(!removeFunctions())
+				return;
+		
+		parent.setEnabled(true);
+		this.dispose();
+	}
+	
+	@Override
+	public void windowOpened(WindowEvent e) {}
+
+	@Override
+	public void windowClosing(WindowEvent e) {
+		parent.setEnabled(true);
+	}
+
+	@Override
+	public void windowClosed(WindowEvent e) {}
+
+	@Override
+	public void windowIconified(WindowEvent e) {}
+
+	@Override
+	public void windowDeiconified(WindowEvent e) {}
+
+	@Override
+	public void windowActivated(WindowEvent e) {}
+
+	@Override
+	public void windowDeactivated(WindowEvent e) {}
 	
 }

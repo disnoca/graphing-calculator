@@ -16,6 +16,7 @@ import javax.swing.JOptionPane;
 import functionComponents.Function;
 import graphplotter.graphics.GraphicsDrawer;
 import graphplotter.popupWindows.ListFunctionsFrame;
+import graphplotter.popupWindows.PopupWindow;
 import graphplotter.popupWindows.RemoveFunctionFrame;
 
 @SuppressWarnings("serial")
@@ -30,16 +31,13 @@ public class GraphPlotterFrame extends JFrame implements ActionListener {
 	private Dimension graphicsSize;
 	private GraphicsDrawer graphicsDrawer;
 	
-	private RemoveFunctionFrame removeFunctionFrame;
-	private ListFunctionsFrame listFunctionsFrame;
+	private PopupWindow removeFunctionFrame, listFunctionsFrame;
 	
 	private final int MAX_FUNCTIONS = 6;
 	
 	private final Color[] functionColors = {Color.BLUE, Color.RED, Color.GREEN, Color.CYAN, Color.MAGENTA, Color.ORANGE};
 	private Stack<Color> colorStack;
 	private HashMap<Color, Integer> colorIdsMap;
-	
-	private int functionCount;
 	
 
 	public GraphPlotterFrame() {
@@ -49,7 +47,6 @@ public class GraphPlotterFrame extends JFrame implements ActionListener {
 	    this.setResizable(false);
 	    
 	    graphicsSize = new Dimension(900,900);
-	    functionCount = 0;
 	    
 	    initFunctionColors();
 		addMenuBar();
@@ -71,11 +68,6 @@ public class GraphPlotterFrame extends JFrame implements ActionListener {
 			colorStack.push(functionColors[MAX_FUNCTIONS-1-i]);
 			colorIdsMap.put(functionColors[i], i);
 		}
-	}
-	
-	private void initSecondaryWindows() {
-		removeFunctionFrame = new RemoveFunctionFrame(this, "Remove Functions", graphicsDrawer, colorStack);
-		listFunctionsFrame = new ListFunctionsFrame(this, "Functions List");
 	}
 	
 	private void addMenuBar() {
@@ -147,12 +139,16 @@ public class GraphPlotterFrame extends JFrame implements ActionListener {
 		this.add(graphicsDrawer);
 	}
 	
+	private void initSecondaryWindows() {
+		removeFunctionFrame = new RemoveFunctionFrame(this, "Remove Functions", graphicsDrawer, colorStack);
+		listFunctionsFrame = new ListFunctionsFrame(this, "Functions List", graphicsDrawer, colorIdsMap);
+	}
+	
 	private void addFunction(String expression) {
 		try {
 			Color color = colorStack.pop();
 			Function function = new Function(graphicsSize, expression, color);
-			graphicsDrawer.addFunctionGraphic(function);
-			functionCount++;
+			graphicsDrawer.addFunction(function);
 			SwingFunctions.updateFrameContents(this);
 		}
 		
@@ -166,7 +162,7 @@ public class GraphPlotterFrame extends JFrame implements ActionListener {
 	public void actionPerformed(ActionEvent e) {
 		
 		if(e.getSource() == mfuncAdd) {		//TODO: verify if function is not duplicate
-			if(functionCount >= MAX_FUNCTIONS) {
+			if(graphicsDrawer.getFunctionCount() >= MAX_FUNCTIONS) {
 				SwingFunctions.showErrorMessage(this, "Maximum functions limit reached. Remove a function before adding a new one.");
 				return;
 			}
@@ -180,14 +176,14 @@ public class GraphPlotterFrame extends JFrame implements ActionListener {
 		}
 		
 		if(e.getSource() == mfuncRemove) {
-			if(functionCount == 0)
+			if(graphicsDrawer.getFunctionCount() == 0)
 				SwingFunctions.showErrorMessage(this, "There are no functions to remove.");
 			else
 				removeFunctionFrame.showWindow();
 		}
 		
 		if(e.getSource() == mfuncList) {
-			if(functionCount == 0)
+			if(graphicsDrawer.getFunctionCount() == 0)
 				SwingFunctions.showErrorMessage(this, "There are no functions to list.");
 			else
 				listFunctionsFrame.showWindow();
