@@ -11,13 +11,12 @@ import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
 
-import functionComponents.Function;
 import graphplotter.graphics.GraphicsDrawer;
-import graphplotter.popupWindows.ListFunctionsFrame;
+import graphplotter.popupWindows.AddFunctionWindow;
+import graphplotter.popupWindows.ListFunctionsWindow;
 import graphplotter.popupWindows.PopupWindow;
-import graphplotter.popupWindows.RemoveFunctionFrame;
+import graphplotter.popupWindows.RemoveFunctionWindow;
 
 @SuppressWarnings("serial")
 public class GraphPlotterFrame extends JFrame implements ActionListener {
@@ -31,7 +30,7 @@ public class GraphPlotterFrame extends JFrame implements ActionListener {
 	private Dimension graphicsSize;
 	private GraphicsDrawer graphicsDrawer;
 	
-	private PopupWindow removeFunctionFrame, listFunctionsFrame;
+	private PopupWindow addFunctionWindow, removeFunctionWindow, listFunctionsWindow;
 	
 	private final int MAX_FUNCTIONS = 6;
 	
@@ -140,53 +139,33 @@ public class GraphPlotterFrame extends JFrame implements ActionListener {
 	}
 	
 	private void initSecondaryWindows() {
-		removeFunctionFrame = new RemoveFunctionFrame(this, "Remove Functions", graphicsDrawer, colorStack);
-		listFunctionsFrame = new ListFunctionsFrame(this, "Functions List", graphicsDrawer, colorIdsMap);
-	}
-	
-	private void addFunction(String expression) {
-		try {
-			Color color = colorStack.pop();
-			Function function = new Function(graphicsSize, expression, color);
-			graphicsDrawer.addFunction(function);
-			SwingFunctions.updateFrameContents(this);
-		}
-		
-		// exception caught if expression has unknown symbols or is an empty string
-		catch(IllegalArgumentException e) {
-			SwingFunctions.showErrorMessage(this, "Invalid function");
-		}
+		addFunctionWindow = new AddFunctionWindow(this, "Add Function", graphicsDrawer, colorStack, graphicsSize);
+		removeFunctionWindow = new RemoveFunctionWindow(this, "Remove Functions", graphicsDrawer, colorStack);
+		listFunctionsWindow = new ListFunctionsWindow(this, "Functions List", graphicsDrawer, colorIdsMap);
 	}
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		
 		if(e.getSource() == mfuncAdd) {		//TODO: verify if function is not duplicate
-			if(graphicsDrawer.getFunctionCount() >= MAX_FUNCTIONS) {
+			if(graphicsDrawer.getFunctionCount() >= MAX_FUNCTIONS)
 				SwingFunctions.showErrorMessage(this, "Maximum functions limit reached. Remove a function before adding a new one.");
-				return;
-			}
-			
-			// gets user input
-			String expression = (String)JOptionPane.showInputDialog(this ,"Enter the function's expression:", "Add Function", JOptionPane.PLAIN_MESSAGE);
-			
-			// expression is null if user pressed Cancel or closed pop-up, in which case does nothing
-			if(expression != null)
-				this.addFunction(expression);
+			else
+				addFunctionWindow.showWindow();
 		}
 		
 		if(e.getSource() == mfuncRemove) {
 			if(graphicsDrawer.getFunctionCount() == 0)
 				SwingFunctions.showErrorMessage(this, "There are no functions to remove.");
 			else
-				removeFunctionFrame.showWindow();
+				removeFunctionWindow.showWindow();
 		}
 		
 		if(e.getSource() == mfuncList) {
 			if(graphicsDrawer.getFunctionCount() == 0)
 				SwingFunctions.showErrorMessage(this, "There are no functions to list.");
 			else
-				listFunctionsFrame.showWindow();
+				listFunctionsWindow.showWindow();
 		}
 		
 		if(e.getSource() == vwDefault) {

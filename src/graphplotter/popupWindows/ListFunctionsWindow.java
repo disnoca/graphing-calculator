@@ -23,7 +23,7 @@ import graphplotter.SwingFunctions;
 import graphplotter.graphics.GraphicsDrawer;
 
 @SuppressWarnings("serial")
-public class ListFunctionsFrame extends PopupWindow {
+public class ListFunctionsWindow extends PopupWindow {
 	
 	private ArrayList<JButton> upButtons;
 	private ArrayList<JButton> downButtons;
@@ -36,7 +36,7 @@ public class ListFunctionsFrame extends PopupWindow {
 	private boolean swaped;
 	
 	
-	public ListFunctionsFrame(JFrame parent, String title, GraphicsDrawer graphicsDrawer, HashMap<Color,Integer> colorIdsMap) {
+	public ListFunctionsWindow(JFrame parent, String title, GraphicsDrawer graphicsDrawer, HashMap<Color,Integer> colorIdsMap) {
 		super(parent, title);
 		this.graphicsDrawer = graphicsDrawer;
 		this.colorIdsMap = colorIdsMap;
@@ -131,6 +131,13 @@ public class ListFunctionsFrame extends PopupWindow {
 		return colorIds;
 	}
 
+	private void swapFunctions(int pos1, int pos2) {
+		graphicsDrawer.swapFunctions(pos1, pos2);
+		super.resetContainer();
+		SwingFunctions.updateFrameContents(this);
+	}
+	
+	
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		swaped = true;
@@ -146,20 +153,7 @@ public class ListFunctionsFrame extends PopupWindow {
 		}
 		
 	}
-	
-	private void swapFunctions(int pos1, int pos2) {
-		graphicsDrawer.swapFunctions(pos1, pos2);
-		super.resetContainer();
-		SwingFunctions.updateFrameContents(this);
-	}
 
-	@Override
-	public void windowOpened(WindowEvent e) {}
-
-	@Override
-	public void windowClosing(WindowEvent e) {
-		parent.setEnabled(true);
-	}
 
 	@Override
 	public void windowClosed(WindowEvent e) {
@@ -167,16 +161,4 @@ public class ListFunctionsFrame extends PopupWindow {
 			SwingFunctions.updateFrameContents(parent);
 	}
 
-	@Override
-	public void windowIconified(WindowEvent e) {}
-
-	@Override
-	public void windowDeiconified(WindowEvent e) {}
-
-	@Override
-	public void windowActivated(WindowEvent e) {}
-
-	@Override
-	public void windowDeactivated(WindowEvent e) {}
-	
 }

@@ -7,7 +7,6 @@ import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 import java.util.Stack;
 
@@ -24,17 +23,17 @@ import graphplotter.SwingFunctions;
 import graphplotter.graphics.GraphicsDrawer;
 
 @SuppressWarnings("serial")
-public class RemoveFunctionFrame extends PopupWindow {
+public class RemoveFunctionWindow extends PopupWindow {
 	
 	private ArrayList<JCheckBox> checkboxes;
 	private boolean[] activeCheckboxes;
-	private JButton removeButton, cancelButton;
+	private JButton removeButton;
 	
 	private GraphicsDrawer graphicsDrawer;
 	private Stack<Color> colorStack;
 	
 	
-	public RemoveFunctionFrame(JFrame parent, String title, GraphicsDrawer graphicsDrawer, Stack<Color> colorStack) {
+	public RemoveFunctionWindow(JFrame parent, String title, GraphicsDrawer graphicsDrawer, Stack<Color> colorStack) {
 		super(parent, title);
 		this.graphicsDrawer = graphicsDrawer;
 		this.colorStack = colorStack;
@@ -46,7 +45,7 @@ public class RemoveFunctionFrame extends PopupWindow {
 		removeButton = new JButton("Remove");
 		removeButton.setFocusable(false);
 		removeButton.addActionListener(this);
-		cancelButton = new JButton("Cancel");
+		JButton cancelButton = new JButton("Cancel");
 		cancelButton.setFocusable(false);
 		cancelButton.addActionListener(this);
 		
@@ -133,28 +132,5 @@ public class RemoveFunctionFrame extends PopupWindow {
 		parent.setEnabled(true);
 		this.dispose();
 	}
-	
-	@Override
-	public void windowOpened(WindowEvent e) {}
-
-	@Override
-	public void windowClosing(WindowEvent e) {
-		parent.setEnabled(true);
-	}
-
-	@Override
-	public void windowClosed(WindowEvent e) {}
-
-	@Override
-	public void windowIconified(WindowEvent e) {}
-
-	@Override
-	public void windowDeiconified(WindowEvent e) {}
-
-	@Override
-	public void windowActivated(WindowEvent e) {}
-
-	@Override
-	public void windowDeactivated(WindowEvent e) {}
 	
 }

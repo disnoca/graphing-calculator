@@ -3,6 +3,7 @@ package graphplotter.popupWindows;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 
 import javax.swing.JFrame;
@@ -43,5 +44,29 @@ public abstract class PopupWindow extends JFrame implements ActionListener, Wind
 		size.width = Math.max(size.width, width);
 		this.setSize(size);
 	}
+	
+	
+	@Override
+	public void windowOpened(WindowEvent e) {}
+
+	@Override
+	public void windowClosing(WindowEvent e) {
+		parent.setEnabled(true);
+	}
+
+	@Override
+	public void windowClosed(WindowEvent e) {}
+
+	@Override
+	public void windowIconified(WindowEvent e) {}
+
+	@Override
+	public void windowDeiconified(WindowEvent e) {}
+
+	@Override
+	public void windowActivated(WindowEvent e) {}
+
+	@Override
+	public void windowDeactivated(WindowEvent e) {}
 	
 }
