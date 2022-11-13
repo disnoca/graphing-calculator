@@ -5,6 +5,7 @@ import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
+import java.util.EmptyStackException;
 import java.util.Stack;
 
 import javax.swing.BorderFactory;
@@ -18,6 +19,7 @@ import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 
 import functionComponents.Function;
+import graphplotter.GraphPlotterFrame;
 import graphplotter.SwingFunctions;
 import graphplotter.graphics.GraphicsDrawer;
 import net.objecthunter.exp4j.tokenizer.UnknownFunctionOrVariableException;
@@ -30,14 +32,12 @@ public class AddFunctionWindow extends PopupWindow {
 	
 	private GraphicsDrawer graphicsDrawer;
 	private Stack<Color> colorStack;
-	private Dimension graphicsSize;
 	
 	
-	public AddFunctionWindow(JFrame parent, String title, GraphicsDrawer graphicsDrawer, Stack<Color> colorStack, Dimension graphicsSize) {
+	public AddFunctionWindow(JFrame parent, String title, GraphicsDrawer graphicsDrawer, Stack<Color> colorStack) {
 		super(parent, title);
 		this.graphicsDrawer = graphicsDrawer;
 		this.colorStack = colorStack;
-		this.graphicsSize = graphicsSize;
 	}
 	
 	@Override
@@ -78,7 +78,8 @@ public class AddFunctionWindow extends PopupWindow {
 	
 	
 	private void addFunction(String expression) {
-		Function function = new Function(graphicsSize, expression);
+		Dimension size = ((GraphPlotterFrame) parent).drawingAreaSize();
+		Function function = new Function(size, expression);
 		graphicsDrawer.addFunction(function, colorStack.pop());
 		SwingFunctions.updateFrameContents(parent);
 	}
@@ -94,7 +95,10 @@ public class AddFunctionWindow extends PopupWindow {
 			} catch(UnknownFunctionOrVariableException e1) {
 				SwingFunctions.showErrorMessage(this, "Invalid function");
 				return;
-			} catch(IllegalArgumentException e2) {
+			}	catch(EmptyStackException e2) {
+				SwingFunctions.showErrorMessage(this, "Check the number of parentheses");
+				return;
+			} catch(IllegalArgumentException e3) {
 				SwingFunctions.showErrorMessage(this, "Please enter a function");
 				return;
 			}

@@ -29,7 +29,6 @@ public class GraphPlotterFrame extends JFrame implements ActionListener {
 	private JMenuItem vwDefault, vwSetValues, vwZoomIn, vwZoomOut;
 	private JMenuItem gsRoot, gsMax, gsMin, gsYIntersect, gsIntersect, gsYCalc, gsXCalc, gsIntegral;
 	
-	private Dimension graphicsSize;
 	private GraphicsDrawer graphicsDrawer;
 	
 	private PopupWindow addFunctionWindow, removeFunctionWindow, listFunctionsWindow;
@@ -48,7 +47,6 @@ public class GraphPlotterFrame extends JFrame implements ActionListener {
 	    this.setResizable(false);	// to change once I find how to only resize after mouse released
 	    this.setSize(1000,1000);
 	    
-	    graphicsSize = getActualSize();
 	    initFunctionColors();
 		addMenuBar();
 		initGraphics();
@@ -56,8 +54,7 @@ public class GraphPlotterFrame extends JFrame implements ActionListener {
 		
 		this.addComponentListener(new ComponentAdapter() {
 		    public void componentResized(ComponentEvent componentEvent) {
-		    	graphicsSize = getActualSize();
-		        graphicsDrawer.recalculateFrameSize(graphicsSize);
+		        graphicsDrawer.recalculateFrameSize(drawingAreaSize());
 		    }
 		});
 		
@@ -140,13 +137,13 @@ public class GraphPlotterFrame extends JFrame implements ActionListener {
 	}
 	
 	private void initGraphics() {
-		graphicsDrawer = new GraphicsDrawer(graphicsSize);
+		graphicsDrawer = new GraphicsDrawer(drawingAreaSize());
 		graphicsDrawer.setReferentialGraphic();
 		this.add(graphicsDrawer);
 	}
 	
 	private void initSecondaryWindows() {
-		addFunctionWindow = new AddFunctionWindow(this, "Add Function", graphicsDrawer, colorStack, graphicsSize);
+		addFunctionWindow = new AddFunctionWindow(this, "Add Function", graphicsDrawer, colorStack);
 		removeFunctionWindow = new RemoveFunctionWindow(this, "Remove Functions", graphicsDrawer, colorStack);
 		listFunctionsWindow = new ListFunctionsWindow(this, "Functions List", graphicsDrawer, colorIdsMap);
 	}
@@ -225,9 +222,7 @@ public class GraphPlotterFrame extends JFrame implements ActionListener {
 		
 	}
 	
-	// for some reason the frame's size does not match the graphic's size visually, even though the values are the same
-	// this function adjust the frame's size with a bias that makes it visually the same as the graphic's
-	private Dimension getActualSize() {
+	public Dimension drawingAreaSize() {
 		Dimension size = this.getSize();
 		size.width -= 21;
 		size.height -= 63;
