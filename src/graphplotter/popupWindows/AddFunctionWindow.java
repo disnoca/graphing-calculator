@@ -42,13 +42,14 @@ public class AddFunctionWindow extends PopupWindow {
 	
 	@Override
 	protected void addComponents(Container contentPane) {
-		textField = new JTextField();
-		
 		addButton = new JButton("Add");
 		addButton.setFocusable(false);
 		addButton.addActionListener(this);
-		addButton.getInputMap().put(KeyStroke.getKeyStroke("released ENTER"), "enter");		// not working
-		addButton.getActionMap().put("enter", new SimulateButtonPressAction(addButton));
+		
+		textField = new JTextField();
+		// when textField is selected and user presses enter, Add button is automatically clicked
+		textField.getInputMap().put(KeyStroke.getKeyStroke("pressed ENTER"), "enter");
+		textField.getActionMap().put("enter", new SimulateButtonPressAction(addButton));
 		
 		JButton cancelButton = new JButton("Cancel");
 		cancelButton.setFocusable(false);
@@ -77,9 +78,8 @@ public class AddFunctionWindow extends PopupWindow {
 	
 	
 	private void addFunction(String expression) {
-		Color color = colorStack.pop();
-		Function function = new Function(graphicsSize, expression, color);
-		graphicsDrawer.addFunction(function);
+		Function function = new Function(graphicsSize, expression);
+		graphicsDrawer.addFunction(function, colorStack.pop());
 		SwingFunctions.updateFrameContents(parent);
 	}
 	

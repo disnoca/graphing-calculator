@@ -13,19 +13,22 @@ import functionComponents.Point;
 public class FunctionGraphic extends BufferedImage {
 	
 	private Graphics2D g2d;
+	private Color color;
 	private Function function;
 	
 	
-	public FunctionGraphic(Dimension size, Function function) {
+	public FunctionGraphic(Dimension size, Function function, Color color) {
 		super(size.width, size.height, BufferedImage.TYPE_INT_ARGB);
 		this.function = function;
+		this.color = color;
+		
 		g2d = this.createGraphics();
 		drawFunction();
 	}
 	
 	public void drawFunction() {
 		g2d.setStroke(new BasicStroke(2));
-		g2d.setColor(function.getColor());
+		g2d.setColor(color);
 
 		Polygon pol = new Polygon();
 		ArrayList<Point> points = function.getPoints();
@@ -38,7 +41,11 @@ public class FunctionGraphic extends BufferedImage {
 	}
 
 	public Color getColor() {
-		return function.getColor();
+		return color;
+	}
+	
+	public Function getFunction() {
+		return function;
 	}
 	
 }

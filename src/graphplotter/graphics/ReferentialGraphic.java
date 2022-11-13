@@ -52,8 +52,6 @@ public class ReferentialGraphic extends BufferedImage {
 		}
 		
 		g2d.setFont(new Font("", Font.PLAIN, 20));
-		g2d.drawString("X", width-20, height/2-10);
-		g2d.drawString("Y", width/2+10, 20);
 	}
 	
 }

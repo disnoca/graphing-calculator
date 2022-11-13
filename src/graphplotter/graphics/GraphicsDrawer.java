@@ -28,8 +28,8 @@ public class GraphicsDrawer extends JComponent {
 		referentialGraphic = new ReferentialGraphic(size);
 	}
 	
-	public void addFunction(Function function) {
-		FunctionGraphic functionGraphic = new FunctionGraphic(size, function);
+	public void addFunction(Function function, Color color) {
+		FunctionGraphic functionGraphic = new FunctionGraphic(size, function, color);
 		functionGraphics.add(functionGraphic);
 	}
 	
@@ -67,6 +67,13 @@ public class GraphicsDrawer extends JComponent {
 		for(int i = 0; i < functionGraphics.size(); i++)
 			functionExpressions[i] = functionGraphics.get(i).getExpression();
 		return functionExpressions;
+	}
+	
+	public void recalculateFrameSize(Dimension size) {
+		this.size = size;
+		setReferentialGraphic();
+		
+		// todo redraw functions
 	}
 	
 }

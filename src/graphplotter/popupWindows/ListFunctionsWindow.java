@@ -73,12 +73,14 @@ public class ListFunctionsWindow extends PopupWindow {
 		buttonPane.setLayout(new BoxLayout(buttonPane, BoxLayout.PAGE_AXIS));
 		buttonPane.add(Box.createRigidArea(new Dimension(0,25)));
 		
+		// The expressions and colors must be listed in reverse because the functions that are listed first are the functions that are drawn last.
+		// This would confuse the user, therefore we want to make it so that the higher the function is in the list, the more on top of other layers it is.
 		for(int i = 0; i < expressions.length; i++) {
 			// create color and expression labels
-			String filename = "assets\\color"+colorIds[i]+".jpg";
+			String filename = "assets\\color"+colorIds[colorIds.length-i-1]+".jpg";
 			ImageIcon icon = new ImageIcon(filename);
 			JLabel imageLabel = new JLabel(icon);
-			JLabel expressionLabel = new JLabel(expressions[i]);
+			JLabel expressionLabel = new JLabel(expressions[expressions.length-i-1]);
 			
 			JPanel expressionPane = new JPanel();
 			expressionPane.add(imageLabel);
@@ -142,14 +144,15 @@ public class ListFunctionsWindow extends PopupWindow {
 	public void actionPerformed(ActionEvent e) {
 		swaped = true;
 		
+		// Since the functions are listed in reverse, we need to reverse their positions again to the actual function's position in order to switch them correctly
 		if(upButtons.contains(e.getSource())) {
-			int pos = upButtons.indexOf(e.getSource());
-			swapFunctions(pos, pos-1);
+			int pos = graphicsDrawer.getFunctionCount()-upButtons.indexOf(e.getSource())-1;
+			swapFunctions(pos, pos+1);
 		}
 		
 		if(downButtons.contains(e.getSource())) {
-			int pos = downButtons.indexOf(e.getSource());
-			swapFunctions(pos, pos+1);
+			int pos = graphicsDrawer.getFunctionCount()-downButtons.indexOf(e.getSource())-1;
+			swapFunctions(pos, pos-1);
 		}
 		
 	}

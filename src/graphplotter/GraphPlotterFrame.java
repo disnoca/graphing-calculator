@@ -2,6 +2,8 @@ package graphplotter;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.util.HashMap;
@@ -43,17 +45,22 @@ public class GraphPlotterFrame extends JFrame implements ActionListener {
 		super("Graph Plotter");
 	    this.setTitle("Graph Plotter");
 	    this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-	    this.setResizable(false);
+	    this.setResizable(true);
+	    this.setSize(1000,1000);
 	    
-	    graphicsSize = new Dimension(900,900);
-	    
+	    graphicsSize = getActualSize();
 	    initFunctionColors();
 		addMenuBar();
 		initGraphics();
 		initSecondaryWindows();
 		
-		this.setSize(graphicsSize);
-		adjustSize();
+		this.addComponentListener(new ComponentAdapter() {
+		    public void componentResized(ComponentEvent componentEvent) {
+		    	graphicsSize = getActualSize();
+		        graphicsDrawer.recalculateFrameSize(graphicsSize);
+		    }
+		});
+		
 		this.setLocationRelativeTo(null);
 		this.setVisible(true);
 	}
@@ -220,11 +227,11 @@ public class GraphPlotterFrame extends JFrame implements ActionListener {
 	
 	// for some reason the frame's size does not match the graphic's size visually, even though the values are the same
 	// this function adjust the frame's size with a bias that makes it visually the same as the graphic's
-	private void adjustSize() {
+	private Dimension getActualSize() {
 		Dimension size = this.getSize();
-		size.width += 21;
-		size.height += 63;
-		this.setSize(size);
+		size.width -= 21;
+		size.height -= 63;
+		return size;
 	}
 	
 	public static void main(String[] args) {
