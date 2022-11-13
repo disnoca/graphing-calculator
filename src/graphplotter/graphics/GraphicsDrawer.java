@@ -47,6 +47,7 @@ public class GraphicsDrawer extends JComponent {
 	
 	@Override
     public void paintComponent(Graphics g){
+		super.paintComponent(g);
 		// referential is always the bottom layer
 		g.drawImage(referentialGraphic, 0, 0, size.width, size.height, null);
 		
@@ -73,7 +74,15 @@ public class GraphicsDrawer extends JComponent {
 		this.size = size;
 		setReferentialGraphic();
 		
-		// todo redraw functions
+		ArrayList<FunctionGraphic> temp = new ArrayList<>(functionGraphics.size());
+		for(FunctionGraphic fg: functionGraphics) {
+			Function f = fg.getFunction();
+			Color c = fg.getColor();
+			f.recalculateFrameSize(size);
+			temp.add(new FunctionGraphic(size, f, c));
+		}
+		
+		functionGraphics = temp;
 	}
 	
 }

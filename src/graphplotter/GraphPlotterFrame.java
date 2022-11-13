@@ -45,7 +45,7 @@ public class GraphPlotterFrame extends JFrame implements ActionListener {
 		super("Graph Plotter");
 	    this.setTitle("Graph Plotter");
 	    this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-	    this.setResizable(true);
+	    this.setResizable(false);	// to change once I find how to only resize after mouse released
 	    this.setSize(1000,1000);
 	    
 	    graphicsSize = getActualSize();
