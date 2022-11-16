@@ -9,8 +9,11 @@ import java.util.ArrayList;
 
 import functionComponents.Function;
 import functionComponents.Point;
+import graphplotter.GraphPlotterFrame;
 
 public class FunctionGraphic extends BufferedImage {
+	
+	private double minX, maxX, minY, maxY;
 	
 	private Graphics2D g2d;
 	private Color color;
@@ -22,6 +25,11 @@ public class FunctionGraphic extends BufferedImage {
 		this.function = function;
 		this.color = color;
 		
+		minX = GraphPlotterFrame.STARTING_MINX;
+		maxX = GraphPlotterFrame.STARTING_MAXX;
+		minY = GraphPlotterFrame.STARTING_MINY;
+		maxY = GraphPlotterFrame.STARTING_MAXY;
+		
 		g2d = this.createGraphics();
 		drawFunction();
 	}
@@ -32,7 +40,10 @@ public class FunctionGraphic extends BufferedImage {
 
 		Polygon pol = new Polygon();
 		ArrayList<Point> points = function.getPoints();
-		points.forEach(point -> pol.addPoint(point.getXFrameCoord(-10, 10), point.getYFrameCoord(-10, 10)));
+		
+		for(Point point : points)
+			pol.addPoint(point.getXFrameCoord(minX, maxX), point.getYFrameCoord(minY, maxY));
+			
 		g2d.drawPolyline(pol.xpoints, pol.ypoints, pol.npoints);
 	}
 	

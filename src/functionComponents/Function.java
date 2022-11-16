@@ -3,25 +3,29 @@ package functionComponents;
 import java.awt.Dimension;
 import java.util.ArrayList;
 
+import graphplotter.GraphPlotterFrame;
 import net.objecthunter.exp4j.Expression;
 import net.objecthunter.exp4j.ExpressionBuilder;
 
 public class Function {
 	
 	private int width, height;
-	private int minX, maxX;
+	private double minX, maxX;
 	private String expression;
 	private Expression function;
 	
 	private ArrayList<Point> points;
-	private final double ACCURACY = 20000;
+	
+	// determines how fluid is the function's drawing
+	// setting it any higher than this can cause significant loading times
+	private final double ACCURACY = 20000;	
 	
 
 	public Function(Dimension size, String expression) {
 		this.width = size.width;
 		this.height = size.height;
-		this.minX = -10;
-		this.maxX = 10;
+		this.minX = GraphPlotterFrame.STARTING_MINY;
+		this.maxX = GraphPlotterFrame.STARTING_MAXY;
 		
 		this.expression = expression;
 		this.function = new ExpressionBuilder(expression).variable("x").build();

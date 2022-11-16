@@ -23,6 +23,11 @@ import graphplotter.popupWindows.RemoveFunctionWindow;
 @SuppressWarnings("serial")
 public class GraphPlotterFrame extends JFrame implements ActionListener {
 	
+	public final static double STARTING_MINX = -10;
+	public final static double STARTING_MAXX = 10;
+	public final static double STARTING_MINY = -10;
+	public final static double STARTING_MAXY = 10;
+	
 	private JMenuBar menubar;
 	private JMenu menuFunc, menuVW, menuGS;
 	private JMenuItem mfuncAdd, mfuncRemove, mfuncList;
@@ -44,7 +49,7 @@ public class GraphPlotterFrame extends JFrame implements ActionListener {
 		super("Graph Plotter");
 	    this.setTitle("Graph Plotter");
 	    this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-	    this.setResizable(false);	// to change once I find how to only resize after mouse released
+	    this.setResizable(false);	// TODO: change to true once I find how to only resize after mouse released
 	    this.setSize(1000,1000);
 	    
 	    initFunctionColors();

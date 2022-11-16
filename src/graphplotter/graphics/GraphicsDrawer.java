@@ -70,6 +70,7 @@ public class GraphicsDrawer extends JComponent {
 		return functionExpressions;
 	}
 	
+	
 	public void recalculateFrameSize(Dimension size) {
 		this.size = size;
 		setReferentialGraphic();
