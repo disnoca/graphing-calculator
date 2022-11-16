@@ -14,7 +14,7 @@ public class Function {
 	private Expression function;
 	
 	private ArrayList<Point> points;
-	private final double ACCURACY = 0.001;
+	private final double ACCURACY = 20000;
 	
 
 	public Function(Dimension size, String expression) {
@@ -34,10 +34,12 @@ public class Function {
 	}
 	
 	private void computeFunction() {
-		int pointCount = (int) Math.ceil((maxX-minX)/ACCURACY);
+		double step = (maxX-minX)/ACCURACY;
+		int pointCount = (int) Math.ceil((maxX-minX)/step);
+		
 		points = new ArrayList<>(pointCount);
 		
-		for(double i=minX; i<=maxX; i+=ACCURACY)
+		for(double i=minX; i<=maxX; i+=step)
 			points.add(new Point(i, f(i), width, height));
 	}
 	
