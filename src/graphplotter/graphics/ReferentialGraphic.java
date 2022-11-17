@@ -49,7 +49,10 @@ public class ReferentialGraphic extends BufferedImage {
 	}
 	
 	private void drawReferenceLines() {
-		for(int i=minX; i<=maxX; i++) {
+		int xStep = (maxX-minX)/10;	//TODO: optimize for doubles
+		int yStep = (maxY-minY)/10;
+		
+		for(int i=minX; i<=maxX; i+=xStep) {
 			if(i == 0) continue;
 			
 			Point p = new Point(i, 0, width, height);
@@ -59,7 +62,7 @@ public class ReferentialGraphic extends BufferedImage {
 			g2d.drawString(String.valueOf(i), xFrameCoord-5, yFrameCoord+20);
 		}
 		
-		for(int i=minY; i<=maxY; i++) {
+		for(int i=minY; i<=maxY; i+=yStep) {
 			if(i == 0) continue;
 			
 			Point p = new Point(0, i, width, height);

@@ -23,8 +23,8 @@ import graphplotter.popupWindows.RemoveFunctionWindow;
 @SuppressWarnings("serial")
 public class GraphPlotterFrame extends JFrame implements ActionListener {
 	
-	public final static double STARTING_MINX = -10;
-	public final static double STARTING_MAXX = 10;
+	public final static double STARTING_MINX = -256;
+	public final static double STARTING_MAXX = 256;
 	public final static double STARTING_MINY = -10;
 	public final static double STARTING_MAXY = 10;
 	
