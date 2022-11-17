@@ -29,10 +29,10 @@ public class ReferentialGraphic extends BufferedImage {
 		this.height = this.getHeight();
 		g2d = this.createGraphics();
 		
-		minX = (int) Math.ceil(minX);
-		maxX = (int) Math.floor(maxX);
-		minY = (int) Math.ceil(minY);
-		maxY = (int) Math.floor(maxY);
+		this.minX = (int) Math.ceil(minX);
+		this.maxX = (int) Math.floor(maxX);
+		this.minY = (int) Math.ceil(minY);
+		this.maxY = (int) Math.floor(maxY);
 		
 		drawReferential();
 	}
