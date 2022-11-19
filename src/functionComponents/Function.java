@@ -3,14 +3,13 @@ package functionComponents;
 import java.awt.Dimension;
 import java.util.ArrayList;
 
-import graphplotter.GraphPlotterFrame;
 import net.objecthunter.exp4j.Expression;
 import net.objecthunter.exp4j.ExpressionBuilder;
 
 public class Function {
 	
 	private int width, height;
-	private double minX, maxX;
+	private ReferentialLimits referentialLimits;
 	private String expression;
 	private Expression function;
 	
@@ -21,11 +20,10 @@ public class Function {
 	private final double ACCURACY = 20000;	
 	
 
-	public Function(Dimension size, String expression) {
+	public Function(Dimension size, ReferentialLimits referentialLimits, String expression) {
 		this.width = size.width;
 		this.height = size.height;
-		this.minX = GraphPlotterFrame.STARTING_MINY;
-		this.maxX = GraphPlotterFrame.STARTING_MAXY;
+		this.referentialLimits = referentialLimits;
 		
 		this.expression = expression;
 		this.function = new ExpressionBuilder(expression).variable("x").build();
@@ -38,12 +36,13 @@ public class Function {
 	}
 	
 	private void computeFunction() {
-		double step = (maxX-minX)/ACCURACY;
-		int pointCount = (int) Math.ceil((maxX-minX)/step);
+		double xLength = referentialLimits.getXLength();
+		double step = xLength/ACCURACY;
+		int pointCount = (int) Math.ceil(xLength/step);
 		
 		points = new ArrayList<>(pointCount);
 		
-		for(double i=minX; i<=maxX; i+=step)
+		for(double i=referentialLimits.getXMin(); i<=referentialLimits.getXMax(); i+=step)
 			points.add(new Point(i, f(i), width, height));
 	}
 	

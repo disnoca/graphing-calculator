@@ -9,26 +9,21 @@ import java.util.ArrayList;
 
 import functionComponents.Function;
 import functionComponents.Point;
-import graphplotter.GraphPlotterFrame;
+import functionComponents.ReferentialLimits;
 
 public class FunctionGraphic extends BufferedImage {
 	
-	private double minX, maxX, minY, maxY;
-	
+	private ReferentialLimits referentialLimits;
 	private Graphics2D g2d;
 	private Color color;
 	private Function function;
 	
 	
-	public FunctionGraphic(Dimension size, Function function, Color color) {
+	public FunctionGraphic(Dimension size, ReferentialLimits referentialLimits, Function function, Color color) {
 		super(size.width, size.height, BufferedImage.TYPE_INT_ARGB);
+		this.referentialLimits = referentialLimits;
 		this.function = function;
 		this.color = color;
-		
-		minX = GraphPlotterFrame.STARTING_MINX;
-		maxX = GraphPlotterFrame.STARTING_MAXX;
-		minY = GraphPlotterFrame.STARTING_MINY;
-		maxY = GraphPlotterFrame.STARTING_MAXY;
 		
 		g2d = this.createGraphics();
 		drawFunction();
@@ -40,9 +35,10 @@ public class FunctionGraphic extends BufferedImage {
 
 		Polygon pol = new Polygon();
 		ArrayList<Point> points = function.getPoints();
+		double[] limits = referentialLimits.getLimits();
 		
 		for(Point point : points)
-			pol.addPoint(point.getXFrameCoord(minX, maxX), point.getYFrameCoord(minY, maxY));
+			pol.addPoint(point.getXFrameCoord(limits[0], limits[1]), point.getYFrameCoord(limits[2], limits[3]));
 			
 		g2d.drawPolyline(pol.xpoints, pol.ypoints, pol.npoints);
 	}

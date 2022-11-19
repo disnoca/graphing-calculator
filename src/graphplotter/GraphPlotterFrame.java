@@ -14,6 +14,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 
+import functionComponents.ReferentialLimits;
 import graphplotter.graphics.GraphicsDrawer;
 import graphplotter.popupWindows.AddFunctionWindow;
 import graphplotter.popupWindows.ListFunctionsWindow;
@@ -22,11 +23,6 @@ import graphplotter.popupWindows.RemoveFunctionWindow;
 
 @SuppressWarnings("serial")
 public class GraphPlotterFrame extends JFrame implements ActionListener {
-	
-	public final static double STARTING_MINX = -256;
-	public final static double STARTING_MAXX = 256;
-	public final static double STARTING_MINY = -10;
-	public final static double STARTING_MAXY = 10;
 	
 	private JMenuBar menubar;
 	private JMenu menuFunc, menuVW, menuGS;
@@ -43,6 +39,11 @@ public class GraphPlotterFrame extends JFrame implements ActionListener {
 	private final Color[] functionColors = {Color.BLUE, Color.RED, Color.GREEN, Color.CYAN, Color.MAGENTA, Color.ORANGE};
 	private Stack<Color> colorStack;
 	private HashMap<Color, Integer> colorIdsMap;
+	
+	public final double STARTING_MINX = -10;
+	public final double STARTING_MAXX = 10;
+	public final double STARTING_MINY = -10;
+	public final double STARTING_MAXY = 10;
 	
 
 	public GraphPlotterFrame() {
@@ -142,7 +143,8 @@ public class GraphPlotterFrame extends JFrame implements ActionListener {
 	}
 	
 	private void initGraphics() {
-		graphicsDrawer = new GraphicsDrawer(drawingAreaSize());
+		ReferentialLimits referentialLimits = new ReferentialLimits(drawingAreaSize(), STARTING_MINX, STARTING_MAXX, STARTING_MINY, STARTING_MAXY);
+		graphicsDrawer = new GraphicsDrawer(drawingAreaSize(), referentialLimits);
 		graphicsDrawer.setReferentialGraphic();
 		this.add(graphicsDrawer);
 	}

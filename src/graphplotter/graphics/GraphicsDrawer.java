@@ -10,26 +10,29 @@ import java.util.Collections;
 import javax.swing.JComponent;
 
 import functionComponents.Function;
+import functionComponents.ReferentialLimits;
 
 @SuppressWarnings("serial")
 public class GraphicsDrawer extends JComponent {
 	
 	private Dimension size;
+	private ReferentialLimits referentialLimits;
 	private BufferedImage referentialGraphic;
 	private ArrayList<FunctionGraphic> functionGraphics;
 	
 
-	public GraphicsDrawer(Dimension size) {
+	public GraphicsDrawer(Dimension size, ReferentialLimits referentialLimits) {
 		this.size = size;
+		this.referentialLimits = referentialLimits;
 		functionGraphics = new ArrayList<>();
 	}
 	
 	public void setReferentialGraphic() {
-		referentialGraphic = new ReferentialGraphic(size);
+		referentialGraphic = new ReferentialGraphic(size, referentialLimits);
 	}
 	
 	public void addFunction(Function function, Color color) {
-		FunctionGraphic functionGraphic = new FunctionGraphic(size, function, color);
+		FunctionGraphic functionGraphic = new FunctionGraphic(size, referentialLimits, function, color);
 		functionGraphics.add(functionGraphic);
 	}
 	
@@ -43,6 +46,10 @@ public class GraphicsDrawer extends JComponent {
 	
 	public int getFunctionCount() {
 		return functionGraphics.size();
+	}
+	
+	public ReferentialLimits getReferentialLimits() {
+		return referentialLimits;
 	}
 	
 	@Override
@@ -80,7 +87,7 @@ public class GraphicsDrawer extends JComponent {
 			Function f = fg.getFunction();
 			Color c = fg.getColor();
 			f.recalculateFrameSize(size);
-			temp.add(new FunctionGraphic(size, f, c));
+			temp.add(new FunctionGraphic(size, referentialLimits, f, c));
 		}
 		
 		functionGraphics = temp;

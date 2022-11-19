@@ -19,7 +19,6 @@ import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 
 import functionComponents.Function;
-import graphplotter.GraphPlotterFrame;
 import graphplotter.SwingFunctions;
 import graphplotter.graphics.GraphicsDrawer;
 import net.objecthunter.exp4j.tokenizer.UnknownFunctionOrVariableException;
@@ -78,8 +77,7 @@ public class AddFunctionWindow extends PopupWindow {
 	
 	
 	private void addFunction(String expression) {
-		Dimension size = ((GraphPlotterFrame) parent).drawingAreaSize();
-		Function function = new Function(size, expression);
+		Function function = new Function(graphicsDrawer.getSize(), graphicsDrawer.getReferentialLimits(), expression);
 		graphicsDrawer.addFunction(function, colorStack.pop());
 		SwingFunctions.updateFrameContents(parent);
 	}
