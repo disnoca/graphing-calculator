@@ -40,10 +40,10 @@ public class GraphPlotterFrame extends JFrame implements ActionListener {
 	private Stack<Color> colorStack;
 	private HashMap<Color, Integer> colorIdsMap;
 	
-	public final double STARTING_MINX = -10;
-	public final double STARTING_MAXX = 10;
-	public final double STARTING_MINY = -10;
-	public final double STARTING_MAXY = 10;
+	public final double STARTING_MINX = -3;
+	public final double STARTING_MAXX = 3;
+	public final double STARTING_MINY = -3;
+	public final double STARTING_MAXY = 3;
 	
 
 	public GraphPlotterFrame() {
