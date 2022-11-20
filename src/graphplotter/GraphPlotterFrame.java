@@ -40,10 +40,10 @@ public class GraphPlotterFrame extends JFrame implements ActionListener {
 	private Stack<Color> colorStack;
 	private HashMap<Color, Integer> colorIdsMap;
 	
-	public final double STARTING_MINX = -10;
-	public final double STARTING_MAXX = 10;
-	public final double STARTING_MINY = -10;
-	public final double STARTING_MAXY = 10;
+	private final double DEFAULT_MINX = -10;
+	private final double DEFAULT_MAXX = 10;
+	private final double DEFAULT_MINY = -10;
+	private final double DEFAULT_MAXY = 10;
 	
 
 	public GraphPlotterFrame() {
@@ -60,7 +60,7 @@ public class GraphPlotterFrame extends JFrame implements ActionListener {
 		
 		this.addComponentListener(new ComponentAdapter() {
 		    public void componentResized(ComponentEvent componentEvent) {
-		        graphicsDrawer.recalculateFrameSize(drawingAreaSize());
+		        graphicsDrawer.setFrameSize(drawingAreaSize());
 		    }
 		});
 		
@@ -143,7 +143,7 @@ public class GraphPlotterFrame extends JFrame implements ActionListener {
 	}
 	
 	private void initGraphics() {
-		ReferentialLimits referentialLimits = new ReferentialLimits(drawingAreaSize(), STARTING_MINX, STARTING_MAXX, STARTING_MINY, STARTING_MAXY);
+		ReferentialLimits referentialLimits = new ReferentialLimits(drawingAreaSize(), DEFAULT_MINX, DEFAULT_MAXX, DEFAULT_MINY, DEFAULT_MAXY);
 		graphicsDrawer = new GraphicsDrawer(drawingAreaSize(), referentialLimits);
 		graphicsDrawer.setReferentialGraphic();
 		this.add(graphicsDrawer);
@@ -180,19 +180,22 @@ public class GraphPlotterFrame extends JFrame implements ActionListener {
 		}
 		
 		if(e.getSource() == vwDefault) {
-			
+			graphicsDrawer.setReferentialLimits(DEFAULT_MINX, DEFAULT_MAXX, DEFAULT_MINY, DEFAULT_MAXY);
+			SwingFunctions.updateFrameContents(this);
 		}
 		
 		if(e.getSource() == vwSetValues) {
-			
+			SwingFunctions.updateFrameContents(this);
 		}
 		
 		if(e.getSource() == vwZoomIn) {
-			
+			graphicsDrawer.halveReferentialLimits();
+			SwingFunctions.updateFrameContents(this);
 		}
 		
 		if(e.getSource() == vwZoomOut) {
-			
+			graphicsDrawer.doubleReferentialLimits();
+			SwingFunctions.updateFrameContents(this);
 		}
 		
 		if(e.getSource() == gsRoot) {

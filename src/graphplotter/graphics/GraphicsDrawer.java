@@ -78,10 +78,28 @@ public class GraphicsDrawer extends JComponent {
 	}
 	
 	
-	public void recalculateFrameSize(Dimension size) {
+	public void setFrameSize(Dimension size) {
 		this.size = size;
+		updateGraphics();
+	}
+	
+	public void doubleReferentialLimits() {
+		double[] limits = referentialLimits.getLimits();
+		setReferentialLimits(limits[0]*2, limits[1]*2, limits[2]*2, limits[3]*2);
+	}
+	
+	public void halveReferentialLimits() {
+		double[] limits = referentialLimits.getLimits();
+		setReferentialLimits(limits[0]/2, limits[1]/2, limits[2]/2, limits[3]/2);
+	}
+	
+	public void setReferentialLimits(double xMin, double xMax, double yMin, double yMax) {
+		referentialLimits.updateLimits(xMin, xMax, yMin, yMax);
+		updateGraphics();
+	}
+	
+	public void updateGraphics() {
 		setReferentialGraphic();
-		
 		ArrayList<FunctionGraphic> temp = new ArrayList<>(functionGraphics.size());
 		for(FunctionGraphic fg: functionGraphics) {
 			Function f = fg.getFunction();

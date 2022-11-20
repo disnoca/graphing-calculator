@@ -57,27 +57,28 @@ public class ReferentialLimits {
 			while(start < min)
 				start += step;
 		
-		for(double current = start; current <= max; current += step) {
-			current = formatDecimalPlaces(current, decimalPlaces);
-			if(current == 0) continue;
+		for(int i = 0; referentialMarks.size() <= 10; i++) {
+			HashMap<Point, String> marksBatch = new HashMap<>();
+			double currStep = step/Math.pow(2, Math.max(0,i-1));
 			
-			String label = formattedNumberString(current, decimalPlaces);
-			if(xLine)
-				referentialMarks.put(new Point(current, 0, frameWidth, frameHeight), label);
-			else
-				referentialMarks.put(new Point(0, current, frameWidth, frameHeight), label);
-		}
-		
-		// adds extra referential marks in case there are too few of them
-		if(referentialMarks.size() <= 10) {
-			decimalPlaces++;
-			for(double current = start+step/2; current <= max; current += step) {
-				String label = formattedNumberString(current, decimalPlaces);
-				if(xLine)
-					referentialMarks.put(new Point(current, 0, frameWidth, frameHeight), label);
-				else
-					referentialMarks.put(new Point(0, current, frameWidth, frameHeight), label);
+			for(double current = start+currStep/2; current <= max; current += currStep) {
+				if(i == 0 && current == start+currStep/2) current = start;
+				
+				current = formatDecimalPlaces(current, decimalPlaces+i);
+				if(current == 0 || current < min || current > max) continue;
+				
+				String label = formattedNumberString(current, decimalPlaces+i);
+				
+				if(!referentialMarks.containsValue(label)) {
+					if(xLine)
+						marksBatch.put(new Point(current, 0, frameWidth, frameHeight), label);
+					else
+						marksBatch.put(new Point(0, current, frameWidth, frameHeight), label);
+				}
 			}
+			
+			if(referentialMarks.size()+marksBatch.size() > 20) break;
+			referentialMarks.putAll(marksBatch);
 		}
 		
 		return referentialMarks;
@@ -160,6 +161,16 @@ public class ReferentialLimits {
 
 	public HashMap<Point, String> getYReferentialMarks() {
 		return yReferentialMarks;
+	}
+	
+	public void updateLimits(double xMin, double xMax, double yMin, double yMax) {
+		this.xMin = xMin;
+		this.xMax = xMax;
+		this.yMin = yMin;
+		this.yMax = yMax;
+		
+		xReferentialMarks = calculateReferentialMarks(true);
+		yReferentialMarks = calculateReferentialMarks(false);
 	}
 	
 }
