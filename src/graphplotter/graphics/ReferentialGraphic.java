@@ -32,13 +32,37 @@ public class ReferentialGraphic extends BufferedImage {
 		g2d.setStroke(new BasicStroke(2));
 		g2d.setColor(Color.black);
 		
-		g2d.drawLine(0 , height/2, width, height/2);
-		g2d.drawLine(width/2 ,0, width/2, height);
+		Point origin = new Point(0, 0, width, height);
+		double[] limits = referentialLimits.getLimits();
 		
-		drawReferenceLines();
+		int xLineYFrameCoord = getXLineYFrameCoord(origin, limits[2], limits[3]);
+		int yLineXFrameCoord = getYLineXFrameCoord(origin, limits[0], limits[1]);
+		
+		g2d.drawLine(0, xLineYFrameCoord, width, xLineYFrameCoord);		// x line
+		g2d.drawLine(yLineXFrameCoord, 0, yLineXFrameCoord, height);	// y line
+		
+		drawReferentialMarks(xLineYFrameCoord, yLineXFrameCoord);
 	}
 	
-	private void drawReferenceLines() {
+	private int getXLineYFrameCoord(Point origin, double yMin, double yMax) {
+		int xLineYFrameCoord = origin.getYFrameCoord(yMin, yMax);
+		if(xLineYFrameCoord < 0)
+			return 0;
+		if(xLineYFrameCoord > height)
+			return height;
+		return xLineYFrameCoord;
+	}
+	
+	private int getYLineXFrameCoord(Point origin, double xMin, double xMax) {
+		int yLineXFrameCoord = origin.getXFrameCoord(xMin, xMax);
+		if(yLineXFrameCoord < 0)
+			return 0;
+		if(yLineXFrameCoord > width)
+			return width;
+		return yLineXFrameCoord;
+	}
+	
+	private void drawReferentialMarks(int xLineYFrameCoord, int yLineXFrameCoord) {
 		HashMap<Point,String> xReferentialMarks = referentialLimits.getXReferentialMarks();
 		HashMap<Point,String> yReferentialMarks = referentialLimits.getYReferentialMarks();
 		double[] limits = referentialLimits.getLimits();
@@ -47,18 +71,22 @@ public class ReferentialGraphic extends BufferedImage {
 			Point p = mark.getKey();
 			String label = mark.getValue();
 			int xFrameCoord = p.getXFrameCoord(limits[0], limits[1]);
-			int yFrameCoord = p.getYFrameCoord(limits[2], limits[3]);
-			g2d.drawLine(xFrameCoord, yFrameCoord-5, xFrameCoord, yFrameCoord+5);
-			g2d.drawString(label, xFrameCoord-5, yFrameCoord+20);
+			g2d.drawLine(xFrameCoord, xLineYFrameCoord-5, xFrameCoord, xLineYFrameCoord+5);
+			if(xLineYFrameCoord <= width/2)
+				g2d.drawString(label, xFrameCoord-label.length()*3, xLineYFrameCoord+20);
+			else
+				g2d.drawString(label, xFrameCoord-label.length()*3, xLineYFrameCoord-10);
 		}
 		
 		for(Entry<Point,String> mark : yReferentialMarks.entrySet()) {
 			Point p = mark.getKey();
 			String label = mark.getValue();
-			int xFrameCoord = p.getXFrameCoord(limits[0], limits[1]);
 			int yFrameCoord = p.getYFrameCoord(limits[2], limits[3]);
-			g2d.drawLine(xFrameCoord-5, yFrameCoord, xFrameCoord+5, yFrameCoord);
-			g2d.drawString(label, xFrameCoord+10, yFrameCoord+4);
+			g2d.drawLine(yLineXFrameCoord-5, yFrameCoord, yLineXFrameCoord+5, yFrameCoord);
+			if(xLineYFrameCoord >= height/2)
+				g2d.drawString(label, yLineXFrameCoord-10-label.length()*6, yFrameCoord+4);
+			else
+				g2d.drawString(label, yLineXFrameCoord+8+label.length(), yFrameCoord+4);
 		}
 	}
 	
