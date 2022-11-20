@@ -37,21 +37,28 @@ public class ReferentialLimits {
 			min = yMin; max = yMax;
 		}
 		double length = max-min;
-		int decimalPlaces = calculateDecimalPoint(length);
+		int decimalPlaces = calculateDecimalPlaces(length);
 		
 		double maxLength;
-		if(decimalPlaces <= 0) {
-			maxLength = Math.pow(10, Math.abs(decimalPlaces));
-			
-		}
+		if(decimalPlaces <= 0)
+			maxLength = Math.pow(10, Math.abs(decimalPlaces)+1)*2;
 		else {
-			maxLength = Math.pow(10, -decimalPlaces+1);
-			min = Double.parseDouble(formattedNumberString(min, decimalPlaces));
+			maxLength = Math.pow(10, -decimalPlaces+1)*2;
+			min = formatDecimalPlaces(min, decimalPlaces);
 		}
 		
-		double step = maxLength/10;
+		double step = maxLength/20;
 		
-		for(double current = min; current <= max; current += step) {
+		double start = 0;
+		if(start > min)
+			while(start > min)
+				start -= step;
+		else
+			while(start < min)
+				start += step;
+		
+		for(double current = start; current <= max; current += step) {
+			current = formatDecimalPlaces(current, decimalPlaces);
 			if(current == 0) continue;
 			
 			String label = formattedNumberString(current, decimalPlaces);
@@ -61,16 +68,32 @@ public class ReferentialLimits {
 				referentialMarks.put(new Point(0, current, frameWidth, frameHeight), label);
 		}
 		
+		// adds extra referential marks in case there are too few of them
+		if(referentialMarks.size() <= 10) {
+			decimalPlaces++;
+			for(double current = start+step/2; current <= max; current += step) {
+				String label = formattedNumberString(current, decimalPlaces);
+				if(xLine)
+					referentialMarks.put(new Point(current, 0, frameWidth, frameHeight), label);
+				else
+					referentialMarks.put(new Point(0, current, frameWidth, frameHeight), label);
+			}
+		}
+		
 		return referentialMarks;
 	}
 	
-	// negative decimal places represent the number of "0"s to the right
-	private int calculateDecimalPoint(double length) {
+	// negative decimal places represent the number of '0's to the right
+	// edge cases like 0.1, 1 and 10 return their decimal places minus 1
+	// this is so that the referential is marked with the units below in these specific cases
+	// which makes for a better looking referential:
+	// ex. -10 -> 10 is marked with units and -1 -> 1 marked with decimals
+	private int calculateDecimalPlaces(double length) {
 		length /= 2;
 		int decimalPoints = 0;
 		
-		if(length > 1)
-			while(length > 1) {
+		if(length > 10)
+			while(length > 10) {
 				length /= 10;
 				decimalPoints--;
 			}
@@ -94,8 +117,12 @@ public class ReferentialLimits {
 			format += '#';
 		
 		DecimalFormat df = new DecimalFormat(format);
-		df.setRoundingMode(RoundingMode.FLOOR);
+		df.setRoundingMode(RoundingMode.HALF_EVEN);
 		return df.format(number);
+	}
+	
+	private double formatDecimalPlaces(double number, int decimalPlaces) {
+		return Double.parseDouble(formattedNumberString(number, decimalPlaces));
 	}
 	
 	public double[] getLimits() {

@@ -2,7 +2,6 @@ package graphplotter.graphics;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.util.HashMap;
@@ -59,7 +58,7 @@ public class ReferentialGraphic extends BufferedImage {
 			int xFrameCoord = p.getXFrameCoord(limits[0], limits[1]);
 			int yFrameCoord = p.getYFrameCoord(limits[2], limits[3]);
 			g2d.drawLine(xFrameCoord-5, yFrameCoord, xFrameCoord+5, yFrameCoord);
-			g2d.drawString(label, xFrameCoord-20, yFrameCoord+5);
+			g2d.drawString(label, xFrameCoord+10, yFrameCoord+4);
 		}
 	}
 	
