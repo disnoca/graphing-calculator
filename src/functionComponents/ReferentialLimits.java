@@ -37,7 +37,7 @@ public class ReferentialLimits {
 			min = yMin; max = yMax;
 		}
 		double length = max-min;
-		int decimalPlaces = calculateDecimalPlaces(length);
+		int decimalPlaces = calculateDecimalPlacesForReferential(length);
 		
 		double maxLength;
 		if(decimalPlaces <= 0)
@@ -84,12 +84,16 @@ public class ReferentialLimits {
 		return referentialMarks;
 	}
 	
+	
+	// duplicated code but I cant do anything about it. joining these two methods into one
+	// would make it much more complex and it would be impossible to understand what it does
+	
 	// negative decimal places represent the number of '0's to the right
-	// edge cases like 0.1, 1 and 10 return their decimal places minus 1
+	// in this method, edge cases like 0.1, 1 and 10 return their decimal places minus 1
 	// this is so that the referential is marked with the units below in these specific cases
 	// which makes for a better looking referential:
 	// ex. -10 -> 10 is marked with units and -1 -> 1 marked with decimals
-	private int calculateDecimalPlaces(double length) {
+	private int calculateDecimalPlacesForReferential(double length) {
 		length /= 2;
 		int decimalPoints = 0;
 		
@@ -100,6 +104,25 @@ public class ReferentialLimits {
 			}
 		else
 			while(length <= 1) {
+				length *= 10;
+				decimalPoints++;
+			}
+		return decimalPoints;
+	}
+	
+	// this method returns the actual decimal places because it is used to display the numbers correctly
+	// unlike the one above which is used for calculations and visuals of the referential marks
+	private int calculateDecimalPlacesForFormatting(double length) {
+		length /= 2;
+		int decimalPoints = 0;
+		
+		if(length > 1)
+			while(length > 10) {
+				length /= 10;
+				decimalPoints--;
+			}
+		else
+			while(length < 1) {
 				length *= 10;
 				decimalPoints++;
 			}
@@ -129,6 +152,19 @@ public class ReferentialLimits {
 	public double[] getLimits() {
 		double[] limits = {xMin, xMax, yMin, yMax};
 		return limits;
+	}
+	
+	public String[] getFormattedLimits() {
+		double xLength = xMax-xMin;
+		int xDecimalPlaces = calculateDecimalPlacesForFormatting(xLength);
+		double yLength = yMax-yMin;
+		int yDecimalPlaces = calculateDecimalPlacesForFormatting(yLength);
+		
+		String[] formattedLimits = {formattedNumberString(xMin, xDecimalPlaces), 
+				formattedNumberString(xMax, xDecimalPlaces), 
+				formattedNumberString(yMin, yDecimalPlaces), 
+				formattedNumberString(yMin, yDecimalPlaces)};
+		return formattedLimits;
 	}
 	
 	public double getXMin() {

@@ -20,6 +20,7 @@ import graphplotter.popupWindows.AddFunctionWindow;
 import graphplotter.popupWindows.ListFunctionsWindow;
 import graphplotter.popupWindows.PopupWindow;
 import graphplotter.popupWindows.RemoveFunctionWindow;
+import graphplotter.popupWindows.SetReferentialLimitsWindow;
 
 @SuppressWarnings("serial")
 public class GraphPlotterFrame extends JFrame implements ActionListener {
@@ -33,6 +34,7 @@ public class GraphPlotterFrame extends JFrame implements ActionListener {
 	private GraphicsDrawer graphicsDrawer;
 	
 	private PopupWindow addFunctionWindow, removeFunctionWindow, listFunctionsWindow;
+	private PopupWindow setReferentialLimitsWindow;
 	
 	private final int MAX_FUNCTIONS = 6;
 	
@@ -56,7 +58,7 @@ public class GraphPlotterFrame extends JFrame implements ActionListener {
 	    initFunctionColors();
 		addMenuBar();
 		initGraphics();
-		initSecondaryWindows();
+		initPopupWindows();
 		
 		this.addComponentListener(new ComponentAdapter() {
 		    public void componentResized(ComponentEvent componentEvent) {
@@ -149,10 +151,11 @@ public class GraphPlotterFrame extends JFrame implements ActionListener {
 		this.add(graphicsDrawer);
 	}
 	
-	private void initSecondaryWindows() {
+	private void initPopupWindows() {
 		addFunctionWindow = new AddFunctionWindow(this, "Add Function", graphicsDrawer, colorStack);
 		removeFunctionWindow = new RemoveFunctionWindow(this, "Remove Functions", graphicsDrawer, colorStack);
 		listFunctionsWindow = new ListFunctionsWindow(this, "Functions List", graphicsDrawer, colorIdsMap);
+		setReferentialLimitsWindow = new SetReferentialLimitsWindow(this, "Set Referential Limits", graphicsDrawer);
 	}
 
 	@Override
@@ -185,7 +188,7 @@ public class GraphPlotterFrame extends JFrame implements ActionListener {
 		}
 		
 		if(e.getSource() == vwSetValues) {
-			SwingFunctions.updateFrameContents(this);
+			setReferentialLimitsWindow.showWindow();
 		}
 		
 		if(e.getSource() == vwZoomIn) {
@@ -234,8 +237,8 @@ public class GraphPlotterFrame extends JFrame implements ActionListener {
 	
 	public Dimension drawingAreaSize() {
 		Dimension size = this.getSize();
-		size.width -= 21;
-		size.height -= 63;
+		size.width -= 16;
+		size.height -= 62;
 		return size;
 	}
 	
