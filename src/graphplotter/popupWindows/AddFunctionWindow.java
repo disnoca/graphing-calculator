@@ -25,7 +25,7 @@ import net.objecthunter.exp4j.tokenizer.UnknownFunctionOrVariableException;
 
 @SuppressWarnings("serial")
 public class AddFunctionWindow extends PopupWindow {
-
+	
 	private JTextField textField;
 	private JButton addButton;
 	

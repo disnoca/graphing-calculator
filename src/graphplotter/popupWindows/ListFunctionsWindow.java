@@ -6,7 +6,6 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
-import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -25,6 +24,8 @@ import graphplotter.graphics.GraphicsDrawer;
 @SuppressWarnings("serial")
 public class ListFunctionsWindow extends PopupWindow {
 	
+	private EditFunctionWindow editFunctionWindow;
+	
 	private ArrayList<JButton> editButtons;
 	private ArrayList<JButton> upButtons;
 	private ArrayList<JButton> downButtons;
@@ -34,8 +35,6 @@ public class ListFunctionsWindow extends PopupWindow {
 	
 	private Dimension buttonSize;
 	
-	private boolean swaped;
-	
 	
 	public ListFunctionsWindow(JFrame parent, String title, GraphicsDrawer graphicsDrawer, HashMap<Color,Integer> colorIdsMap) {
 		super(parent, title);
@@ -43,12 +42,7 @@ public class ListFunctionsWindow extends PopupWindow {
 		this.colorIdsMap = colorIdsMap;
 		
 		buttonSize = new Dimension(20,20);
-	}
-	
-	@Override
-	public void showWindow() {
-		super.showWindow();
-		swaped = false;
+		editFunctionWindow = new EditFunctionWindow(this, "Edit Function", parent);
 	}
 	
 	protected void addComponents(Container contentPane) {
@@ -153,26 +147,25 @@ public class ListFunctionsWindow extends PopupWindow {
 	
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		swaped = true;
-		
 		// Since the functions are listed in reverse, we need to reverse their positions again to the actual function's position in order to switch them correctly
 		if(upButtons.contains(e.getSource())) {
 			int pos = graphicsDrawer.getFunctionCount()-upButtons.indexOf(e.getSource())-1;
 			swapFunctions(pos, pos+1);
+			SwingFunctions.updateFrameContents(parent);
 		}
 		
 		if(downButtons.contains(e.getSource())) {
 			int pos = graphicsDrawer.getFunctionCount()-downButtons.indexOf(e.getSource())-1;
 			swapFunctions(pos, pos-1);
+			SwingFunctions.updateFrameContents(parent);
+		}
+		
+		if(editButtons.contains(e.getSource())) {
+			int pos = graphicsDrawer.getFunctionCount()-editButtons.indexOf(e.getSource())-1;
+			editFunctionWindow.showWindow(graphicsDrawer.getFunction(pos));
 		}
 		
 	}
 
-
-	@Override
-	public void windowClosed(WindowEvent e) {
-		if(swaped)
-			SwingFunctions.updateFrameContents(parent);
-	}
-
 }
+

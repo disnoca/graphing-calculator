@@ -16,24 +16,28 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 
+import functionComponents.Function;
 import graphplotter.SwingFunctions;
-import graphplotter.graphics.GraphicsDrawer;
 import net.objecthunter.exp4j.tokenizer.UnknownFunctionOrVariableException;
 
 @SuppressWarnings("serial")
 public class EditFunctionWindow extends PopupWindow {
 	
-	private GraphicsDrawer graphicsDrawer;
-	private int functionPos;
-	private String functionExpression;
+	private JFrame grandparent;
+	private Function function;
 	
 	private JTextField textField;
 	private JButton changeButton;
 	
 
-	public EditFunctionWindow(JFrame parent, String title, GraphicsDrawer graphicsDrawer, int functionPos, String functionExpression) {
+	public EditFunctionWindow(JFrame parent, String title, JFrame grandparent) {
 		super(parent, title);
-		this.functionExpression = functionExpression;
+		this.grandparent = grandparent;
+	}
+	
+	public void showWindow(Function function) {
+		this.function = function;
+		super.showWindow();
 	}
 	
 	@Override
@@ -45,7 +49,7 @@ public class EditFunctionWindow extends PopupWindow {
 		textField = new JTextField();
 		textField.getInputMap().put(KeyStroke.getKeyStroke("pressed ENTER"), "enter");
 		textField.getActionMap().put("enter", new SimulateButtonPressAction(changeButton));
-		textField.setText(functionExpression);
+		textField.setText(function.getExpression());
 		
 		JButton cancelButton = new JButton("Cancel");
 		cancelButton.setFocusable(false);
@@ -71,16 +75,12 @@ public class EditFunctionWindow extends PopupWindow {
 		
 		SwingFunctions.evenButtonsWidth(changeButton, cancelButton);
 	}
-	
-	private void changeFunction(String newExpression) {
-		graphicsDrawer.getFunction(functionPos).setExpression(newExpression);
-	}
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if(e.getSource() == changeButton) {
 			try {
-				changeFunction(textField.getText().trim());
+				function.setExpression(textField.getText().trim());
 			} catch(UnknownFunctionOrVariableException e1) {
 				SwingFunctions.showErrorMessage(this, "Invalid function");
 				return;
@@ -93,6 +93,9 @@ public class EditFunctionWindow extends PopupWindow {
 			}
 		}
 		
+		((PopupWindow) parent).resetContainer();
+		SwingFunctions.updateFrameContents(parent);
+		SwingFunctions.updateFrameContents(grandparent);
 		parent.setEnabled(true);
 		this.dispose();
 	}
