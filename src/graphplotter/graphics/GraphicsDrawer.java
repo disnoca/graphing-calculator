@@ -62,6 +62,10 @@ public class GraphicsDrawer extends JComponent {
             g.drawImage(layer, 0, 0, size.width, size.height, null);
     }
 	
+	public Function getFunction(int pos) {
+		return functionGraphics.get(pos).getFunction();
+	}
+	
 	public String getFunctionExpression(int pos) {
 		return functionGraphics.get(pos).getExpression();
 	}

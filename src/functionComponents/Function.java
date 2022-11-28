@@ -25,14 +25,17 @@ public class Function {
 		this.height = size.height;
 		this.referentialLimits = referentialLimits;
 		
-		this.expression = expression;
-		this.function = new ExpressionBuilder(expression).variable("x").build();
-		
-		computeFunction();
+		setExpression(expression);
 	}
 
 	public String getExpression() {
 		return expression;
+	}
+	
+	public void setExpression(String expression) {
+		this.expression = expression;
+		this.function = new ExpressionBuilder(expression).variable("x").build();
+		computeFunction();
 	}
 	
 	private void computeFunction() {
@@ -58,10 +61,6 @@ public class Function {
 		this.width = size.width;
 		this.height = size.height;
 		computeFunction();
-	}
-	
-	public void recalculateReferentialSize() {
-		
 	}
 	
 }

@@ -25,6 +25,7 @@ import graphplotter.graphics.GraphicsDrawer;
 @SuppressWarnings("serial")
 public class ListFunctionsWindow extends PopupWindow {
 	
+	private ArrayList<JButton> editButtons;
 	private ArrayList<JButton> upButtons;
 	private ArrayList<JButton> downButtons;
 	
@@ -54,6 +55,7 @@ public class ListFunctionsWindow extends PopupWindow {
 		String[] expressions = graphicsDrawer.getFunctionExpressions();
 		int[] colorIds = getColorIds();
 		
+		editButtons = new ArrayList<>(expressions.length);
 		upButtons = new ArrayList<>(expressions.length);
 		downButtons = new ArrayList<>(expressions.length);
 		
@@ -76,6 +78,14 @@ public class ListFunctionsWindow extends PopupWindow {
 		// The expressions and colors must be listed in reverse because the functions that are listed first are the functions that are drawn last.
 		// This would confuse the user, therefore we want to make it so that the higher the function is in the list, the more on top of other layers it is.
 		for(int i = 0; i < expressions.length; i++) {
+			// create edit buttons
+			JButton editButton = new JButton("e");
+			editButton.setFocusable(false);
+			editButton.setMargin(new Insets(0,0,0,0));
+			editButton.setPreferredSize(buttonSize);
+			editButton.addActionListener(this);
+			editButtons.add(editButton);
+			
 			// create color and expression labels
 			String filename = "assets\\color"+colorIds[colorIds.length-i-1]+".jpg";
 			ImageIcon icon = new ImageIcon(filename);
@@ -83,13 +93,14 @@ public class ListFunctionsWindow extends PopupWindow {
 			JLabel expressionLabel = new JLabel(expressions[expressions.length-i-1]);
 			
 			JPanel expressionPane = new JPanel();
+			expressionPane.add(editButton);
 			expressionPane.add(imageLabel);
 			expressionPane.add(expressionLabel);
 			listPane.add(expressionPane);
 			listPane.add(Box.createRigidArea(new Dimension(0,5)));
 			
 			
-			// create buttons
+			// create up and down buttons
 			JButton upButton = new JButton("^");
 			upButton.setFocusable(false);
 			upButton.setMargin(new Insets(0,0,0,0));
