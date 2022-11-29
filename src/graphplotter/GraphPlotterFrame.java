@@ -26,7 +26,9 @@ import graphplotter.popupWindows.SetReferentialLimitsWindow;
 public class GraphPlotterFrame extends JFrame implements ActionListener {
 	
 	private JMenuBar menubar;
+	private JMenu menuFile, menuFileSave, menuFileLoad;
 	private JMenu menuFunc, menuVW, menuGS;
+	private JMenuItem mfilesaveProject, mfilesaveImage, mfileloadProject;
 	private JMenuItem mfuncAdd, mfuncRemove, mfuncList;
 	private JMenuItem vwDefault, vwSetValues, vwZoomIn, vwZoomOut;
 	private JMenuItem gsRoot, gsMax, gsMin, gsYIntersect, gsIntersect, gsYCalc, gsXCalc, gsIntegral;
@@ -84,9 +86,16 @@ public class GraphPlotterFrame extends JFrame implements ActionListener {
 	private void addMenuBar() {
 		menubar = new JMenuBar();
 		
+		menuFile = new JMenu("File");
+		menuFileSave = new JMenu("Save");
+		menuFileLoad = new JMenu("Load");
 		menuFunc = new JMenu("Function");
 	    menuVW = new JMenu("View Window");
 	    menuGS = new JMenu("G-Solve");
+	    
+	    mfilesaveProject = new JMenuItem("Project");
+	    mfilesaveImage = new JMenuItem("Image");
+	    mfileloadProject = new JMenuItem("Project");
 	    
 	    mfuncAdd = new JMenuItem("Add");
 	    mfuncRemove = new JMenuItem("Remove");
@@ -122,6 +131,11 @@ public class GraphPlotterFrame extends JFrame implements ActionListener {
 	    gsXCalc.addActionListener(this);
 	    gsIntegral.addActionListener(this);
 	    
+	    menuFileSave.add(mfilesaveProject);
+	    menuFileSave.add(mfilesaveImage);
+	    menuFileLoad.add(mfileloadProject);
+	    menuFile.add(menuFileSave);
+	    menuFile.add(menuFileLoad);
 	    menuFunc.add(mfuncAdd);
 	    menuFunc.add(mfuncRemove);
 	    menuFunc.add(mfuncList);
@@ -138,6 +152,7 @@ public class GraphPlotterFrame extends JFrame implements ActionListener {
 	    menuGS.add(gsXCalc);
 	    menuGS.add(gsIntegral);
 	    
+	    menubar.add(menuFile);
 	    menubar.add(menuFunc);
 	    menubar.add(menuVW);
 	    menubar.add(menuGS);
