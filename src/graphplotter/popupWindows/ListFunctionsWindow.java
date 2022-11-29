@@ -78,10 +78,13 @@ public class ListFunctionsWindow extends PopupWindow {
 		// This would confuse the user, therefore we want to make it so that the higher the function is in the list, the more on top of other layers it is.
 		for(int i = 0; i < expressions.length; i++) {
 			// create edit buttons
-			JButton editButton = new JButton("e");
+			JButton editButton = new JButton();
 			editButton.setFocusable(false);
 			editButton.setMargin(new Insets(0,0,0,0));
-			editButton.setPreferredSize(buttonSize);
+			editButton.setOpaque(false);
+			editButton.setContentAreaFilled(false);
+			editButton.setBorderPainted(false);
+			editButton.setIcon(new ImageIcon("assets\\edit_icon.png"));
 			editButton.addActionListener(this);
 			editButtons.add(editButton);
 			
@@ -103,17 +106,23 @@ public class ListFunctionsWindow extends PopupWindow {
 			
 			
 			// create up and down buttons
-			JButton upButton = new JButton("^");
+			JButton upButton = new JButton();
 			upButton.setFocusable(false);
 			upButton.setMargin(new Insets(0,0,0,0));
-			upButton.setPreferredSize(buttonSize);
+			upButton.setOpaque(false);
+			upButton.setContentAreaFilled(false);
+			upButton.setBorderPainted(false);
+			upButton.setIcon(new ImageIcon("assets\\up_arrow_icon.png"));
 			upButton.addActionListener(this);
 			upButtons.add(upButton);
 			
-			JButton downButton = new JButton("v");
+			JButton downButton = new JButton();
 			downButton.setFocusable(false);
 			downButton.setMargin(new Insets(0,0,0,0));
-			downButton.setPreferredSize(buttonSize);
+			downButton.setOpaque(false);
+			downButton.setContentAreaFilled(false);
+			downButton.setBorderPainted(false);
+			downButton.setIcon(new ImageIcon("assets\\down_arrow_icon.png"));
 			downButton.addActionListener(this);
 			downButtons.add(downButton);
 			

@@ -247,9 +247,9 @@ public class GraphPlotterFrame extends JFrame implements ActionListener {
 	}
 	
 	// TODO:
-	// add a set labels function in listfunctionswindow
-	// add icons to list functions window's buttons
 	// refactor graphicsdrawer in popupwindows, put it in abstract
 	// refactor label+textfield+buttons panel code
+	//
+	// add file menu: save and load image and project
 	
 }
