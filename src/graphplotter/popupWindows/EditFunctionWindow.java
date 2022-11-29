@@ -18,11 +18,13 @@ import javax.swing.KeyStroke;
 
 import functionComponents.Function;
 import graphplotter.SwingFunctions;
+import graphplotter.graphics.GraphicsDrawer;
 import net.objecthunter.exp4j.tokenizer.UnknownFunctionOrVariableException;
 
 @SuppressWarnings("serial")
 public class EditFunctionWindow extends PopupWindow {
 	
+	private GraphicsDrawer graphicsDrawer;
 	private JFrame grandparent;
 	private Function function;
 	
@@ -30,8 +32,9 @@ public class EditFunctionWindow extends PopupWindow {
 	private JButton changeButton;
 	
 
-	public EditFunctionWindow(JFrame parent, String title, JFrame grandparent) {
+	public EditFunctionWindow(JFrame parent, String title, GraphicsDrawer graphicsDrawer, JFrame grandparent) {
 		super(parent, title);
+		this.graphicsDrawer = graphicsDrawer;
 		this.grandparent = grandparent;
 	}
 	
@@ -75,7 +78,7 @@ public class EditFunctionWindow extends PopupWindow {
 		
 		SwingFunctions.evenButtonsWidth(changeButton, cancelButton);
 	}
-
+	
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if(e.getSource() == changeButton) {
@@ -93,9 +96,9 @@ public class EditFunctionWindow extends PopupWindow {
 			}
 		}
 		
-		((PopupWindow) parent).resetContainer();
-		SwingFunctions.updateFrameContents(parent);
+		graphicsDrawer.updateGraphics();
 		SwingFunctions.updateFrameContents(grandparent);
+		((ListFunctionsWindow) parent).resetLabels();
 		parent.setEnabled(true);
 		this.dispose();
 	}

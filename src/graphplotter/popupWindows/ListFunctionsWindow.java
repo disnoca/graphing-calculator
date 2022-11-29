@@ -26,6 +26,8 @@ public class ListFunctionsWindow extends PopupWindow {
 	
 	private EditFunctionWindow editFunctionWindow;
 	
+	private ArrayList<JLabel> colorLabels, expressionLabels;
+	
 	private ArrayList<JButton> editButtons;
 	private ArrayList<JButton> upButtons;
 	private ArrayList<JButton> downButtons;
@@ -42,12 +44,15 @@ public class ListFunctionsWindow extends PopupWindow {
 		this.colorIdsMap = colorIdsMap;
 		
 		buttonSize = new Dimension(20,20);
-		editFunctionWindow = new EditFunctionWindow(this, "Edit Function", parent);
+		editFunctionWindow = new EditFunctionWindow(this, "Edit Function", graphicsDrawer, parent);
 	}
 	
 	protected void addComponents(Container contentPane) {
 		String[] expressions = graphicsDrawer.getFunctionExpressions();
 		int[] colorIds = getColorIds();
+		
+		colorLabels = new ArrayList<>(expressions.length);
+		expressionLabels = new ArrayList<>(expressions.length);
 		
 		editButtons = new ArrayList<>(expressions.length);
 		upButtons = new ArrayList<>(expressions.length);
@@ -85,6 +90,9 @@ public class ListFunctionsWindow extends PopupWindow {
 			ImageIcon icon = new ImageIcon(filename);
 			JLabel imageLabel = new JLabel(icon);
 			JLabel expressionLabel = new JLabel(expressions[expressions.length-i-1]);
+			
+			colorLabels.add(imageLabel);
+			expressionLabels.add(expressionLabel);
 			
 			JPanel expressionPane = new JPanel();
 			expressionPane.add(editButton);
@@ -131,6 +139,18 @@ public class ListFunctionsWindow extends PopupWindow {
 		contentPane.add(buttonPane, BorderLayout.CENTER);
 	}
 	
+	public void resetLabels() {
+		String[] expressions = graphicsDrawer.getFunctionExpressions();
+		int[] colorIds = getColorIds();
+		
+		for(int i = 0; i < expressions.length; i++) {
+			String filename = "assets\\color"+colorIds[colorIds.length-i-1]+".jpg";
+			ImageIcon icon = new ImageIcon(filename);
+			colorLabels.get(i).setIcon(icon);
+			expressionLabels.get(i).setText(expressions[expressions.length-i-1]);;
+		}
+	}
+	
 	private int[] getColorIds() {
 		int[] colorIds = new int[graphicsDrawer.getFunctionCount()];
 		for(int i = 0; i < colorIds.length; i++)
@@ -140,8 +160,7 @@ public class ListFunctionsWindow extends PopupWindow {
 
 	private void swapFunctions(int pos1, int pos2) {
 		graphicsDrawer.swapFunctions(pos1, pos2);
-		super.resetContainer();
-		SwingFunctions.updateFrameContents(this);
+		resetLabels();
 	}
 	
 	
