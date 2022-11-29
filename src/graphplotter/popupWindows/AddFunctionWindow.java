@@ -29,13 +29,11 @@ public class AddFunctionWindow extends PopupWindow {
 	private JTextField textField;
 	private JButton addButton;
 	
-	private GraphicsDrawer graphicsDrawer;
 	private Stack<Color> colorStack;
 	
 	
 	public AddFunctionWindow(JFrame parent, String title, GraphicsDrawer graphicsDrawer, Stack<Color> colorStack) {
-		super(parent, title);
-		this.graphicsDrawer = graphicsDrawer;
+		super(parent, title, graphicsDrawer);
 		this.colorStack = colorStack;
 	}
 	

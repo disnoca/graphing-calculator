@@ -24,7 +24,6 @@ import net.objecthunter.exp4j.tokenizer.UnknownFunctionOrVariableException;
 @SuppressWarnings("serial")
 public class EditFunctionWindow extends PopupWindow {
 	
-	private GraphicsDrawer graphicsDrawer;
 	private JFrame grandparent;
 	private Function function;
 	
@@ -33,8 +32,7 @@ public class EditFunctionWindow extends PopupWindow {
 	
 
 	public EditFunctionWindow(JFrame parent, String title, GraphicsDrawer graphicsDrawer, JFrame grandparent) {
-		super(parent, title);
-		this.graphicsDrawer = graphicsDrawer;
+		super(parent, title, graphicsDrawer);
 		this.grandparent = grandparent;
 	}
 	

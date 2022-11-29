@@ -23,12 +23,9 @@ public class SetReferentialLimitsWindow extends PopupWindow {
 	private JTextField[] referentialLimitsTF;	// xMin, xMax, yMin, yMax textfields respectively
 	private JButton changeButton;
 	
-	private GraphicsDrawer graphicsDrawer;
-	
 
 	public SetReferentialLimitsWindow(JFrame parent, String title, GraphicsDrawer graphicsDrawer) {
-		super(parent, title);
-		this.graphicsDrawer = graphicsDrawer;
+		super(parent, title, graphicsDrawer);
 		referentialLimitsTF = new JTextField[4];
 	}
 

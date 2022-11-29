@@ -29,13 +29,11 @@ public class RemoveFunctionWindow extends PopupWindow {
 	private boolean[] activeCheckboxes;
 	private JButton removeButton;
 	
-	private GraphicsDrawer graphicsDrawer;
 	private Stack<Color> colorStack;
 	
 	
 	public RemoveFunctionWindow(JFrame parent, String title, GraphicsDrawer graphicsDrawer, Stack<Color> colorStack) {
-		super(parent, title);
-		this.graphicsDrawer = graphicsDrawer;
+		super(parent, title, graphicsDrawer);
 		this.colorStack = colorStack;
 	}
 	

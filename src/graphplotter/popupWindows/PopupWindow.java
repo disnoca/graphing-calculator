@@ -8,15 +8,19 @@ import java.awt.event.WindowListener;
 
 import javax.swing.JFrame;
 
+import graphplotter.graphics.GraphicsDrawer;
+
 @SuppressWarnings("serial")
 public abstract class PopupWindow extends JFrame implements ActionListener, WindowListener {
 
 	protected JFrame parent;
+	protected GraphicsDrawer graphicsDrawer;
 	private final int MIN_SECONDARY_WINDOW_WIDTH = 300;
 	
-	public PopupWindow(JFrame parent, String title) {
+	public PopupWindow(JFrame parent, String title, GraphicsDrawer graphicsDrawer) {
 		super(title);
 		this.parent = parent;
+		this.graphicsDrawer = graphicsDrawer;
 		this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		this.setResizable(false);
 		this.addWindowListener(this);

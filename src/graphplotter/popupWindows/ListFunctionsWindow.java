@@ -32,15 +32,13 @@ public class ListFunctionsWindow extends PopupWindow {
 	private ArrayList<JButton> upButtons;
 	private ArrayList<JButton> downButtons;
 	
-	private GraphicsDrawer graphicsDrawer;
 	private HashMap<Color, Integer> colorIdsMap;
 	
 	private Dimension buttonSize;
 	
 	
 	public ListFunctionsWindow(JFrame parent, String title, GraphicsDrawer graphicsDrawer, HashMap<Color,Integer> colorIdsMap) {
-		super(parent, title);
-		this.graphicsDrawer = graphicsDrawer;
+		super(parent, title, graphicsDrawer);
 		this.colorIdsMap = colorIdsMap;
 		
 		buttonSize = new Dimension(20,20);
