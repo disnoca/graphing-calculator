@@ -6,11 +6,13 @@ import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Map.Entry;
 
 import javax.swing.JComponent;
 
 import functionComponents.Function;
 import functionComponents.ReferentialLimits;
+import graphplotter.GraphPlotterProjectSave;
 
 @SuppressWarnings("serial")
 public class GraphicsDrawer extends JComponent {
@@ -26,6 +28,16 @@ public class GraphicsDrawer extends JComponent {
 		this.referentialLimits = referentialLimits;
 		functionGraphics = new ArrayList<>();
 	}
+	
+	@Override
+    public void paintComponent(Graphics g){
+		super.paintComponent(g);
+		// referential is always the bottom layer
+		g.drawImage(referentialGraphic, 0, 0, size.width, size.height, null);
+		
+        for(FunctionGraphic layer : functionGraphics)
+            g.drawImage(layer, 0, 0, size.width, size.height, null);
+    }
 	
 	public void setReferentialGraphic() {
 		referentialGraphic = new ReferentialGraphic(size, referentialLimits);
@@ -51,16 +63,6 @@ public class GraphicsDrawer extends JComponent {
 	public ReferentialLimits getReferentialLimits() {
 		return referentialLimits;
 	}
-	
-	@Override
-    public void paintComponent(Graphics g){
-		super.paintComponent(g);
-		// referential is always the bottom layer
-		g.drawImage(referentialGraphic, 0, 0, size.width, size.height, null);
-		
-        for(FunctionGraphic layer : functionGraphics)
-            g.drawImage(layer, 0, 0, size.width, size.height, null);
-    }
 	
 	public Function getFunction(int pos) {
 		return functionGraphics.get(pos).getFunction();
@@ -88,13 +90,17 @@ public class GraphicsDrawer extends JComponent {
 	}
 	
 	public void doubleReferentialLimits() {
+		double xAdjustment = referentialLimits.getXLength()/2;
+		double yAdjustment = referentialLimits.getYLength()/2;
 		double[] limits = referentialLimits.getLimits();
-		setReferentialLimits(limits[0]*2, limits[1]*2, limits[2]*2, limits[3]*2);
+		setReferentialLimits(limits[0]-xAdjustment, limits[1]+xAdjustment, limits[2]-yAdjustment, limits[3]+yAdjustment);
 	}
 	
 	public void halveReferentialLimits() {
+		double xAdjustment = referentialLimits.getXLength()/4;
+		double yAdjustment = referentialLimits.getYLength()/4;
 		double[] limits = referentialLimits.getLimits();
-		setReferentialLimits(limits[0]/2, limits[1]/2, limits[2]/2, limits[3]/2);
+		setReferentialLimits(limits[0]+xAdjustment, limits[1]-xAdjustment, limits[2]+yAdjustment, limits[3]-yAdjustment);
 	}
 	
 	public void setReferentialLimits(double xMin, double xMax, double yMin, double yMax) {
@@ -113,6 +119,17 @@ public class GraphicsDrawer extends JComponent {
 		}
 		
 		functionGraphics = temp;
+	}
+	
+	public void loadProject(GraphPlotterProjectSave save) {
+		referentialLimits = save.getReferentiaLimits();
+		setReferentialGraphic();
+		
+		functionGraphics.clear();
+		for(Entry<Color, String> entry : save.getFunctions().entrySet()) {
+			Function function = new Function(size, referentialLimits, entry.getValue());
+			addFunction(function, entry.getKey());
+		}
 	}
 	
 }

@@ -1,12 +1,15 @@
 package functionComponents;
 
 import java.awt.Dimension;
+import java.io.Serializable;
 import java.util.ArrayList;
 
 import net.objecthunter.exp4j.Expression;
 import net.objecthunter.exp4j.ExpressionBuilder;
 
-public class Function {
+public class Function implements Serializable {
+	
+	private static final long serialVersionUID = 1L;
 	
 	private int width, height;
 	private ReferentialLimits referentialLimits;

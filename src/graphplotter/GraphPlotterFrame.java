@@ -4,6 +4,11 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.util.HashMap;
@@ -115,6 +120,9 @@ public class GraphPlotterFrame extends JFrame implements ActionListener {
 	    gsXCalc = new JMenuItem("X-Value");
 	    gsIntegral = new JMenuItem("Integral");
 	    
+	    mfilesaveProject.addActionListener(this);
+	    mfilesaveImage.addActionListener(this);
+	    mfileloadProject.addActionListener(this);
 	    mfuncAdd.addActionListener(this);
 	    mfuncRemove.addActionListener(this);
 	    mfuncList.addActionListener(this);
@@ -151,7 +159,6 @@ public class GraphPlotterFrame extends JFrame implements ActionListener {
 	    menuGS.add(gsYCalc);
 	    menuGS.add(gsXCalc);
 	    menuGS.add(gsIntegral);
-	    
 	    menubar.add(menuFile);
 	    menubar.add(menuFunc);
 	    menubar.add(menuVW);
@@ -172,9 +179,55 @@ public class GraphPlotterFrame extends JFrame implements ActionListener {
 		listFunctionsWindow = new ListFunctionsWindow(this, "Functions List", graphicsDrawer, colorIdsMap);
 		setReferentialLimitsWindow = new SetReferentialLimitsWindow(this, "Set Referential Limits", graphicsDrawer);
 	}
+	
+	private void saveProject() throws IOException {
+		GraphPlotterProjectSave save = new GraphPlotterProjectSave(graphicsDrawer);
+		FileOutputStream fileOutputStream = new FileOutputStream("graphplotterproject.gp");
+	    ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream);
+	    objectOutputStream.writeObject(save);
+	    objectOutputStream.flush();
+	    objectOutputStream.close();
+	}
+	
+	private void loadProject() throws ClassNotFoundException, IOException {
+		FileInputStream fileInputStream = new FileInputStream("graphplotterproject.gp");
+	    ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
+	    GraphPlotterProjectSave save = (GraphPlotterProjectSave) objectInputStream.readObject();
+	    objectInputStream.close();
+		
+		colorStack.clear();
+		int savedFunctions = save.getFunctions().keySet().size();
+		for(int i = savedFunctions; i < MAX_FUNCTIONS-1; i++)
+			colorStack.push(functionColors[i]);
+		
+		graphicsDrawer.loadProject(save);
+		SwingFunctions.updateFrameContents(this);
+	}
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
+		
+		if(e.getSource() == mfilesaveProject) {
+			try {
+				saveProject();
+			} catch (IOException e1) {
+				e1.printStackTrace();
+				SwingFunctions.showErrorMessage(this, "There was an error saving the project.");
+			}
+		}
+		
+		if(e.getSource() == mfilesaveImage) {
+			
+		}
+		
+		if(e.getSource() == mfileloadProject) {
+			try {
+				loadProject();
+			} catch (ClassNotFoundException | IOException e1) {
+				e1.printStackTrace();
+				SwingFunctions.showErrorMessage(this, "There was an error loading the project.");
+			}
+		}
 		
 		if(e.getSource() == mfuncAdd) {		//TODO: verify if function is not duplicate
 			if(graphicsDrawer.getFunctionCount() >= MAX_FUNCTIONS)
