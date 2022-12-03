@@ -1,12 +1,15 @@
 package functionComponents;
 
 import java.awt.Dimension;
+import java.io.Serializable;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.util.HashMap;
 
-public class ReferentialLimits {
+public class ReferentialLimits implements Serializable {
 
+	private static final long serialVersionUID = 1L;
+	
 	private double xMin, xMax, yMin, yMax;
 	private int frameWidth, frameHeight;
 	private HashMap<Point, String> xReferentialMarks, yReferentialMarks;
@@ -111,19 +114,19 @@ public class ReferentialLimits {
 	}
 	
 	// this method returns the actual decimal places because it is used to display the numbers correctly
-	// unlike the one above which is used for calculations and visuals of the referential marks
-	private int calculateDecimalPlacesForFormatting(double length) {
-		length /= 2;
+	// unlike the one above which is used for calculations and better visuals of the referential marks
+	private int calculateDecimalPlacesForFormatting(double number) {
+		number = Math.abs(number);
 		int decimalPoints = 0;
 		
-		if(length > 1)
-			while(length > 10) {
-				length /= 10;
+		if(number > 1)
+			while(number > 10) {
+				number /= 10;
 				decimalPoints--;
 			}
 		else
-			while(length < 1) {
-				length *= 10;
+			while(number < 1) {
+				number *= 10;
 				decimalPoints++;
 			}
 		return decimalPoints;
@@ -155,15 +158,11 @@ public class ReferentialLimits {
 	}
 	
 	public String[] getFormattedLimits() {
-		double xLength = xMax-xMin;
-		int xDecimalPlaces = calculateDecimalPlacesForFormatting(xLength);
-		double yLength = yMax-yMin;
-		int yDecimalPlaces = calculateDecimalPlacesForFormatting(yLength);
+		String[] formattedLimits = {formattedNumberString(xMin, calculateDecimalPlacesForFormatting(xMin)), 
+				formattedNumberString(xMax, calculateDecimalPlacesForFormatting(xMax)), 
+				formattedNumberString(yMin, calculateDecimalPlacesForFormatting(yMin)), 
+				formattedNumberString(yMax, calculateDecimalPlacesForFormatting(yMax))};
 		
-		String[] formattedLimits = {formattedNumberString(xMin, xDecimalPlaces), 
-				formattedNumberString(xMax, xDecimalPlaces), 
-				formattedNumberString(yMin, yDecimalPlaces), 
-				formattedNumberString(yMin, yDecimalPlaces)};
 		return formattedLimits;
 	}
 	
