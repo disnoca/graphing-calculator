@@ -4,6 +4,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -14,6 +16,7 @@ import java.awt.Dimension;
 import java.util.HashMap;
 import java.util.Stack;
 
+import javax.imageio.ImageIO;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -189,6 +192,11 @@ public class GraphPlotterFrame extends JFrame implements ActionListener {
 	    objectOutputStream.close();
 	}
 	
+	private void saveImage() throws IOException {
+		BufferedImage saveImg = graphicsDrawer.getBufferedImage(false);
+		ImageIO.write(saveImg, "png", new File(".\\graphplotter_image.png"));
+	}
+	
 	private void loadProject() throws ClassNotFoundException, IOException {
 		FileInputStream fileInputStream = new FileInputStream("graphplotterproject.gp");
 	    ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
@@ -212,12 +220,16 @@ public class GraphPlotterFrame extends JFrame implements ActionListener {
 				saveProject();
 			} catch (IOException e1) {
 				e1.printStackTrace();
-				SwingFunctions.showErrorMessage(this, "There was an error saving the project.");
+				SwingFunctions.showErrorMessage(this, "There was a problem saving the project.");
 			}
 		}
 		
 		if(e.getSource() == mfilesaveImage) {
-			
+			try {
+				saveImage();
+			} catch (IOException e1) {
+				SwingFunctions.showErrorMessage(this, "There was a problem saving the image.");
+			}
 		}
 		
 		if(e.getSource() == mfileloadProject) {
@@ -225,7 +237,7 @@ public class GraphPlotterFrame extends JFrame implements ActionListener {
 				loadProject();
 			} catch (ClassNotFoundException | IOException e1) {
 				e1.printStackTrace();
-				SwingFunctions.showErrorMessage(this, "There was an error loading the project.");
+				SwingFunctions.showErrorMessage(this, "There was a problem loading the project.");
 			}
 		}
 		
@@ -316,5 +328,6 @@ public class GraphPlotterFrame extends JFrame implements ActionListener {
 	
 	// TODO:
 	// add file menu: save and load image and project
+	// add image save options: white/transparent background and jpeg/png (jpeg disabled when transparent enabled and viceversa)
 	
 }

@@ -3,6 +3,7 @@ package graphplotter.graphics;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -119,6 +120,24 @@ public class GraphicsDrawer extends JComponent {
 		}
 		
 		functionGraphics = temp;
+	}
+	
+	public BufferedImage getBufferedImage(boolean transparent) {
+		BufferedImage bImg;
+		if(transparent)
+			bImg = new BufferedImage(size.width, size.height, BufferedImage.TYPE_INT_ARGB);
+		else
+			bImg = new BufferedImage(size.width, size.height, BufferedImage.TYPE_INT_RGB);
+		
+	    Graphics2D cg = bImg.createGraphics();
+	    
+	    if(!transparent) {
+	    	cg.setPaint(Color.WHITE);
+	    	cg.fillRect (0, 0, size.width, size.height);
+	    }
+	    
+	    this.paintAll(cg);
+	    return bImg;
 	}
 	
 	public void loadProject(GraphPlotterProjectSave save) {
