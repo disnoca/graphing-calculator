@@ -113,7 +113,7 @@ public class RemoveFunctionWindow extends PopupWindow {
 		if(removed)
 			SwingFunctions.updateFrameContents(parent);
 		else
-			SwingFunctions.showErrorMessage(this, "No functions were selected.");
+			SwingFunctions.showErrorMessageDialog(this, "No functions were selected.");
 		
 		return removed;
 	}

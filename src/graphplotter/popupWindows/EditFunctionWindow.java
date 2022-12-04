@@ -83,13 +83,13 @@ public class EditFunctionWindow extends PopupWindow {
 			try {
 				function.setExpression(textField.getText().trim());
 			} catch(UnknownFunctionOrVariableException e1) {
-				SwingFunctions.showErrorMessage(this, "Invalid function");
+				SwingFunctions.showErrorMessageDialog(this, "Invalid function");
 				return;
 			}	catch(EmptyStackException e2) {
-				SwingFunctions.showErrorMessage(this, "Check the number of parentheses");
+				SwingFunctions.showErrorMessageDialog(this, "Check the number of parentheses");
 				return;
 			} catch(IllegalArgumentException e3) {
-				SwingFunctions.showErrorMessage(this, "Please enter a function");
+				SwingFunctions.showErrorMessageDialog(this, "Please enter a function");
 				return;
 			}
 		}

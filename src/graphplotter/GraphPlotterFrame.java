@@ -4,7 +4,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -16,7 +15,6 @@ import java.awt.Dimension;
 import java.util.HashMap;
 import java.util.Stack;
 
-import javax.imageio.ImageIO;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -28,7 +26,10 @@ import graphplotter.popupWindows.AddFunctionWindow;
 import graphplotter.popupWindows.ListFunctionsWindow;
 import graphplotter.popupWindows.PopupWindow;
 import graphplotter.popupWindows.RemoveFunctionWindow;
+import graphplotter.popupWindows.SaveImageWindow;
 import graphplotter.popupWindows.SetReferentialLimitsWindow;
+import graphplotter.saver.GraphPlotterProjectFileFilter;
+import graphplotter.saver.GraphPlotterProjectSave;
 
 @SuppressWarnings("serial")
 public class GraphPlotterFrame extends JFrame implements ActionListener {
@@ -43,6 +44,7 @@ public class GraphPlotterFrame extends JFrame implements ActionListener {
 	
 	private GraphicsDrawer graphicsDrawer;
 	
+	private PopupWindow saveImageWindow;
 	private PopupWindow addFunctionWindow, removeFunctionWindow, listFunctionsWindow;
 	private PopupWindow setReferentialLimitsWindow;
 	
@@ -177,6 +179,7 @@ public class GraphPlotterFrame extends JFrame implements ActionListener {
 	}
 	
 	private void initPopupWindows() {
+		saveImageWindow = new SaveImageWindow(this, "Save Image", graphicsDrawer);
 		addFunctionWindow = new AddFunctionWindow(this, "Add Function", graphicsDrawer, colorStack);
 		removeFunctionWindow = new RemoveFunctionWindow(this, "Remove Functions", graphicsDrawer, colorStack);
 		listFunctionsWindow = new ListFunctionsWindow(this, "Functions List", graphicsDrawer, colorIdsMap);
@@ -184,29 +187,30 @@ public class GraphPlotterFrame extends JFrame implements ActionListener {
 	}
 	
 	private void saveProject() throws IOException {
+		String filePath = SwingFunctions.showSaveFileDialog(this, "gpp", new GraphPlotterProjectFileFilter());
+		if(filePath == null) return;
+		
 		GraphPlotterProjectSave save = new GraphPlotterProjectSave(graphicsDrawer);
-		FileOutputStream fileOutputStream = new FileOutputStream("graphplotterproject.gp");
+		FileOutputStream fileOutputStream = new FileOutputStream(filePath);
 	    ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream);
 	    objectOutputStream.writeObject(save);
 	    objectOutputStream.flush();
 	    objectOutputStream.close();
 	}
 	
-	private void saveImage() throws IOException {
-		BufferedImage saveImg = graphicsDrawer.getBufferedImage(false);
-		ImageIO.write(saveImg, "png", new File(".\\graphplotter_image.png"));
-	}
-	
 	private void loadProject() throws ClassNotFoundException, IOException {
-		FileInputStream fileInputStream = new FileInputStream("graphplotterproject.gp");
+		File file = SwingFunctions.showLoadFileDialog(this);
+		if(file == null) return;
+		
+		FileInputStream fileInputStream = new FileInputStream(file);
 	    ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
 	    GraphPlotterProjectSave save = (GraphPlotterProjectSave) objectInputStream.readObject();
 	    objectInputStream.close();
 		
-		colorStack.clear();
+		initFunctionColors();
 		int savedFunctions = save.getFunctions().keySet().size();
-		for(int i = savedFunctions; i < MAX_FUNCTIONS-1; i++)
-			colorStack.push(functionColors[i]);
+		for(int i = 0; i < savedFunctions; i++)
+			colorStack.pop();
 		
 		graphicsDrawer.loadProject(save);
 		SwingFunctions.updateFrameContents(this);
@@ -220,16 +224,12 @@ public class GraphPlotterFrame extends JFrame implements ActionListener {
 				saveProject();
 			} catch (IOException e1) {
 				e1.printStackTrace();
-				SwingFunctions.showErrorMessage(this, "There was a problem saving the project.");
+				SwingFunctions.showErrorMessageDialog(this, "There was a problem saving the project.");
 			}
 		}
 		
 		if(e.getSource() == mfilesaveImage) {
-			try {
-				saveImage();
-			} catch (IOException e1) {
-				SwingFunctions.showErrorMessage(this, "There was a problem saving the image.");
-			}
+			saveImageWindow.showWindow();
 		}
 		
 		if(e.getSource() == mfileloadProject) {
@@ -237,27 +237,27 @@ public class GraphPlotterFrame extends JFrame implements ActionListener {
 				loadProject();
 			} catch (ClassNotFoundException | IOException e1) {
 				e1.printStackTrace();
-				SwingFunctions.showErrorMessage(this, "There was a problem loading the project.");
+				SwingFunctions.showErrorMessageDialog(this, "There was a problem loading the project.");
 			}
 		}
 		
 		if(e.getSource() == mfuncAdd) {		//TODO: verify if function is not duplicate
 			if(graphicsDrawer.getFunctionCount() >= MAX_FUNCTIONS)
-				SwingFunctions.showErrorMessage(this, "Maximum functions limit reached. Remove a function before adding a new one.");
+				SwingFunctions.showErrorMessageDialog(this, "Maximum functions limit reached. Remove a function before adding a new one.");
 			else
 				addFunctionWindow.showWindow();
 		}
 		
 		if(e.getSource() == mfuncRemove) {
 			if(graphicsDrawer.getFunctionCount() == 0)
-				SwingFunctions.showErrorMessage(this, "There are no functions to remove.");
+				SwingFunctions.showErrorMessageDialog(this, "There are no functions to remove.");
 			else
 				removeFunctionWindow.showWindow();
 		}
 		
 		if(e.getSource() == mfuncList) {
 			if(graphicsDrawer.getFunctionCount() == 0)
-				SwingFunctions.showErrorMessage(this, "There are no functions to list.");
+				SwingFunctions.showErrorMessageDialog(this, "There are no functions to list.");
 			else
 				listFunctionsWindow.showWindow();
 		}
@@ -327,7 +327,6 @@ public class GraphPlotterFrame extends JFrame implements ActionListener {
 	}
 	
 	// TODO:
-	// add file menu: save and load image and project
-	// add image save options: white/transparent background and jpeg/png (jpeg disabled when transparent enabled and viceversa)
+	// 
 	
 }

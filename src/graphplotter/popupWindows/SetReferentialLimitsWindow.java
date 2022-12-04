@@ -92,16 +92,16 @@ public class SetReferentialLimitsWindow extends PopupWindow {
 				for(int i = 0; i < referentialLimitsTF.length; i++)
 					limits[i] = Double.parseDouble(referentialLimitsTF[i].getText());
 		    } catch (NumberFormatException ignore) {
-		        SwingFunctions.showErrorMessage(this, "Invalid Values.");
+		        SwingFunctions.showErrorMessageDialog(this, "Invalid Values.");
 		        return;
 		    }
 			
 			if(limits[0] >= limits[1]) {
-				SwingFunctions.showErrorMessage(this, "max X must be greater than min X.");
+				SwingFunctions.showErrorMessageDialog(this, "max X must be greater than min X.");
 				return;
 			}
 			else if(limits[2] >= limits[3]) {
-				SwingFunctions.showErrorMessage(this, "max Y must be greater than min Y.");
+				SwingFunctions.showErrorMessageDialog(this, "max Y must be greater than min Y.");
 				return;
 			}
 				

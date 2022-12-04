@@ -1,4 +1,4 @@
-package graphplotter;
+package graphplotter.saver;
 
 import java.awt.Color;
 import java.io.Serializable;

@@ -1,14 +1,19 @@
 package graphplotter;
 
 import java.awt.Dimension;
+import java.io.File;
 
 import javax.swing.JButton;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import javax.swing.filechooser.FileFilter;
+
+import graphplotter.saver.GraphPlotterProjectFileFilter;
 
 public class SwingFunctions {
 
-	public static void showErrorMessage(JFrame parent, String message) {
+	public static void showErrorMessageDialog(JFrame parent, String message) {
 		JOptionPane.showMessageDialog(parent, message, "Error", JOptionPane.ERROR_MESSAGE);
 	}
 	
@@ -31,6 +36,28 @@ public class SwingFunctions {
 		
 		frame.setSize(tempSize);
 		frame.setSize(size);
+	}
+	
+	public static String showSaveFileDialog(JFrame parent, String fileExtension, FileFilter fileFilter) {
+		JFileChooser fileSaver = new JFileChooser();
+		fileSaver.addChoosableFileFilter(fileFilter);
+		fileSaver.setAcceptAllFileFilterUsed(false);
+		int choice = fileSaver.showSaveDialog(parent);
+		if (choice != JFileChooser.APPROVE_OPTION) return null;
+		File chosenFile = fileSaver.getSelectedFile();
+		String filePath = chosenFile.getAbsolutePath();
+		if(GraphPlotterProjectFileFilter.getExtension(chosenFile) == null)
+			filePath += "."+fileExtension;
+		return filePath;
+	}
+	
+	public static File showLoadFileDialog(JFrame parent) {
+		JFileChooser fileChooser = new JFileChooser();
+		fileChooser.addChoosableFileFilter(new GraphPlotterProjectFileFilter());
+		fileChooser.setAcceptAllFileFilterUsed(false);
+		int choice = fileChooser.showOpenDialog(parent);
+		if (choice != JFileChooser.APPROVE_OPTION) return null;
+		return fileChooser.getSelectedFile();
 	}
 	
 }

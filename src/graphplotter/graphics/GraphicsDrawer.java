@@ -13,7 +13,7 @@ import javax.swing.JComponent;
 
 import functionComponents.Function;
 import functionComponents.ReferentialLimits;
-import graphplotter.GraphPlotterProjectSave;
+import graphplotter.saver.GraphPlotterProjectSave;
 
 @SuppressWarnings("serial")
 public class GraphicsDrawer extends JComponent {
