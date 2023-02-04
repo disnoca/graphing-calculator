@@ -115,16 +115,12 @@ public class ReferentialLimits implements Serializable {
 	
 	// this method returns the actual decimal places because it is used to display the numbers correctly
 	// unlike the one above which is used for calculations and better visuals of the referential marks
-	private int calculateDecimalPlacesForFormatting(double number) {
+	private int calculateDecimalPlacesForFormatting(double number) {	
 		number = Math.abs(number);
-		int decimalPoints = 0;
+		number = number-Math.floor(number);
+		if(number == 0) return 0;
 		
-		if(number > 1)
-			while(number > 10) {
-				number /= 10;
-				decimalPoints--;
-			}
-		else
+		int decimalPoints = 0;
 			while(number < 1) {
 				number *= 10;
 				decimalPoints++;
