@@ -109,27 +109,8 @@ public class ReferentialLimits implements Serializable {
 		return decimalPoints;
 	}
 	
-	// this method returns the actual decimal places because it is used to display the numbers correctly
-	// unlike the one above which is used for calculations and better visuals of the referential marks
-	private int calculateDecimalPlacesForFormatting(double number) {	
-		number = Math.abs(number);
-		number = number-Math.floor(number);
-		if(number == 0) return 0;
-		
-		int decimalPoints = 0;
-			while(number < 1) {
-				number *= 10;
-				decimalPoints++;
-			}
-		return decimalPoints;
-	}
-	
 	private String formattedNumberString(double number, int decimalPlaces) {
-		if(decimalPlaces <= 0) {
-			String numberString = String.valueOf(number);
-			int pointCharIndex = numberString.indexOf('.');
-			return numberString.substring(0, pointCharIndex);
-		}
+		if(decimalPlaces <= 0) return String.valueOf(Math.round(number));
 		
 		String format = "#.";
 		for(int i=0; i<decimalPlaces; i++)
@@ -150,12 +131,14 @@ public class ReferentialLimits implements Serializable {
 	}
 	
 	public String[] getFormattedLimits() {
-		String[] formattedLimits = {formattedNumberString(xMin, calculateDecimalPlacesForFormatting(xMin)), 
-				formattedNumberString(xMax, calculateDecimalPlacesForFormatting(xMax)), 
-				formattedNumberString(yMin, calculateDecimalPlacesForFormatting(yMin)), 
-				formattedNumberString(yMax, calculateDecimalPlacesForFormatting(yMax))};
+		String[] limitStrs = {Double.toString(xMin), Double.toString(xMax), Double.toString(yMin), Double.toString(yMax)};
 		
-		return formattedLimits;
+		// integer values (coded as doubles) have a trailing .0 when turned into a String. This gets rid of that
+		for(int i = 0; i < limitStrs.length; i++)
+			if(limitStrs[i].endsWith(".0"))
+				limitStrs[i] = limitStrs[i].substring(0, limitStrs[i].length()-2);
+		
+		return limitStrs;
 	}
 	
 	public double getXMin() {
@@ -188,6 +171,10 @@ public class ReferentialLimits implements Serializable {
 
 	public HashMap<Point, String> getYReferentialMarks() {
 		return yReferentialMarks;
+	}
+	
+	public String getFormattedAbcissa(double abcissa) {
+		return formattedNumberString(abcissa, calculateDecimalPlacesForReferential(xMax-xMin));
 	}
 	
 	public void updateLimits(double xMin, double xMax, double yMin, double yMax) {

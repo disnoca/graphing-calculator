@@ -20,7 +20,7 @@ public class Function implements Serializable {
 	
 	// determines how fluid is the function's drawing
 	// setting it any higher than this can cause significant loading times
-	private final double ACCURACY = 20000;	
+	private final double DRAWING_ACCURACY = 20000;	
 	
 
 	public Function(Dimension size, ReferentialLimits referentialLimits, String expression) {
@@ -43,7 +43,7 @@ public class Function implements Serializable {
 	
 	private void computeFunction() {
 		double xLength = referentialLimits.getXLength();
-		double step = xLength/ACCURACY;
+		double step = xLength/DRAWING_ACCURACY;
 		int pointCount = (int) Math.ceil(xLength/step);
 		
 		points = new ArrayList<>(pointCount);
@@ -64,6 +64,31 @@ public class Function implements Serializable {
 		this.width = size.width;
 		this.height = size.height;
 		computeFunction();
+	}
+	
+	
+	// Mathematical Algorithms
+	private final double RESULT_ACCURACY = 0.000001;
+	
+	public double secant(double x1, double x2) {
+		if(f(x1)*f(x2) > 0) return Double.NaN;
+		double m = (x1+x2)/2;
+		if(f(m) == 0) return m;
+		
+		double y1, ym;
+		while((x2-x1)/2 > RESULT_ACCURACY) {
+			y1 = f(x1);
+			ym = f(m);
+			
+			if(y1*ym < 0)
+				x2 = m;
+			else
+				x1 = m;
+			
+			m = (x1+x2)/2;
+		}
+		
+		return m;
 	}
 	
 }
