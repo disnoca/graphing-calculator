@@ -80,16 +80,12 @@ public class ReferentialLimits implements Serializable {
 				}
 			}
 			
-			if(referentialMarks.size()+marksBatch.size() > 20) break;
+			if(i > 0 && referentialMarks.size()+marksBatch.size() > 20) break;
 			referentialMarks.putAll(marksBatch);
 		}
 		
 		return referentialMarks;
 	}
-	
-	
-	// duplicated code but I cant do anything about it. joining these two methods into one
-	// would make it much more complex and it would be impossible to understand what it does
 	
 	// negative decimal places represent the number of '0's to the right
 	// in this method, edge cases like 0.1, 1 and 10 return their decimal places minus 1
