@@ -4,6 +4,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -32,7 +34,7 @@ import graphplotter.saver.GraphPlotterProjectFileFilter;
 import graphplotter.saver.GraphPlotterProjectSave;
 
 @SuppressWarnings("serial")
-public class GraphPlotterFrame extends JFrame implements ActionListener, KeyListener {
+public class GraphPlotterFrame extends JFrame implements ActionListener, KeyListener, MouseWheelListener {
 	
 	private JMenuBar menubar;
 	private JMenu menuFile, menuFileSave, menuFileLoad;
@@ -74,6 +76,8 @@ public class GraphPlotterFrame extends JFrame implements ActionListener, KeyList
 		initGraphics();
 		initPopupWindows();
 		
+		this.addKeyListener(this);
+		this.addMouseWheelListener(this);
 		/*this.addComponentListener(new ComponentAdapter() {				uncomment when above todo is completed
 		    public void componentResized(ComponentEvent componentEvent) {
 		        graphicsDrawer.setFrameSize(drawingAreaSize());
@@ -82,7 +86,6 @@ public class GraphPlotterFrame extends JFrame implements ActionListener, KeyList
 		
 		this.setLocationRelativeTo(null);
 		this.setVisible(true);
-		this.addKeyListener(this);
 	}
 	
 	private void initFunctionColors() {
@@ -324,10 +327,6 @@ public class GraphPlotterFrame extends JFrame implements ActionListener, KeyList
 		size.height -= 62;
 		return size;
 	}
-	
-	public static void main(String[] args) {
-		new GraphPlotterFrame();
-	}
 
 	@Override
 	public void keyPressed(KeyEvent e) {
@@ -357,8 +356,28 @@ public class GraphPlotterFrame extends JFrame implements ActionListener, KeyList
 	public void keyTyped(KeyEvent e) {}
 	@Override
 	public void keyReleased(KeyEvent e) {}
+
+	@Override
+	public void mouseWheelMoved(MouseWheelEvent e) {
+		int notches = e.getWheelRotation();
+		
+		if(notches < 0)
+			for(int i = 0; i > notches; i--)
+				graphicsDrawer.halveReferentialLimits();
+		else
+			for(int i = 0; i < notches; i++)
+				graphicsDrawer.doubleReferentialLimits();
+	
+		SwingFunctions.updateFrameContents(this);
+	}
+	
+	
+	public static void main(String[] args) {
+		new GraphPlotterFrame();
+	}
 	
 	// TODO:
-	// 
+	// add referential move on mouse drag
+	// find how to only resize after mouse released (refere to constructor)
 	
 }
