@@ -71,6 +71,7 @@ public class ReferentialGraphic extends BufferedImage {
 			Point p = mark.getKey();
 			String label = mark.getValue();
 			int xFrameCoord = p.getXFrameCoord(limits[0], limits[1]);
+			
 			g2d.drawLine(xFrameCoord, xLineYFrameCoord-5, xFrameCoord, xLineYFrameCoord+5);
 			if(xLineYFrameCoord <= width/2)
 				g2d.drawString(label, xFrameCoord-label.length()*3, xLineYFrameCoord+20);
@@ -82,8 +83,9 @@ public class ReferentialGraphic extends BufferedImage {
 			Point p = mark.getKey();
 			String label = mark.getValue();
 			int yFrameCoord = p.getYFrameCoord(limits[2], limits[3]);
+			
 			g2d.drawLine(yLineXFrameCoord-5, yFrameCoord, yLineXFrameCoord+5, yFrameCoord);
-			if(xLineYFrameCoord >= height/2)
+			if(yLineXFrameCoord >= height/2)
 				g2d.drawString(label, yLineXFrameCoord-10-label.length()*6, yFrameCoord+4);
 			else
 				g2d.drawString(label, yLineXFrameCoord+8+label.length(), yFrameCoord+4);
