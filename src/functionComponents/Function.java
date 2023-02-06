@@ -3,6 +3,7 @@ package functionComponents;
 import java.awt.Dimension;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Random;
 
 import net.objecthunter.exp4j.Expression;
 import net.objecthunter.exp4j.ExpressionBuilder;
@@ -68,15 +69,18 @@ public class Function implements Serializable {
 	
 	
 	// Mathematical Algorithms
-	private final double RESULT_ACCURACY = 0.000001;
+	private final double TOLERANCE = 0.000001;
 	
-	public double secant(double x1, double x2) {
+	// Root Finding Algorithm
+	// Secant method
+	// find the root of a function between two points with different signs
+	private double findRoot(double x1, double x2) {
 		if(f(x1)*f(x2) > 0) return Double.NaN;
 		double m = (x1+x2)/2;
 		if(f(m) == 0) return m;
 		
 		double y1, ym;
-		while((x2-x1)/2 > RESULT_ACCURACY) {
+		while((x2-x1)/2 > TOLERANCE) {
 			y1 = f(x1);
 			ym = f(m);
 			
@@ -89,6 +93,34 @@ public class Function implements Serializable {
 		}
 		
 		return m;
+	}
+	
+	// Integral Calculation Algorithm
+	// Monte Carlo integration using anthitetic variables for variance reduction
+	private final int SAMPLE_SIZE = 100000;
+	
+	private double calculateIntegral(double x1, double x2) {
+		Random rand = new Random();
+		double range = (x2-x1);
+		double randValues[] = new double[SAMPLE_SIZE];
+		double funcSamples[] = new double[SAMPLE_SIZE];
+		double funcSamplesSum = 0;
+		
+		// the generated values must be generated from a Standard Uniform Distribution in order for the anthitetic variables method to be used
+		// hence first generating the value between 0 and 1 (and its counterpart) and only then performing the scaling to the specified bounds
+		for(int i = 0; i < SAMPLE_SIZE; i+=2) {
+			randValues[i] = rand.nextDouble();
+			randValues[i+1] = 1-randValues[i];
+			randValues[i] = randValues[i]*range + x1;
+			randValues[i+1] = randValues[i+1]*range + x1;
+		}
+		
+		for(int i = 0; i < SAMPLE_SIZE; i++) {
+			funcSamples[i] = range*f(randValues[i]);
+			funcSamplesSum += funcSamples[i];
+		}
+		
+		return funcSamplesSum/SAMPLE_SIZE;
 	}
 	
 }

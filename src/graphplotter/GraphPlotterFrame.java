@@ -2,8 +2,8 @@ package graphplotter;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -32,7 +32,7 @@ import graphplotter.saver.GraphPlotterProjectFileFilter;
 import graphplotter.saver.GraphPlotterProjectSave;
 
 @SuppressWarnings("serial")
-public class GraphPlotterFrame extends JFrame implements ActionListener {
+public class GraphPlotterFrame extends JFrame implements ActionListener, KeyListener {
 	
 	private JMenuBar menubar;
 	private JMenu menuFile, menuFileSave, menuFileLoad;
@@ -59,6 +59,8 @@ public class GraphPlotterFrame extends JFrame implements ActionListener {
 	private final double DEFAULT_MINY = -10;
 	private final double DEFAULT_MAXY = 10;
 	
+	private final int SCREEN_MOVE_PORTION = 8;	// an eight of the screen is moved on key press
+	
 
 	public GraphPlotterFrame() {
 		super("Graph Plotter");
@@ -72,14 +74,15 @@ public class GraphPlotterFrame extends JFrame implements ActionListener {
 		initGraphics();
 		initPopupWindows();
 		
-		this.addComponentListener(new ComponentAdapter() {
+		/*this.addComponentListener(new ComponentAdapter() {				uncomment when above todo is completed
 		    public void componentResized(ComponentEvent componentEvent) {
 		        graphicsDrawer.setFrameSize(drawingAreaSize());
 		    }
-		});
+		});*/
 		
 		this.setLocationRelativeTo(null);
 		this.setVisible(true);
+		this.addKeyListener(this);
 	}
 	
 	private void initFunctionColors() {
@@ -325,6 +328,35 @@ public class GraphPlotterFrame extends JFrame implements ActionListener {
 	public static void main(String[] args) {
 		new GraphPlotterFrame();
 	}
+
+	@Override
+	public void keyPressed(KeyEvent e) {
+		int keyCode = e.getKeyCode();
+		if(keyCode < KeyEvent.VK_LEFT || keyCode > KeyEvent.VK_DOWN) return;
+		
+		ReferentialLimits rl = graphicsDrawer.getReferentialLimits(); 
+		double step = rl.getXLength()/SCREEN_MOVE_PORTION;
+		double[] limits = rl.getLimits();
+		
+		if(keyCode == KeyEvent.VK_LEFT)
+			graphicsDrawer.setReferentialLimits(limits[0]-step, limits[1]-step, limits[2], limits[3]);
+		
+		if(keyCode == KeyEvent.VK_RIGHT)
+			graphicsDrawer.setReferentialLimits(limits[0]+step, limits[1]+step, limits[2], limits[3]);
+		
+		if(keyCode == KeyEvent.VK_UP)
+			graphicsDrawer.setReferentialLimits(limits[0], limits[1], limits[2]+step, limits[3]+step);
+		
+		if(keyCode == KeyEvent.VK_DOWN)
+			graphicsDrawer.setReferentialLimits(limits[0], limits[1], limits[2]-step, limits[3]-step);
+		
+		SwingFunctions.updateFrameContents(this);
+	}
+	
+	@Override
+	public void keyTyped(KeyEvent e) {}
+	@Override
+	public void keyReleased(KeyEvent e) {}
 	
 	// TODO:
 	// 

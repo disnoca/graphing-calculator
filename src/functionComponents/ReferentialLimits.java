@@ -80,6 +80,8 @@ public class ReferentialLimits implements Serializable {
 				}
 			}
 			
+			// in some cases, the step might be too high and too few marks will appear
+			// ine those cases, this allows for more marks to be added, up to a maximum of 19
 			if(i > 0 && referentialMarks.size()+marksBatch.size() > 20) break;
 			referentialMarks.putAll(marksBatch);
 		}
