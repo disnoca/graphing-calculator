@@ -3,6 +3,8 @@ package functionComponents;
 import java.awt.Dimension;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map.Entry;
 import java.util.Random;
 
 import net.objecthunter.exp4j.Expression;
@@ -27,7 +29,9 @@ public class Function implements Serializable {
 	
 	// determines how fluid is the function's drawing
 	// setting it any higher than this can cause significant loading times
-	private final double DRAWING_ACCURACY = 20000;	
+	private final double DRAWING_ACCURACY = 20000;
+	
+	private ArrayList<Double> roots, maximums, minimums;
 	
 
 	public Function(Dimension size, ReferentialLimits referentialLimits, String expression) {
@@ -35,8 +39,16 @@ public class Function implements Serializable {
 		this.height = size.height;
 		this.referentialLimits = referentialLimits;
 		
+		roots = new ArrayList<>();
+		maximums = new ArrayList<>();
+		minimums = new ArrayList<>();
+		
 		setExpression(expression);
 		secondaryFunction = null;
+		
+		findRoots(-100, 100);
+		for(double root : roots)
+			System.out.println(root);
 	}
 
 	public String getExpression() {
@@ -56,8 +68,12 @@ public class Function implements Serializable {
 		
 		points = new ArrayList<>(pointCount);
 		
-		for(double i=referentialLimits.getXMin(); i<=referentialLimits.getXMax(); i+=step)
-			points.add(new Point(i, f(i), width, height));
+		double y;
+		for(double i=referentialLimits.getXMin(); i<=referentialLimits.getXMax(); i+=step) {
+			y = f(i);
+			if(y != Double.NaN)
+				points.add(new Point(i, f(i), width, height));
+		}
 	}
 	
 	private double f(double x) {
@@ -87,6 +103,40 @@ public class Function implements Serializable {
 		this.width = size.width;
 		this.height = size.height;
 		computeFunctionPoints();
+	}
+	
+	// G-Solve Functions
+	private double step = 0.1;
+	
+	private void findRoots(double minCoord, double maxCoord) {
+		HashMap<Double, Double> rootAreas = new HashMap<>();
+		
+		double prevY = 0;
+		boolean prevWasNan = false;
+		for(double x = minCoord; x <= maxCoord; x += step) {
+			double y = f(x);
+			if(y == Double.NaN)  {
+				prevWasNan = true;
+				continue;
+			}
+			
+			if(prevWasNan) {
+				prevWasNan = false;
+				prevY = y;
+				continue;
+			}
+			
+			if(y == 0)
+				roots.add(x);
+			else if(y*prevY < 0)
+				rootAreas.put(x-step, x);
+			
+			prevY = y;
+		}
+		
+		secondaryFunction = null;
+		for(Entry<Double, Double> rootArea : rootAreas.entrySet())
+			roots.add(computeRoot(rootArea.getKey(), rootArea.getValue()));
 	}
 	
 	
