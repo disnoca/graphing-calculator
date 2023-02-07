@@ -46,9 +46,9 @@ public class Function implements Serializable {
 		setExpression(expression);
 		secondaryFunction = null;
 		
-		findRoots(-100, 100);
+		/*findRoots(-100, 100);
 		for(double root : roots)
-			System.out.println(root);
+			System.out.println(root);*/
 	}
 
 	public String getExpression() {
@@ -71,8 +71,10 @@ public class Function implements Serializable {
 		double y;
 		for(double i=referentialLimits.getXMin(); i<=referentialLimits.getXMax(); i+=step) {
 			y = f(i);
-			if(y != Double.NaN)
+			if(Double.isFinite(y))
 				points.add(new Point(i, f(i), width, height));
+			else
+				points.add(null);
 		}
 	}
 	
@@ -108,6 +110,8 @@ public class Function implements Serializable {
 	// G-Solve Functions
 	private double step = 0.1;
 	
+	// TODO: fix the problem of program finding non-existent roots in functions like tan(x) 
+	
 	private void findRoots(double minCoord, double maxCoord) {
 		HashMap<Double, Double> rootAreas = new HashMap<>();
 		
@@ -115,7 +119,7 @@ public class Function implements Serializable {
 		boolean prevWasNan = false;
 		for(double x = minCoord; x <= maxCoord; x += step) {
 			double y = f(x);
-			if(y == Double.NaN)  {
+			if(Double.isNaN(y))  {
 				prevWasNan = true;
 				continue;
 			}

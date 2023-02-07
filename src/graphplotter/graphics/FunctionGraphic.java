@@ -37,8 +37,14 @@ public class FunctionGraphic extends BufferedImage {
 		ArrayList<Point> points = function.getPoints();
 		double[] limits = referentialLimits.getLimits();
 		
-		for(Point point : points)
-			pol.addPoint(point.getXFrameCoord(limits[0], limits[1]), point.getYFrameCoord(limits[2], limits[3]));
+		for(Point point : points) {
+			if(point == null) {
+				g2d.drawPolyline(pol.xpoints, pol.ypoints, pol.npoints);
+				pol.reset();
+			}
+			else
+				pol.addPoint(point.getXFrameCoord(limits[0], limits[1]), point.getYFrameCoord(limits[2], limits[3]));
+		}
 			
 		g2d.drawPolyline(pol.xpoints, pol.ypoints, pol.npoints);
 	}
