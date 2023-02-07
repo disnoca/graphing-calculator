@@ -12,10 +12,16 @@ public class Function implements Serializable {
 	
 	private static final long serialVersionUID = 1L;
 	
+	private final boolean FIND_MAX = true;
+	private final boolean FIND_MIN = false;
+	
 	private int width, height;
 	private ReferentialLimits referentialLimits;
 	private String expression;
-	private Expression function;
+	
+	// secondary function is the function chosen to find the intersection with
+	// it's declared here so that findRoot() and findIntersection() can be the same block of code
+	private Expression function, secondaryFunction;
 	
 	private ArrayList<Point> points;
 	
@@ -30,6 +36,7 @@ public class Function implements Serializable {
 		this.referentialLimits = referentialLimits;
 		
 		setExpression(expression);
+		secondaryFunction = null;
 	}
 
 	public String getExpression() {
@@ -39,10 +46,10 @@ public class Function implements Serializable {
 	public void setExpression(String expression) {
 		this.expression = expression;
 		this.function = new ExpressionBuilder(expression).variable("x").build();
-		computeFunction();
+		computeFunctionPoints();
 	}
 	
-	private void computeFunction() {
+	private void computeFunctionPoints() {
 		double xLength = referentialLimits.getXLength();
 		double step = xLength/DRAWING_ACCURACY;
 		int pointCount = (int) Math.ceil(xLength/step);
@@ -54,7 +61,22 @@ public class Function implements Serializable {
 	}
 	
 	private double f(double x) {
-		return function.setVariable("x", x).evaluate();
+		try {
+			return function.setVariable("x", x).evaluate();
+		} catch(Exception e) {
+			return Double.NaN;
+		}
+	}
+	
+	private double h(double x) {
+		try {
+			if(secondaryFunction == null)
+				return function.setVariable("x", x).evaluate();
+			else
+				return function.setVariable("x", x).evaluate() - secondaryFunction.setVariable("x", x).evaluate();
+		} catch(Exception e) {
+			return Double.NaN;
+		}
 	}
 	
 	public ArrayList<Point> getPoints() {
@@ -64,55 +86,83 @@ public class Function implements Serializable {
 	public void recalculateFrameSize(Dimension size) {
 		this.width = size.width;
 		this.height = size.height;
-		computeFunction();
+		computeFunctionPoints();
 	}
 	
 	
 	// Mathematical Algorithms
 	private final double TOLERANCE = 0.000001;
+	private final double GR = (Math.sqrt(5)-1)/2; 	// golden ratio
 	
 	// Root Finding Algorithm
-	// Secant method
-	// find the root of a function between two points with different signs
-	private double findRoot(double x1, double x2) {
-		if(f(x1)*f(x2) > 0) return Double.NaN;
-		double m = (x1+x2)/2;
-		if(f(m) == 0) return m;
+	// Secant Method
+	// find the root that exists between two points with different signs
+	// if the secondaryFunction variable is set then this method returns the intersection between the two functions
+	private double computeRoot(double a, double b) {
+		if(h(a)*h(b) > 0) return Double.NaN;
+		double m = (a+b)/2;
+		if(h(m) == 0) return m;
 		
 		double y1, ym;
-		while((x2-x1)/2 > TOLERANCE) {
-			y1 = f(x1);
-			ym = f(m);
+		while(b-a > TOLERANCE) {
+			y1 = h(a);
+			ym = h(m);
 			
 			if(y1*ym < 0)
-				x2 = m;
+				b = m;
 			else
-				x1 = m;
+				a = m;
 			
-			m = (x1+x2)/2;
+			m = (a+b)/2;
 		}
 		
 		return m;
+	}
+	
+	// Maximum/Minimum Finding Algorithm
+	// Golden Section Search Method
+	// find the maximum/minimum that exists between two points
+	private double computeExtreme(double a, double b, boolean findMaximum) {
+		double x1, x2, d;
+		boolean cond;
+		
+		while(b-a > TOLERANCE) {
+			d = GR*(b-a);
+			x1 = a+d;
+			x2 = b-d;
+			
+			if(findMaximum)
+				cond = f(x1) > f(x2);
+			else
+				cond = f(x1) < f(x2);
+		
+			if(cond)
+				a = x2;
+			else
+				b = x1;
+		}
+		
+		return (a+b)/2;
 	}
 	
 	// Integral Calculation Algorithm
 	// Monte Carlo integration using anthitetic variables for variance reduction
 	private final int SAMPLE_SIZE = 100000;
 	
-	private double calculateIntegral(double x1, double x2) {
+	private double copmuteIntegral(double a, double b) {
 		Random rand = new Random();
-		double range = (x2-x1);
+		double range = (b-a);
 		double randValues[] = new double[SAMPLE_SIZE];
 		double funcSamples[] = new double[SAMPLE_SIZE];
 		double funcSamplesSum = 0;
 		
 		// the generated values must be generated from a Standard Uniform Distribution in order for the anthitetic variables method to be used
-		// hence first generating the value between 0 and 1 (and its counterpart) and only then performing the scaling to the specified bounds
+		// hence first generating the value between 0 and 1 (and its opposite) and only then performing the scaling to the specified bounds
 		for(int i = 0; i < SAMPLE_SIZE; i+=2) {
 			randValues[i] = rand.nextDouble();
 			randValues[i+1] = 1-randValues[i];
-			randValues[i] = randValues[i]*range + x1;
-			randValues[i+1] = randValues[i+1]*range + x1;
+			randValues[i] = randValues[i]*range + a;
+			randValues[i+1] = randValues[i+1]*range + a;
 		}
 		
 		for(int i = 0; i < SAMPLE_SIZE; i++) {

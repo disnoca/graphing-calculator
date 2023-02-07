@@ -10,6 +10,9 @@ public class ReferentialLimits implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 	
+	private final boolean X_LINE = true;
+	private final boolean Y_LINE = false;
+	
 	private double xMin, xMax, yMin, yMax;
 	private int frameWidth, frameHeight;
 	private HashMap<Point, String> xReferentialMarks, yReferentialMarks;
@@ -26,9 +29,9 @@ public class ReferentialLimits implements Serializable {
 		
 		xReferentialMarks = new HashMap<>();
 		yReferentialMarks = new HashMap<>();
-		
-		xReferentialMarks = calculateReferentialMarks(true);
-		yReferentialMarks = calculateReferentialMarks(false);
+	
+		xReferentialMarks = calculateReferentialMarks(X_LINE);
+		yReferentialMarks = calculateReferentialMarks(Y_LINE);
 	}
 	
 	private HashMap<Point, String> calculateReferentialMarks(boolean xLine) {
@@ -185,8 +188,16 @@ public class ReferentialLimits implements Serializable {
 		this.yMin = yMin;
 		this.yMax = yMax;
 		
-		xReferentialMarks = calculateReferentialMarks(true);
-		yReferentialMarks = calculateReferentialMarks(false);
+		xReferentialMarks = calculateReferentialMarks(X_LINE);
+		yReferentialMarks = calculateReferentialMarks(Y_LINE);
+	}
+	
+	public void updateFrameSize(Dimension frameSize) {
+		this.frameWidth = frameSize.width;
+		this.frameHeight = frameSize.height;
+		
+		xReferentialMarks = calculateReferentialMarks(X_LINE);
+		yReferentialMarks = calculateReferentialMarks(Y_LINE);
 	}
 	
 }

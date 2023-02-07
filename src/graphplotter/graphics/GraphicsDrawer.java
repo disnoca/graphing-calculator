@@ -87,6 +87,7 @@ public class GraphicsDrawer extends JComponent {
 	
 	public void setFrameSize(Dimension size) {
 		this.size = size;
+		referentialLimits.updateFrameSize(size);
 		updateGraphics();
 	}
 	

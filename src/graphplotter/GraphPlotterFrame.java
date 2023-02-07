@@ -2,8 +2,12 @@ package graphplotter;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.io.File;
@@ -34,7 +38,7 @@ import graphplotter.saver.GraphPlotterProjectFileFilter;
 import graphplotter.saver.GraphPlotterProjectSave;
 
 @SuppressWarnings("serial")
-public class GraphPlotterFrame extends JFrame implements ActionListener, KeyListener, MouseWheelListener {
+public class GraphPlotterFrame extends JFrame implements ActionListener, KeyListener, MouseListener, MouseWheelListener {
 	
 	private JMenuBar menubar;
 	private JMenu menuFile, menuFileSave, menuFileLoad;
@@ -77,12 +81,13 @@ public class GraphPlotterFrame extends JFrame implements ActionListener, KeyList
 		initPopupWindows();
 		
 		this.addKeyListener(this);
+		this.addMouseListener(this);
 		this.addMouseWheelListener(this);
-		/*this.addComponentListener(new ComponentAdapter() {				uncomment when above todo is completed
+		this.addComponentListener(new ComponentAdapter() {
 		    public void componentResized(ComponentEvent componentEvent) {
 		        graphicsDrawer.setFrameSize(drawingAreaSize());
 		    }
-		});*/
+		});
 		
 		this.setLocationRelativeTo(null);
 		this.setVisible(true);
@@ -353,9 +358,20 @@ public class GraphPlotterFrame extends JFrame implements ActionListener, KeyList
 	}
 	
 	@Override
-	public void keyTyped(KeyEvent e) {}
+	public void mouseClicked(MouseEvent e) {
+		
+	}
+
 	@Override
-	public void keyReleased(KeyEvent e) {}
+	public void mousePressed(MouseEvent e) {
+		
+		
+	}
+
+	@Override
+	public void mouseReleased(MouseEvent e) {
+		
+	}
 
 	@Override
 	public void mouseWheelMoved(MouseWheelEvent e) {
@@ -371,13 +387,21 @@ public class GraphPlotterFrame extends JFrame implements ActionListener, KeyList
 		SwingFunctions.updateFrameContents(this);
 	}
 	
+	@Override
+	public void keyTyped(KeyEvent e) {}
+	@Override
+	public void keyReleased(KeyEvent e) {}
+	@Override
+	public void mouseEntered(MouseEvent e) {}
+	@Override
+	public void mouseExited(MouseEvent e) {}
 	
 	public static void main(String[] args) {
 		new GraphPlotterFrame();
 	}
 	
 	// TODO:
-	// add referential move on mouse drag
-	// find how to only resize after mouse released (refere to constructor)
+	// make referential move on mouse drag
+	// mark point where mouse clicked and show its coordinates
 	
 }
