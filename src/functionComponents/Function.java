@@ -131,7 +131,12 @@ public class Function implements Serializable {
 		double prevY = 0;
 		boolean prevWasNan = false;
 		for(double x = minCoord; x <= maxCoord; x += step) {
-			double currY = HelperFunctions.roundToDecimalPlaces(f(x), 5);	// must be rounded because for some reason it computes 2^0 = 1.97e-24 instead of 0
+			
+			// for some reason it computes 0^2 = 1.97e-24 instead of 0
+			// i could round it but functions that tend towards 0 would be wrongly marked with having a root
+			// solution: use another root finding algorithm besides secant
+			double currY = f(x);
+			
 			if(Double.isNaN(currY))  {
 				prevWasNan = true;
 				continue;
