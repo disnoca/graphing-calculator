@@ -408,6 +408,5 @@ public class GraphPlotterFrame extends JFrame implements ActionListener, KeyList
 	// fix the problem of program drawing non-existent points (lines) in functions like tan(x) 
 	// fix the problem of program finding non-existent roots in functions like tan(x) 
 	// make screen only resize on mouse release/after a certain timer
-	// change the root finding algorithm
 	
 }

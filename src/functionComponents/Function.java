@@ -9,7 +9,7 @@ import java.util.HashMap;
 import java.util.Map.Entry;
 import java.util.Random;
 
-import graphplotter.HelperFunctions;
+import graphplotter.MathFunctions;
 import net.objecthunter.exp4j.Expression;
 import net.objecthunter.exp4j.ExpressionBuilder;
 
@@ -123,19 +123,25 @@ public class Function implements Serializable {
 	
 	
 	// G-Solve Functions
-	private double step = 0.1;
+	private double searchStep = 0.1;
+	private int searchDecimalPlaces = MathFunctions.numberOfDecimalPlaces(searchStep);
+	private int resultdecimalPlaces = 2;
 	
+	/*
+	 * How this method works:
+	 * 
+	 * Two consecutive xs are kept at a time. If the first x's evaluation value happens to 0, it's saved as a root.
+	 * Otherwise, if the two xs signs differ it means there's a root in the area between them. All root areas are saved and later their respective roots calculated
+	 */
 	private void findRoots(double minCoord, double maxCoord) {
 		HashMap<Double, Double> rootAreas = new HashMap<>();
 		
 		double prevY = 0;
 		boolean prevWasNan = false;
-		for(double x = minCoord; x <= maxCoord; x += step) {
-			
-			// for some reason it computes 0^2 = 1.97e-24 instead of 0
-			// i could round it but functions that tend towards 0 would be wrongly marked with having a root
-			// solution: use another root finding algorithm besides secant
-			double currY = f(x);
+		
+		// first iteration is skipped
+		for(double x = Math.floor(minCoord); x <= maxCoord; x = MathFunctions.roundToDecimalPlaces(x+searchStep, searchDecimalPlaces)) {
+			double currY = h(x);
 			
 			if(Double.isNaN(currY))  {
 				prevWasNan = true;
@@ -148,26 +154,37 @@ public class Function implements Serializable {
 				continue;
 			}
 			
-			if(currY == 0)
+			if(currY == 0) {
 				roots.add(x);
+			}
 			else if(currY*prevY < 0)
-				rootAreas.put(x-step, x);
+				rootAreas.put(x-searchStep, x);
 			
 			prevY = currY;
 		}
 		
 		secondaryFunction = null;
 		for(Entry<Double, Double> rootArea : rootAreas.entrySet())
-			roots.add(computeRoot(rootArea.getKey(), rootArea.getValue()));
+			roots.add(MathFunctions.roundToDecimalPlaces(computeRoot(rootArea.getKey(), rootArea.getValue()), resultdecimalPlaces));
 	}
 	
+	/*
+	 * How this method works:
+	 * 
+	 * 1. Three consecutive xs are kept at time. If the middle x is evaluated higher/lower than the other variables, it means there's a local extreme in the area between the outer xs.
+	 * All local extremes areas are saved and their extremes calculated.
+	 * 
+	 * 2. The minimum/maximum of the local extremes is calculated and only the local extremes that have that value as y are saved as function extremes
+	 */
 	private void findExtremes(double minCoord, double maxCoord) {
 		HashMap<Double, Double> possibleMinimumAreas = new HashMap<>();
 		HashMap<Double, Double> possibleMaximumAreas = new HashMap<>();
 		
 		double pprevY = 0, prevY = 0;
 		int iterationsSinceNan = 0;
-		for(double x = minCoord; x <= maxCoord; x += step) {
+		
+		// first two iterations are skipped
+		for(double x = Math.floor(minCoord); x <= maxCoord; x = MathFunctions.roundToDecimalPlaces(x+searchStep, searchDecimalPlaces)) {
 			double currY = f(x);
 			if(Double.isNaN(currY))  {
 				iterationsSinceNan = 1;
@@ -192,30 +209,32 @@ public class Function implements Serializable {
 			prevY = currY;
 		}
 		
+		// this affects up to how many decimal places are used when compared when comparing extremes' y values
+		int extremeComparisonDecimalPlaces = MathFunctions.numberOfDecimalPlaces(TOLERANCE)-1;
 		
 		double possibleMinimum, possibleMinimumY, actualMinimumY = Double.MIN_VALUE;
 		for(Entry<Double, Double> possibleMinimumArea : possibleMinimumAreas.entrySet()) {
 			possibleMinimum = computeExtreme(possibleMinimumArea.getKey(), possibleMinimumArea.getValue(), FIND_MIN);
-			possibleMinimumY = HelperFunctions.roundToDecimalPlaces(f(possibleMinimum), 2);
+			possibleMinimumY = MathFunctions.roundToDecimalPlaces(f(possibleMinimum), extremeComparisonDecimalPlaces);
 			if(possibleMinimumY <= actualMinimumY) {
 				if(possibleMinimumY < actualMinimumY && !minimums.isEmpty()) {
 					actualMinimumY = possibleMinimumY;
 					minimums.clear();
 				}
-				minimums.add(possibleMinimum);
+				minimums.add(MathFunctions.roundToDecimalPlaces(possibleMinimum, resultdecimalPlaces));
 			}
 		}
 		
 		double possibleMaximum, possibleMaximumY, actualMaximumY = Double.MAX_VALUE;
 		for(Entry<Double, Double> possibleMaximumArea : possibleMaximumAreas.entrySet()) {
 			possibleMaximum = computeExtreme(possibleMaximumArea.getKey(), possibleMaximumArea.getValue(), FIND_MAX);
-			possibleMaximumY = HelperFunctions.roundToDecimalPlaces(f(possibleMaximum), 2);
+			possibleMaximumY = MathFunctions.roundToDecimalPlaces(f(possibleMaximum), extremeComparisonDecimalPlaces);
 			if(possibleMaximumY >= actualMaximumY) {
 				if(possibleMaximumY > actualMaximumY && !maximums.isEmpty()) {
 					actualMaximumY = possibleMaximumY;
 					maximums.clear();
 				}
-				maximums.add(possibleMaximum);
+				maximums.add(MathFunctions.roundToDecimalPlaces(possibleMaximum, resultdecimalPlaces));
 			}
 		}
 	}
@@ -226,7 +245,7 @@ public class Function implements Serializable {
 	private final double GR = (Math.sqrt(5)-1)/2; 	// golden ratio
 	
 	// Root Finding Algorithm
-	// Secant Method
+	// Bissection Method
 	// find the root that exists between two points with different signs
 	// if the secondaryFunction variable is set then this method returns the intersection between the two functions
 	private double computeRoot(double a, double b) {
@@ -280,7 +299,7 @@ public class Function implements Serializable {
 	// Monte Carlo integration using anthitetic variables for variance reduction
 	private final int SAMPLE_SIZE = 100000;
 	
-	private double copmuteIntegral(double a, double b) {
+	private double computeIntegral(double a, double b) {
 		Random rand = new Random();
 		double range = (b-a);
 		double randValues[] = new double[SAMPLE_SIZE];
