@@ -2,9 +2,9 @@ package functionComponents;
 
 import java.awt.Dimension;
 import java.io.Serializable;
-import java.math.RoundingMode;
-import java.text.DecimalFormat;
 import java.util.HashMap;
+
+import graphplotter.HelperFunctions;
 
 public class ReferentialLimits implements Serializable {
 
@@ -50,7 +50,7 @@ public class ReferentialLimits implements Serializable {
 			maxLength = Math.pow(10, Math.abs(decimalPlaces)+1)*2;
 		else {
 			maxLength = Math.pow(10, -decimalPlaces+1)*2;
-			min = formatDecimalPlaces(min, decimalPlaces);
+			min = HelperFunctions.roundToDecimalPlaces(min, decimalPlaces);
 		}
 		
 		double step = maxLength/20;
@@ -70,10 +70,10 @@ public class ReferentialLimits implements Serializable {
 			for(double current = start+currStep/2; current <= max; current += currStep) {
 				if(i == 0 && current == start+currStep/2) current = start;
 				
-				current = formatDecimalPlaces(current, decimalPlaces+i);
+				current = HelperFunctions.roundToDecimalPlaces(current, decimalPlaces+i);
 				if(current == 0 || current < min || current > max) continue;
 				
-				String label = formattedNumberString(current, decimalPlaces+i);
+				String label = HelperFunctions.roundToDecimalPlacesStr(current, decimalPlaces+i);
 				
 				if(!referentialMarks.containsValue(label)) {
 					if(xLine)
@@ -112,22 +112,6 @@ public class ReferentialLimits implements Serializable {
 				decimalPoints++;
 			}
 		return decimalPoints;
-	}
-	
-	private String formattedNumberString(double number, int decimalPlaces) {
-		if(decimalPlaces <= 0) return String.valueOf(Math.round(number));
-		
-		String format = "#.";
-		for(int i=0; i<decimalPlaces; i++)
-			format += '#';
-		
-		DecimalFormat df = new DecimalFormat(format);
-		df.setRoundingMode(RoundingMode.HALF_EVEN);
-		return df.format(number);
-	}
-	
-	private double formatDecimalPlaces(double number, int decimalPlaces) {
-		return Double.parseDouble(formattedNumberString(number, decimalPlaces));
 	}
 	
 	public double[] getLimits() {
@@ -176,10 +160,6 @@ public class ReferentialLimits implements Serializable {
 
 	public HashMap<Point, String> getYReferentialMarks() {
 		return yReferentialMarks;
-	}
-	
-	public String getFormattedAbcissa(double abcissa) {
-		return formattedNumberString(abcissa, calculateDecimalPlacesForReferential(xMax-xMin));
 	}
 	
 	public void updateLimits(double xMin, double xMax, double yMin, double yMax) {

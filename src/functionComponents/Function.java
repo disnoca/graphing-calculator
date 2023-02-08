@@ -2,11 +2,14 @@ package functionComponents;
 
 import java.awt.Dimension;
 import java.io.Serializable;
+import java.math.RoundingMode;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map.Entry;
 import java.util.Random;
 
+import graphplotter.HelperFunctions;
 import net.objecthunter.exp4j.Expression;
 import net.objecthunter.exp4j.ExpressionBuilder;
 
@@ -46,9 +49,12 @@ public class Function implements Serializable {
 		setExpression(expression);
 		secondaryFunction = null;
 		
-		/*findRoots(-100, 100);
-		for(double root : roots)
-			System.out.println(root);*/
+		findExtremes(-100, 100);
+		for(double maximum : maximums)
+			System.out.println(maximum);
+		
+		for(double minimum : minimums)
+			System.out.println(minimum);
 	}
 
 	public String getExpression() {
@@ -107,10 +113,9 @@ public class Function implements Serializable {
 		computeFunctionPoints();
 	}
 	
+	
 	// G-Solve Functions
 	private double step = 0.1;
-	
-	// TODO: fix the problem of program finding non-existent roots in functions like tan(x) 
 	
 	private void findRoots(double minCoord, double maxCoord) {
 		HashMap<Double, Double> rootAreas = new HashMap<>();
@@ -118,29 +123,88 @@ public class Function implements Serializable {
 		double prevY = 0;
 		boolean prevWasNan = false;
 		for(double x = minCoord; x <= maxCoord; x += step) {
-			double y = f(x);
-			if(Double.isNaN(y))  {
+			double currY = f(x);
+			if(Double.isNaN(currY))  {
 				prevWasNan = true;
 				continue;
 			}
 			
 			if(prevWasNan) {
 				prevWasNan = false;
-				prevY = y;
+				prevY = currY;
 				continue;
 			}
 			
-			if(y == 0)
+			if(currY == 0)
 				roots.add(x);
-			else if(y*prevY < 0)
+			else if(currY*prevY < 0)
 				rootAreas.put(x-step, x);
 			
-			prevY = y;
+			prevY = currY;
 		}
 		
 		secondaryFunction = null;
 		for(Entry<Double, Double> rootArea : rootAreas.entrySet())
 			roots.add(computeRoot(rootArea.getKey(), rootArea.getValue()));
+	}
+	
+	private void findExtremes(double minCoord, double maxCoord) {
+		HashMap<Double, Double> possibleMinimumAreas = new HashMap<>();
+		HashMap<Double, Double> possibleMaximumAreas = new HashMap<>();
+		
+		double pprevY = 0, prevY = 0;
+		int iterationsSinceNan = 0;
+		for(double x = minCoord; x <= maxCoord; x += step) {
+			double currY = f(x);
+			if(Double.isNaN(currY))  {
+				iterationsSinceNan = 1;
+				continue;
+			}
+			
+			// two iterations must happen after a NaN to resume the loop correctly
+			// since three points are needed at a time
+			if(iterationsSinceNan >= 0) {
+				iterationsSinceNan--;
+				prevY = currY;
+				pprevY = f(x-1);
+				continue;
+			}
+
+			if(prevY < pprevY && prevY < currY)
+				possibleMinimumAreas.put(x-2, x);
+			else if(prevY > pprevY && prevY > currY)
+				possibleMaximumAreas.put(x-2, x);
+			
+			pprevY = prevY;
+			prevY = currY;
+		}
+		
+		
+		double possibleMinimum, possibleMinimumY, actualMinimumY = Double.MIN_VALUE;
+		for(Entry<Double, Double> possibleMinimumArea : possibleMinimumAreas.entrySet()) {
+			possibleMinimum = computeExtreme(possibleMinimumArea.getKey(), possibleMinimumArea.getValue(), FIND_MIN);
+			possibleMinimumY = HelperFunctions.roundToDecimalPlaces(f(possibleMinimum), 2);
+			if(possibleMinimumY <= actualMinimumY) {
+				if(possibleMinimumY < actualMinimumY && !minimums.isEmpty()) {
+					actualMinimumY = possibleMinimumY;
+					minimums.clear();
+				}
+				minimums.add(possibleMinimum);
+			}
+		}
+		
+		double possibleMaximum, possibleMaximumY, actualMaximumY = Double.MIN_VALUE;
+		for(Entry<Double, Double> possibleMaximumArea : possibleMaximumAreas.entrySet()) {
+			possibleMaximum = computeExtreme(possibleMaximumArea.getKey(), possibleMaximumArea.getValue(), FIND_MAX);
+			possibleMaximumY = HelperFunctions.roundToDecimalPlaces(f(possibleMaximum), 2);
+			if(possibleMaximumY >= actualMaximumY) {
+				if(possibleMaximumY > actualMaximumY && !maximums.isEmpty()) {
+					actualMaximumY = possibleMaximumY;
+					maximums.clear();
+				}
+				maximums.add(possibleMaximum);
+			}
+		}
 	}
 	
 	

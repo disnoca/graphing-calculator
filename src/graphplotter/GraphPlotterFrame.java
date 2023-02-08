@@ -72,7 +72,7 @@ public class GraphPlotterFrame extends JFrame implements ActionListener, KeyList
 		super("Graph Plotter");
 	    this.setTitle("Graph Plotter");
 	    this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-	    this.setResizable(false);	// TODO: change to true once I find how to only resize after mouse released
+	    this.setResizable(false);	
 	    this.setSize(1000,1000);
 	    
 	    initFunctionColors();
@@ -403,5 +403,10 @@ public class GraphPlotterFrame extends JFrame implements ActionListener, KeyList
 	// TODO:
 	// make referential move on mouse drag
 	// mark point where mouse clicked and show its coordinates
+	
+	// Issues:
+	// fix the problem of program drawing non-existent points (lines) in functions like tan(x) 
+	// fix the problem of program finding non-existent roots in functions like tan(x) 
+	// make screen only resize on mouse release/after a certain timer
 	
 }
