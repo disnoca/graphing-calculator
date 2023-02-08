@@ -49,10 +49,18 @@ public class Function implements Serializable {
 		setExpression(expression);
 		secondaryFunction = null;
 		
+		findRoots(-100, 100);
 		findExtremes(-100, 100);
+		
+		System.out.println("root");
+		for(double root : roots)
+			System.out.println(root);
+		
+		System.out.println("max");
 		for(double maximum : maximums)
 			System.out.println(maximum);
 		
+		System.out.println("min");
 		for(double minimum : minimums)
 			System.out.println(minimum);
 	}
@@ -123,7 +131,7 @@ public class Function implements Serializable {
 		double prevY = 0;
 		boolean prevWasNan = false;
 		for(double x = minCoord; x <= maxCoord; x += step) {
-			double currY = f(x);
+			double currY = HelperFunctions.roundToDecimalPlaces(f(x), 5);	// must be rounded because for some reason it computes 2^0 = 1.97e-24 instead of 0
 			if(Double.isNaN(currY))  {
 				prevWasNan = true;
 				continue;
@@ -193,7 +201,7 @@ public class Function implements Serializable {
 			}
 		}
 		
-		double possibleMaximum, possibleMaximumY, actualMaximumY = Double.MIN_VALUE;
+		double possibleMaximum, possibleMaximumY, actualMaximumY = Double.MAX_VALUE;
 		for(Entry<Double, Double> possibleMaximumArea : possibleMaximumAreas.entrySet()) {
 			possibleMaximum = computeExtreme(possibleMaximumArea.getKey(), possibleMaximumArea.getValue(), FIND_MAX);
 			possibleMaximumY = HelperFunctions.roundToDecimalPlaces(f(possibleMaximum), 2);
