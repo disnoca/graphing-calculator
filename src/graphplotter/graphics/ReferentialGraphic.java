@@ -33,7 +33,7 @@ public class ReferentialGraphic extends BufferedImage {
 		g2d.setColor(Color.black);
 		
 		double[] limits = referentialLimits.getLimits();
-		Point origin = new Point(0, 0, width, height, limits);
+		Point origin = new Point((double) 0, (double) 0, width, height, limits);
 		
 		int xLineYFrameCoord = getXLineYFrameCoord(origin, limits[2], limits[3]);
 		int yLineXFrameCoord = getYLineXFrameCoord(origin, limits[0], limits[1]);

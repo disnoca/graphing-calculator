@@ -105,6 +105,11 @@ public class GraphicsDrawer extends JComponent {
 		setReferentialLimits(limits[0]+xAdjustment, limits[1]-xAdjustment, limits[2]+yAdjustment, limits[3]-yAdjustment);
 	}
 	
+	public void moveOriginLocation(double xMove, double yMove) {
+		double[] limits = referentialLimits.getLimits();
+		setReferentialLimits(limits[0]+xMove, limits[1]+xMove, limits[2]+yMove, limits[3]+yMove);
+	}
+	
 	public void setReferentialLimits(double xMin, double xMax, double yMin, double yMax) {
 		referentialLimits.updateLimits(xMin, xMax, yMin, yMax);
 		updateGraphics();

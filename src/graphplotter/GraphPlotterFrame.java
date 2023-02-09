@@ -27,6 +27,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 
+import functionComponents.Point;
 import functionComponents.ReferentialLimits;
 import graphplotter.graphics.GraphicsDrawer;
 import graphplotter.popupWindows.AddFunctionWindow;
@@ -39,7 +40,7 @@ import graphplotter.saver.GraphPlotterProjectFileFilter;
 import graphplotter.saver.GraphPlotterProjectSave;
 
 @SuppressWarnings("serial")
-public class GraphPlotterFrame extends JFrame implements ActionListener, KeyListener, MouseListener, MouseMotionListener, MouseWheelListener {
+public class GraphPlotterFrame extends JFrame implements ActionListener, KeyListener, MouseListener, MouseWheelListener {
 	
 	private JMenuBar menubar;
 	private JMenu menuFile, menuFileSave, menuFileLoad;
@@ -327,7 +328,7 @@ public class GraphPlotterFrame extends JFrame implements ActionListener, KeyList
 		
 	}
 	
-	public Dimension drawingAreaSize() {
+	private Dimension drawingAreaSize() {
 		Dimension size = this.getSize();
 		size.width -= 16;
 		size.height -= 62;
@@ -336,37 +337,24 @@ public class GraphPlotterFrame extends JFrame implements ActionListener, KeyList
 
 	@Override
 	public void keyPressed(KeyEvent e) {
-		int keyCode = e.getKeyCode();
-		if(keyCode < KeyEvent.VK_LEFT || keyCode > KeyEvent.VK_DOWN) return;
 		
-		ReferentialLimits rl = graphicsDrawer.getReferentialLimits(); 
-		double step = rl.getXLength()/SCREEN_MOVE_PORTION;
-		double[] limits = rl.getLimits();
-		
-		if(keyCode == KeyEvent.VK_LEFT)
-			graphicsDrawer.setReferentialLimits(limits[0]-step, limits[1]-step, limits[2], limits[3]);
-		
-		if(keyCode == KeyEvent.VK_RIGHT)
-			graphicsDrawer.setReferentialLimits(limits[0]+step, limits[1]+step, limits[2], limits[3]);
-		
-		if(keyCode == KeyEvent.VK_UP)
-			graphicsDrawer.setReferentialLimits(limits[0], limits[1], limits[2]+step, limits[3]+step);
-		
-		if(keyCode == KeyEvent.VK_DOWN)
-			graphicsDrawer.setReferentialLimits(limits[0], limits[1], limits[2]-step, limits[3]-step);
-		
-		SwingFunctions.updateFrameContents(this);
 	}
 	
-
+	private Point mousePressedPoint;
+	
 	@Override
 	public void mousePressed(MouseEvent e) {
-
+		mousePressedPoint = new Point(e.getX(), e.getY(), drawingAreaSize(), graphicsDrawer.getReferentialLimits().getLimits());
 	}
 	
 	@Override
-	public void mouseDragged(MouseEvent e) {
+	public void mouseReleased(MouseEvent e) {
+		Point mouseReleasedPoint = new Point(e.getX(), e.getY(), drawingAreaSize(), graphicsDrawer.getReferentialLimits().getLimits());
+		double xDiff = mousePressedPoint.getX()-mouseReleasedPoint.getX();
+		double yDiff = mousePressedPoint.getY()-mouseReleasedPoint.getY();
 		
+		graphicsDrawer.moveOriginLocation(xDiff, yDiff);
+		SwingFunctions.updateFrameContents(this);
 	}
 
 	@Override
@@ -390,13 +378,9 @@ public class GraphPlotterFrame extends JFrame implements ActionListener, KeyList
 	@Override
 	public void mouseClicked(MouseEvent e) {}
 	@Override
-	public void mouseReleased(MouseEvent e) {}
-	@Override
 	public void mouseEntered(MouseEvent e) {}
 	@Override
 	public void mouseExited(MouseEvent e) {}
-	@Override
-	public void mouseMoved(MouseEvent e) {}
 	
 	
 	public static void main(String[] args) {

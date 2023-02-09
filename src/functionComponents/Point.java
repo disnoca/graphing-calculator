@@ -1,5 +1,6 @@
 package functionComponents;
 
+import java.awt.Dimension;
 import java.io.Serializable;
 
 public class Point implements Serializable {
@@ -19,13 +20,17 @@ public class Point implements Serializable {
 		calculateFrameCoords(referentialLimits[0], referentialLimits[1], referentialLimits[2], referentialLimits[3]);
 	}
 
-	public Point(int xFrameCoord, int yFrameCoord, int frameWidth, int frameHeight, double xCoordsRange, double yCoordsRange) {
+	public Point(int xFrameCoord, int yFrameCoord, int frameWidth, int frameHeight, double referentialLimits[]) {
 		this.xFrameCoord = xFrameCoord;
 		this.yFrameCoord = yFrameCoord;
 		this.frameWidth = frameWidth;
 		this.frameHeight = frameHeight;
 		
-		calculateReferentialCoords(xCoordsRange, yCoordsRange);
+		calculateReferentialCoords(referentialLimits[0], referentialLimits[1], referentialLimits[2], referentialLimits[3]);
+	}
+	
+	public Point(int xFrameCoord, int yFrameCoord, Dimension size, double referentialLimits[]) {
+		this(xFrameCoord, yFrameCoord, size.width, size.height, referentialLimits);
 	}
 	
 	public double getX() {
@@ -54,12 +59,14 @@ public class Point implements Serializable {
 		yFrameCoord = (int) (frameHeight - (y-yMin)*yPixelPerCoords);
 	}
 	
-	private void calculateReferentialCoords(double xCoordsRange, double yCoordsRange) {
+	private void calculateReferentialCoords(double xMin, double xMax, double yMin, double yMax) {
+		double xCoordsRange = xMax-xMin;
+		double yCoordsRange = yMax-yMin;
 		double xCoordsPerPixel = xCoordsRange/frameWidth;
 		double yCoordsPerPixel = yCoordsRange/frameHeight;
 
-		x = xFrameCoord*xCoordsPerPixel;
-		y = yFrameCoord*yCoordsPerPixel;
+		x = xMin + xFrameCoord*xCoordsPerPixel;
+		y = yMin + (frameHeight-yFrameCoord)*yCoordsPerPixel;
 	}
 		
 }
