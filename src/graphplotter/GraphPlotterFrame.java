@@ -41,7 +41,7 @@ import graphplotter.saver.GraphPlotterProjectFileFilter;
 import graphplotter.saver.GraphPlotterProjectSave;
 
 @SuppressWarnings("serial")
-public class GraphPlotterFrame extends JFrame implements ActionListener, KeyListener, MouseListener, MouseWheelListener {
+public class GraphPlotterFrame extends JFrame implements ActionListener, KeyListener, MouseListener {
 	
 	private JMenuBar menubar;
 	private JMenu menuFile, menuFileSave, menuFileLoad;
@@ -68,8 +68,9 @@ public class GraphPlotterFrame extends JFrame implements ActionListener, KeyList
 	private final double DEFAULT_MINY = -10;
 	private final double DEFAULT_MAXY = 10;
 	
-	private Timer screenResizeTimer;
-	private boolean screenResizeScheduled;
+	private Timer screenResizeTimer, referentialZoomTimer;
+	private boolean screenResizeScheduled, referentialZoomScheduled;
+	private int referentialZoomsScheduledCount;
 	
 
 	public GraphPlotterFrame() {
@@ -83,42 +84,7 @@ public class GraphPlotterFrame extends JFrame implements ActionListener, KeyList
 		addMenuBar();
 		initGraphics();
 		initPopupWindows();
-		
-		this.addKeyListener(this);
-		this.addMouseListener(this);
-		this.addMouseWheelListener(this);
-		
-		/*
-		 * This gigantic block of code is that the graphics only update once after dragging the screen
-		 * as opposed to every single pixel that is changed, which maxes resize unusable.
-		 * 
-		 * I've tried multiple solutions and this one is the only one that has worked thus far.
-		 * This mess of a code will unfortunately have to stay.
-		 */
-		new Timer().schedule(new TimerTask() {
-			public void run() {
-				screenResizeTimer = new Timer();
-				screenResizeScheduled = false;
-				GraphPlotterFrame.this.addComponentListener(new ComponentAdapter() {
-				    public void componentResized(ComponentEvent componentEvent) {
-				    	if(screenResizeScheduled) {
-				    		screenResizeTimer.cancel();
-				    		screenResizeTimer = new Timer();
-				    	}
-				    	screenResizeScheduled = true;
-				    	
-				    	screenResizeTimer.schedule(new TimerTask() {
-				    		@Override
-				    		public void run() {
-				    			graphicsDrawer.setFrameSize(drawingAreaSize());
-				    			SwingFunctions.updateFrameContents(GraphPlotterFrame.this);
-				    			screenResizeScheduled = false;
-				    		}
-				    	}, 100);
-				    }
-				});
-			}
-		}, 1000);
+		setupListeners();
 		
 		this.setLocationRelativeTo(null);
 		this.setVisible(true);
@@ -385,20 +351,6 @@ public class GraphPlotterFrame extends JFrame implements ActionListener, KeyList
 		graphicsDrawer.moveOriginLocation(xDiff, yDiff);
 		SwingFunctions.updateFrameContents(this);
 	}
-
-	@Override
-	public void mouseWheelMoved(MouseWheelEvent e) {
-		int notches = e.getWheelRotation();
-		
-		if(notches < 0)
-			for(int i = 0; i > notches; i--)
-				graphicsDrawer.halveReferentialLimits();
-		else
-			for(int i = 0; i < notches; i++)
-				graphicsDrawer.doubleReferentialLimits();
-	
-		SwingFunctions.updateFrameContents(this);
-	}
 	
 	@Override
 	public void keyTyped(KeyEvent e) {}
@@ -411,17 +363,86 @@ public class GraphPlotterFrame extends JFrame implements ActionListener, KeyList
 	@Override
 	public void mouseExited(MouseEvent e) {}
 	
+	/*
+	 * When dragging the screen or scrolling, the graphics drawer tries to draw for every single changed frame
+	 * through the process of resizing the window/zooming the referential, even though only the last frame is required.
+	 * Since the all the functions must be recaulculated on every draw, the program would be stuck for several seconds
+	 * processing frames that didn't need to be.
+	 * 
+	 * These blocks of code are for these two cases. What they do is the graphics drawer will only start
+	 * drawing a new frame after a certain delay has passed. This delay must be small enough so that the user doesn't
+	 * notice too much lag after one of the above mentioned actions but big enough that it lets the user keep
+	 * dragging the window/scrolling without the graphics drawer being asked to draw unecessary frames.
+	 */
+	private final int ACTION_DELAY = 25;
+	
+	public void setupListeners() {
+		this.addKeyListener(this);
+		this.addMouseListener(this);
+		
+		screenResizeTimer = new Timer();
+		screenResizeScheduled = false;
+		this.addComponentListener(new ComponentAdapter() {
+			public void componentResized(ComponentEvent componentEvent) {
+				if(SwingFunctions.resizeUpdateState > 0) {
+				    SwingFunctions.resizeUpdateState--;
+				    return;
+				}
+				    	
+				if(screenResizeScheduled) {
+				    screenResizeTimer.cancel();
+				    screenResizeTimer = new Timer();
+				}
+				screenResizeScheduled = true;
+				    	
+				screenResizeTimer.schedule(new TimerTask() {
+					@Override
+					public void run() {
+						graphicsDrawer.setFrameSize(drawingAreaSize());
+						SwingFunctions.updateFrameContents(GraphPlotterFrame.this);
+						screenResizeScheduled = false;
+					}
+				}, ACTION_DELAY);
+			}
+		});
+		
+		
+		referentialZoomTimer = new Timer();
+		referentialZoomScheduled = false;
+		referentialZoomsScheduledCount = 0;
+		this.addMouseWheelListener(new MouseWheelListener() {
+			public void mouseWheelMoved(MouseWheelEvent e) {
+				if(referentialZoomScheduled) {
+					referentialZoomTimer.cancel();
+					referentialZoomTimer = new Timer();
+				}
+				referentialZoomScheduled = true;
+				referentialZoomsScheduledCount += e.getWheelRotation();
+				
+				screenResizeTimer.schedule(new TimerTask() {
+					@Override
+					public void run() {
+						graphicsDrawer.zoomReferentialLimitsBy(-referentialZoomsScheduledCount);
+						SwingFunctions.updateFrameContents(GraphPlotterFrame.this);
+						referentialZoomScheduled = false;
+						referentialZoomsScheduledCount = 0;
+					}
+				}, ACTION_DELAY);
+			}
+		});
+	}
+	
 	
 	public static void main(String[] args) {
 		new GraphPlotterFrame();
 	}
 	
 	// TODO:
-	// make referential move on mouse drag
 	// mark point where mouse clicked and show its coordinates
 	
 	// Issues:
-	// fix the problem of program drawing non-existent points (lines) in functions like tan(x) 
-	// fix the problem of program finding non-existent roots in functions like tan(x) 
+	// non-existent points/lines in functions like tan(x) and 1/x are being drawn 
+	// functions like tan(x) and 1/x produce wrong results when applied the mathematical algorithms
+	// functions that have y values tending to infinity are only drawn to a certain extent
 	
 }

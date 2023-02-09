@@ -12,6 +12,14 @@ import javax.swing.filechooser.FileFilter;
 import graphplotter.saver.GraphPlotterProjectFileFilter;
 
 public class SwingFunctions {
+	
+	/*
+	 * GraphPlotterFrame has a window resize listener.
+	 * To update its contents we need to resize the window twice and if these two resizes aren't kept in check,
+	 * the window will resize permanently (e.g. update contents -> resize down -> resize up -> update contents -> ...)
+	 * This variable lets the listener know that it was just an update and not an actual resize input.
+	 */
+	public static int resizeUpdateState = 1;
 
 	public static void showErrorMessageDialog(JFrame parent, String message) {
 		JOptionPane.showMessageDialog(parent, message, "Error", JOptionPane.ERROR_MESSAGE);
@@ -34,6 +42,8 @@ public class SwingFunctions {
 		int height = size.height;
 		Dimension tempSize = new Dimension(width+1, height+1);
 		
+		if(frame instanceof GraphPlotterFrame)
+			resizeUpdateState = 2;
 		frame.setSize(tempSize);
 		frame.setSize(size);
 	}

@@ -92,17 +92,42 @@ public class GraphicsDrawer extends JComponent {
 	}
 	
 	public void doubleReferentialLimits() {
-		double xAdjustment = referentialLimits.getXLength()/2;
-		double yAdjustment = referentialLimits.getYLength()/2;
-		double[] limits = referentialLimits.getLimits();
-		setReferentialLimits(limits[0]-xAdjustment, limits[1]+xAdjustment, limits[2]-yAdjustment, limits[3]+yAdjustment);
+		zoomReferentialLimitsBy(-1);
 	}
 	
 	public void halveReferentialLimits() {
-		double xAdjustment = referentialLimits.getXLength()/4;
-		double yAdjustment = referentialLimits.getYLength()/4;
+		zoomReferentialLimitsBy(1);
+	}
+	
+	/*
+	 * positive values zoom in zoomFactor times
+	 * negative values zoom out -zoomFactor times
+	 */
+	public void zoomReferentialLimitsBy(int zoomFactor) {
+		if(zoomFactor == 0) return;
+		
 		double[] limits = referentialLimits.getLimits();
-		setReferentialLimits(limits[0]+xAdjustment, limits[1]-xAdjustment, limits[2]+yAdjustment, limits[3]-yAdjustment);
+		double xLength = referentialLimits.getXLength();
+		double yLength = referentialLimits.getYLength();
+		double xAdjustment = 0, yAdjustment = 0;
+		
+		// zoom in
+		if(zoomFactor > 0) {
+			for(int i = 0; i < zoomFactor; i++) {
+				xAdjustment += xLength/Math.pow(2, i)/4;
+				yAdjustment += yLength/Math.pow(2, i)/4;
+			}
+			setReferentialLimits(limits[0]+xAdjustment, limits[1]-xAdjustment, limits[2]+yAdjustment, limits[3]-yAdjustment);
+		}
+		
+		// zoom out
+		else {
+			for(int i = 0; i > zoomFactor; i--) {
+				xAdjustment += xLength*Math.pow(2, -i)/2;
+				yAdjustment += yLength*Math.pow(2, -i)/2;
+			}
+			setReferentialLimits(limits[0]-xAdjustment, limits[1]+xAdjustment, limits[2]-yAdjustment, limits[3]+yAdjustment);
+		}
 	}
 	
 	public void moveOriginLocation(double xMove, double yMove) {

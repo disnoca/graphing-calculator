@@ -6,6 +6,7 @@ import java.awt.Graphics2D;
 import java.awt.Polygon;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import java.util.ConcurrentModificationException;
 
 import functionComponents.Function;
 import functionComponents.Point;
@@ -23,10 +24,11 @@ public class FunctionGraphic extends BufferedImage {
 		this.color = color;
 		
 		g2d = this.createGraphics();
+		
 		drawFunction();
 	}
 	
-	public void drawFunction() {
+	public void drawFunction() throws ConcurrentModificationException {
 		g2d.setStroke(new BasicStroke(2));
 		g2d.setColor(color);
 
