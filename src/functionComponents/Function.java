@@ -212,7 +212,7 @@ public class Function implements Serializable {
 		// this affects up to how many decimal places are used when compared when comparing extremes' y values
 		int extremeComparisonDecimalPlaces = MathFunctions.numberOfDecimalPlaces(TOLERANCE)-1;
 		
-		double possibleMinimum, possibleMinimumY, actualMinimumY = Double.MIN_VALUE;
+		double possibleMinimum, possibleMinimumY, actualMinimumY = Double.MAX_VALUE;
 		for(Entry<Double, Double> possibleMinimumArea : possibleMinimumAreas.entrySet()) {
 			possibleMinimum = computeExtreme(possibleMinimumArea.getKey(), possibleMinimumArea.getValue(), FIND_MIN);
 			possibleMinimumY = MathFunctions.roundToDecimalPlaces(f(possibleMinimum), extremeComparisonDecimalPlaces);
@@ -225,7 +225,7 @@ public class Function implements Serializable {
 			}
 		}
 		
-		double possibleMaximum, possibleMaximumY, actualMaximumY = Double.MAX_VALUE;
+		double possibleMaximum, possibleMaximumY, actualMaximumY = Double.MIN_VALUE;
 		for(Entry<Double, Double> possibleMaximumArea : possibleMaximumAreas.entrySet()) {
 			possibleMaximum = computeExtreme(possibleMaximumArea.getKey(), possibleMaximumArea.getValue(), FIND_MAX);
 			possibleMaximumY = MathFunctions.roundToDecimalPlaces(f(possibleMaximum), extremeComparisonDecimalPlaces);
