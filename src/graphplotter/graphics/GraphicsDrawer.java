@@ -12,6 +12,7 @@ import java.util.Map.Entry;
 import javax.swing.JComponent;
 
 import functionComponents.Function;
+import functionComponents.Point;
 import functionComponents.ReferentialLimits;
 import graphplotter.saver.GraphPlotterProjectSave;
 
@@ -135,6 +136,12 @@ public class GraphicsDrawer extends JComponent {
 		setReferentialLimits(limits[0]+xMove, limits[1]+xMove, limits[2]+yMove, limits[3]+yMove);
 	}
 	
+	private void setOriginLocation(double x, double y) {
+		double xAdjustment = referentialLimits.getXLength()/2;
+		double yAdjustment = referentialLimits.getYLength()/2;
+		setReferentialLimits(x-xAdjustment, x+xAdjustment, y-yAdjustment, y+yAdjustment);
+	}
+	
 	public void setReferentialLimits(double xMin, double xMax, double yMin, double yMax) {
 		referentialLimits.updateLimits(xMin, xMax, yMin, yMax);
 		updateGraphics();
@@ -182,4 +189,16 @@ public class GraphicsDrawer extends JComponent {
 		}
 	}
 	
+	
+	// G-Solve functions
+	
+	public void gSolveYValue(double x) {
+		Point p = functionGraphics.get(0).getFunction().getYValue(x);
+		setOriginLocation(p.getX(), p.getY());
+	}
+
+	public void gSolveXValue(double var) {
+		// TODO Auto-generated method stub
+		
+	}
 }

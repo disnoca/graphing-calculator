@@ -32,6 +32,7 @@ import functionComponents.Point;
 import functionComponents.ReferentialLimits;
 import graphplotter.graphics.GraphicsDrawer;
 import graphplotter.popupWindows.AddFunctionWindow;
+import graphplotter.popupWindows.GSolveXYValueWindow;
 import graphplotter.popupWindows.ListFunctionsWindow;
 import graphplotter.popupWindows.PopupWindow;
 import graphplotter.popupWindows.RemoveFunctionWindow;
@@ -49,13 +50,14 @@ public class GraphPlotterFrame extends JFrame implements ActionListener, KeyList
 	private JMenuItem mfilesaveProject, mfilesaveImage, mfileloadProject;
 	private JMenuItem mfuncAdd, mfuncRemove, mfuncList;
 	private JMenuItem vwDefault, vwSetValues, vwZoomIn, vwZoomOut;
-	private JMenuItem gsRoot, gsMax, gsMin, gsYIntersect, gsIntersect, gsYCalc, gsXCalc, gsIntegral;
+	private JMenuItem gsRoot, gsMax, gsMin, gsYIntersect, gsFuncIntersect, gsYVal, gsXVal, gsIntegral;
 	
 	private GraphicsDrawer graphicsDrawer;
 	
 	private PopupWindow saveImageWindow;
 	private PopupWindow addFunctionWindow, removeFunctionWindow, listFunctionsWindow;
 	private PopupWindow setReferentialLimitsWindow;
+	private PopupWindow gSolveXYValueWindow;
 	
 	private final int MAX_FUNCTIONS = 6;
 	
@@ -71,6 +73,8 @@ public class GraphPlotterFrame extends JFrame implements ActionListener, KeyList
 	private Timer screenResizeTimer, referentialZoomTimer;
 	private boolean screenResizeScheduled, referentialZoomScheduled;
 	private int referentialZoomsScheduledCount;
+	
+	private GSolveState gSolveState;
 	
 
 	public GraphPlotterFrame() {
@@ -88,6 +92,8 @@ public class GraphPlotterFrame extends JFrame implements ActionListener, KeyList
 		
 		this.setLocationRelativeTo(null);
 		this.setVisible(true);
+		
+		gSolveState = GSolveState.NONE;
 	}
 	
 	private void initFunctionColors() {
@@ -128,9 +134,9 @@ public class GraphPlotterFrame extends JFrame implements ActionListener, KeyList
 	    gsMax = new JMenuItem("Maximum");
 	    gsMin = new JMenuItem("Minimum");
 	    gsYIntersect = new JMenuItem("Intersection with the Y-Axis");
-	    gsIntersect = new JMenuItem("Intersection between two functions");
-	    gsYCalc = new JMenuItem("Y-Value");
-	    gsXCalc = new JMenuItem("X-Value");
+	    gsFuncIntersect = new JMenuItem("Intersection between two functions");
+	    gsYVal = new JMenuItem("Y-Value");
+	    gsXVal = new JMenuItem("X-Value");
 	    gsIntegral = new JMenuItem("Integral");
 	    
 	    mfilesaveProject.addActionListener(this);
@@ -147,9 +153,9 @@ public class GraphPlotterFrame extends JFrame implements ActionListener, KeyList
 	    gsMax.addActionListener(this);
 	    gsMin.addActionListener(this);
 	    gsYIntersect.addActionListener(this);
-	    gsIntersect.addActionListener(this);
-	    gsYCalc.addActionListener(this);
-	    gsXCalc.addActionListener(this);
+	    gsFuncIntersect.addActionListener(this);
+	    gsYVal.addActionListener(this);
+	    gsXVal.addActionListener(this);
 	    gsIntegral.addActionListener(this);
 	    
 	    menuFileSave.add(mfilesaveProject);
@@ -168,9 +174,9 @@ public class GraphPlotterFrame extends JFrame implements ActionListener, KeyList
 	    menuGS.add(gsMax);
 	    menuGS.add(gsMin);
 	    menuGS.add(gsYIntersect);
-	    menuGS.add(gsIntersect);
-	    menuGS.add(gsYCalc);
-	    menuGS.add(gsXCalc);
+	    menuGS.add(gsFuncIntersect);
+	    menuGS.add(gsYVal);
+	    menuGS.add(gsXVal);
 	    menuGS.add(gsIntegral);
 	    menubar.add(menuFile);
 	    menubar.add(menuFunc);
@@ -192,6 +198,7 @@ public class GraphPlotterFrame extends JFrame implements ActionListener, KeyList
 		removeFunctionWindow = new RemoveFunctionWindow(this, "Remove Functions", graphicsDrawer, colorStack);
 		listFunctionsWindow = new ListFunctionsWindow(this, "Functions List", graphicsDrawer, colorIdsMap);
 		setReferentialLimitsWindow = new SetReferentialLimitsWindow(this, "Set Referential Limits", graphicsDrawer);
+		gSolveXYValueWindow = new GSolveXYValueWindow(this, graphicsDrawer);
 	}
 	
 	private void saveProject() throws IOException {
@@ -305,15 +312,22 @@ public class GraphPlotterFrame extends JFrame implements ActionListener, KeyList
 			
 		}
 		
-		if(e.getSource() == gsIntersect) {
+		if(e.getSource() == gsFuncIntersect) {
 			
 		}
 		
-		if(e.getSource() == gsYCalc) {
+		if(e.getSource() == gsYVal) {
+			if(graphicsDrawer.getFunctionCount() == 0) {
+				SwingFunctions.showErrorMessageDialog(this, "There are no functions to G-Solve");
+				return;
+			}
 			
+			gSolveState = GSolveState.Y_VALUE;
+			((GSolveXYValueWindow) gSolveXYValueWindow).setGSolveState(gSolveState);
+			gSolveXYValueWindow.showWindow();
 		}
 		
-		if(e.getSource() == gsXCalc) {
+		if(e.getSource() == gsXVal) {
 			
 		}
 		
@@ -332,7 +346,15 @@ public class GraphPlotterFrame extends JFrame implements ActionListener, KeyList
 
 	@Override
 	public void keyPressed(KeyEvent e) {
+		if(gSolveState == GSolveState.NONE) return;
+		int keyVal = e.getKeyCode();
 		
+		if(keyVal == KeyEvent.VK_RIGHT) {
+			
+		}
+		else if(keyVal == KeyEvent.VK_RIGHT) {
+			
+		}
 	}
 	
 	private Point mousePressedPoint;

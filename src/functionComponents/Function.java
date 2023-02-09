@@ -119,8 +119,14 @@ public class Function implements Serializable {
 		computeFunctionPoints();
 	}
 	
+	// G-Solve functions
 	
-	// G-Solve Functions
+	public Point getYValue(double x) {
+		return new Point(x, f(x),  width, height, referentialLimits.getLimits());
+	}
+	
+	
+	// G-Solve function helpers
 	private double searchStep = 0.1;
 	private int searchDecimalPlaces = MathFunctions.numberOfDecimalPlaces(searchStep);
 	private int resultdecimalPlaces = 2;
