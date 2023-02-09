@@ -8,7 +8,6 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.io.File;
@@ -21,6 +20,8 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.util.HashMap;
 import java.util.Stack;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import javax.swing.JFrame;
 import javax.swing.JMenu;
@@ -67,14 +68,15 @@ public class GraphPlotterFrame extends JFrame implements ActionListener, KeyList
 	private final double DEFAULT_MINY = -10;
 	private final double DEFAULT_MAXY = 10;
 	
-	private final int SCREEN_MOVE_PORTION = 8;	// an eight of the screen is moved on key press
+	private Timer screenResizeTimer;
+	private boolean screenResizeScheduled;
 	
 
 	public GraphPlotterFrame() {
 		super("Graph Plotter");
 	    this.setTitle("Graph Plotter");
 	    this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-	    this.setResizable(false);	
+	    this.setResizable(true);	
 	    this.setSize(1000,1000);
 	    
 	    initFunctionColors();
@@ -85,11 +87,38 @@ public class GraphPlotterFrame extends JFrame implements ActionListener, KeyList
 		this.addKeyListener(this);
 		this.addMouseListener(this);
 		this.addMouseWheelListener(this);
-		this.addComponentListener(new ComponentAdapter() {
-		    public void componentResized(ComponentEvent componentEvent) {
-		        graphicsDrawer.setFrameSize(drawingAreaSize());
-		    }
-		});
+		
+		/*
+		 * This gigantic block of code is that the graphics only update once after dragging the screen
+		 * as opposed to every single pixel that is changed, which maxes resize unusable.
+		 * 
+		 * I've tried multiple solutions and this one is the only one that has worked thus far.
+		 * This mess of a code will unfortunately have to stay.
+		 */
+		new Timer().schedule(new TimerTask() {
+			public void run() {
+				screenResizeTimer = new Timer();
+				screenResizeScheduled = false;
+				GraphPlotterFrame.this.addComponentListener(new ComponentAdapter() {
+				    public void componentResized(ComponentEvent componentEvent) {
+				    	if(screenResizeScheduled) {
+				    		screenResizeTimer.cancel();
+				    		screenResizeTimer = new Timer();
+				    	}
+				    	screenResizeScheduled = true;
+				    	
+				    	screenResizeTimer.schedule(new TimerTask() {
+				    		@Override
+				    		public void run() {
+				    			graphicsDrawer.setFrameSize(drawingAreaSize());
+				    			SwingFunctions.updateFrameContents(GraphPlotterFrame.this);
+				    			screenResizeScheduled = false;
+				    		}
+				    	}, 100);
+				    }
+				});
+			}
+		}, 1000);
 		
 		this.setLocationRelativeTo(null);
 		this.setVisible(true);
@@ -394,6 +423,5 @@ public class GraphPlotterFrame extends JFrame implements ActionListener, KeyList
 	// Issues:
 	// fix the problem of program drawing non-existent points (lines) in functions like tan(x) 
 	// fix the problem of program finding non-existent roots in functions like tan(x) 
-	// make screen only resize on mouse release/after a certain timer
 	
 }

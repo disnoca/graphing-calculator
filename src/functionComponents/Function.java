@@ -2,8 +2,6 @@ package functionComponents;
 
 import java.awt.Dimension;
 import java.io.Serializable;
-import java.math.RoundingMode;
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map.Entry;
