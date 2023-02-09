@@ -77,9 +77,9 @@ public class ReferentialLimits implements Serializable {
 				
 				if(!referentialMarks.containsValue(label)) {
 					if(xLine)
-						marksBatch.put(new Point(current, 0, frameWidth, frameHeight), label);
+						marksBatch.put(new Point(current, (double) 0, frameWidth, frameHeight, getLimits()), label);
 					else
-						marksBatch.put(new Point(0, current, frameWidth, frameHeight), label);
+						marksBatch.put(new Point((double) 0, current, frameWidth, frameHeight, getLimits()), label);
 				}
 			}
 			

@@ -8,6 +8,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.io.File;
@@ -38,7 +39,7 @@ import graphplotter.saver.GraphPlotterProjectFileFilter;
 import graphplotter.saver.GraphPlotterProjectSave;
 
 @SuppressWarnings("serial")
-public class GraphPlotterFrame extends JFrame implements ActionListener, KeyListener, MouseListener, MouseWheelListener {
+public class GraphPlotterFrame extends JFrame implements ActionListener, KeyListener, MouseListener, MouseMotionListener, MouseWheelListener {
 	
 	private JMenuBar menubar;
 	private JMenu menuFile, menuFileSave, menuFileLoad;
@@ -357,19 +358,14 @@ public class GraphPlotterFrame extends JFrame implements ActionListener, KeyList
 		SwingFunctions.updateFrameContents(this);
 	}
 	
-	@Override
-	public void mouseClicked(MouseEvent e) {
-		
-	}
 
 	@Override
 	public void mousePressed(MouseEvent e) {
-		
-		
-	}
 
+	}
+	
 	@Override
-	public void mouseReleased(MouseEvent e) {
+	public void mouseDragged(MouseEvent e) {
 		
 	}
 
@@ -392,9 +388,16 @@ public class GraphPlotterFrame extends JFrame implements ActionListener, KeyList
 	@Override
 	public void keyReleased(KeyEvent e) {}
 	@Override
+	public void mouseClicked(MouseEvent e) {}
+	@Override
+	public void mouseReleased(MouseEvent e) {}
+	@Override
 	public void mouseEntered(MouseEvent e) {}
 	@Override
 	public void mouseExited(MouseEvent e) {}
+	@Override
+	public void mouseMoved(MouseEvent e) {}
+	
 	
 	public static void main(String[] args) {
 		new GraphPlotterFrame();

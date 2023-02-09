@@ -9,19 +9,16 @@ import java.util.ArrayList;
 
 import functionComponents.Function;
 import functionComponents.Point;
-import functionComponents.ReferentialLimits;
 
 public class FunctionGraphic extends BufferedImage {
 	
-	private ReferentialLimits referentialLimits;
 	private Graphics2D g2d;
 	private Color color;
 	private Function function;
 	
 	
-	public FunctionGraphic(Dimension size, ReferentialLimits referentialLimits, Function function, Color color) {
+	public FunctionGraphic(Dimension size, Function function, Color color) {
 		super(size.width, size.height, BufferedImage.TYPE_INT_ARGB);
-		this.referentialLimits = referentialLimits;
 		this.function = function;
 		this.color = color;
 		
@@ -35,7 +32,6 @@ public class FunctionGraphic extends BufferedImage {
 
 		Polygon pol = new Polygon();
 		ArrayList<Point> points = function.getPoints();
-		double[] limits = referentialLimits.getLimits();
 		
 		for(Point point : points) {
 			if(point == null) {
@@ -43,7 +39,7 @@ public class FunctionGraphic extends BufferedImage {
 				pol.reset();
 			}
 			else
-				pol.addPoint(point.getXFrameCoord(limits[0], limits[1]), point.getYFrameCoord(limits[2], limits[3]));
+				pol.addPoint(point.getXFrameCoord(), point.getYFrameCoord());
 		}
 			
 		g2d.drawPolyline(pol.xpoints, pol.ypoints, pol.npoints);

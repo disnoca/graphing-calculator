@@ -86,7 +86,7 @@ public class Function implements Serializable {
 		for(double i=referentialLimits.getXMin(); i<=referentialLimits.getXMax(); i+=step) {
 			y = f(i);
 			if(Double.isFinite(y))
-				points.add(new Point(i, f(i), width, height));
+				points.add(new Point(i, f(i), width, height, referentialLimits.getLimits()));
 			else
 				points.add(null);
 		}

@@ -45,7 +45,7 @@ public class GraphicsDrawer extends JComponent {
 	}
 	
 	public void addFunction(Function function, Color color) {
-		FunctionGraphic functionGraphic = new FunctionGraphic(size, referentialLimits, function, color);
+		FunctionGraphic functionGraphic = new FunctionGraphic(size, function, color);
 		functionGraphics.add(functionGraphic);
 	}
 	
@@ -117,7 +117,7 @@ public class GraphicsDrawer extends JComponent {
 			Function f = fg.getFunction();
 			Color c = fg.getColor();
 			f.recalculateFrameSize(size);
-			temp.add(new FunctionGraphic(size, referentialLimits, f, c));
+			temp.add(new FunctionGraphic(size, f, c));
 		}
 		
 		functionGraphics = temp;
