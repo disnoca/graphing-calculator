@@ -15,10 +15,10 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 
-import graphingCalculator.GSolveState;
-import graphingCalculator.GSolveStateWrapper;
-import graphingCalculator.SwingFunctions;
+import graphingCalculator.gSolveState.GSolveState;
+import graphingCalculator.gSolveState.GSolveStateWrapper;
 import graphingCalculator.graphics.GraphicsDrawer;
+import graphingCalculator.utils.SwingUtils;
 
 @SuppressWarnings("serial")
 public class GSolveXYValueWindow extends PopupWindow {
@@ -72,7 +72,7 @@ public class GSolveXYValueWindow extends PopupWindow {
 		contentPane.add(inputPane, BorderLayout.CENTER);
 		contentPane.add(buttonPane, BorderLayout.PAGE_END);
 		
-		SwingFunctions.evenButtonsWidth(okButton, cancelButton);
+		SwingUtils.evenButtonsWidth(okButton, cancelButton);
 	}
 	
 	private void executeGSolve(double var) {
@@ -80,18 +80,18 @@ public class GSolveXYValueWindow extends PopupWindow {
 		case Y_VALUE: 
 			if(!graphicsDrawer.gSolveYValue(var)) {
 				gSolveState.state = GSolveState.NONE;
-				SwingFunctions.showErrorMessageDialog(this, "No solution found");
+				SwingUtils.showErrorMessageDialog(this, "No solution found");
 			}
 			break;
 		case X_VALUE: 
 			if(!graphicsDrawer.gSolveXValue(var)) {
 				gSolveState.state = GSolveState.NONE;
-				SwingFunctions.showErrorMessageDialog(this, "No solutions found");
+				SwingUtils.showErrorMessageDialog(this, "No solutions found");
 			}
 			break;
 		default: break;
 		}
-		SwingFunctions.updateFrameContents(parent);
+		SwingUtils.updateFrameContents(parent);
 	}
 
 	@Override
@@ -102,7 +102,7 @@ public class GSolveXYValueWindow extends PopupWindow {
 			try {
 				executeGSolve(Double.parseDouble(textField.getText().trim()));
 			} catch(IllegalArgumentException e3) {
-				SwingFunctions.showErrorMessageDialog(this, "Invalid input");
+				SwingUtils.showErrorMessageDialog(this, "Invalid input");
 				return;
 			}
 		}

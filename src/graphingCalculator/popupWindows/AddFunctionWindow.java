@@ -19,8 +19,8 @@ import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 
 import functionComponents.Function;
-import graphingCalculator.SwingFunctions;
 import graphingCalculator.graphics.GraphicsDrawer;
+import graphingCalculator.utils.SwingUtils;
 import net.objecthunter.exp4j.tokenizer.UnknownFunctionOrVariableException;
 
 @SuppressWarnings("serial")
@@ -70,14 +70,14 @@ public class AddFunctionWindow extends PopupWindow {
 		contentPane.add(inputPane, BorderLayout.CENTER);
 		contentPane.add(buttonPane, BorderLayout.PAGE_END);
 		
-		SwingFunctions.evenButtonsWidth(addButton, cancelButton);
+		SwingUtils.evenButtonsWidth(addButton, cancelButton);
 	}
 	
 	
 	private void addFunction(String expression) {
 		Function function = new Function(graphicsDrawer.getSize(), graphicsDrawer.getReferentialLimits(), expression);
 		graphicsDrawer.addFunction(function, colorStack.pop());
-		SwingFunctions.updateFrameContents(parent);
+		SwingUtils.updateFrameContents(parent);
 	}
 	
 	
@@ -89,13 +89,13 @@ public class AddFunctionWindow extends PopupWindow {
 			try {
 				addFunction(textField.getText().trim());
 			} catch(UnknownFunctionOrVariableException e1) {
-				SwingFunctions.showErrorMessageDialog(this, "Invalid function");
+				SwingUtils.showErrorMessageDialog(this, "Invalid function");
 				return;
 			}	catch(EmptyStackException e2) {
-				SwingFunctions.showErrorMessageDialog(this, "Check the number of parentheses");
+				SwingUtils.showErrorMessageDialog(this, "Check the number of parentheses");
 				return;
 			} catch(IllegalArgumentException e3) {
-				SwingFunctions.showErrorMessageDialog(this, "Please enter a function");
+				SwingUtils.showErrorMessageDialog(this, "Please enter a function");
 				return;
 			}
 		}

@@ -19,8 +19,8 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import graphingCalculator.SwingFunctions;
 import graphingCalculator.graphics.GraphicsDrawer;
+import graphingCalculator.utils.SwingUtils;
 
 @SuppressWarnings("serial")
 public class RemoveFunctionWindow extends PopupWindow {
@@ -66,7 +66,7 @@ public class RemoveFunctionWindow extends PopupWindow {
 		contentPane.add(listPane, BorderLayout.CENTER);
 		contentPane.add(buttonPane, BorderLayout.PAGE_END);
 		
-		SwingFunctions.evenButtonsWidth(removeButton, cancelButton);
+		SwingUtils.evenButtonsWidth(removeButton, cancelButton);
 	}
 	
 	private JPanel createCheckboxPane(String[] expressions) {
@@ -111,9 +111,9 @@ public class RemoveFunctionWindow extends PopupWindow {
 			}
 		
 		if(removed)
-			SwingFunctions.updateFrameContents(parent);
+			SwingUtils.updateFrameContents(parent);
 		else
-			SwingFunctions.showErrorMessageDialog(this, "No functions were selected.");
+			SwingUtils.showErrorMessageDialog(this, "No functions were selected.");
 		
 		return removed;
 	}

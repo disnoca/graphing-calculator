@@ -7,7 +7,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map.Entry;
 
-import graphingCalculator.MathFunctions;
+import graphingCalculator.utils.RoundingUtils;
 
 import java.util.Random;
 
@@ -170,7 +170,7 @@ public class Function implements Serializable {
 	
 	// G-Solve function helpers
 	private double searchStep = 0.1;
-	private int searchDecimalPlaces = MathFunctions.numberOfDecimalPlaces(searchStep);
+	private int searchDecimalPlaces = RoundingUtils.numberOfDecimalPlaces(searchStep);
 	private int resultdecimalPlaces = 3;
 	
 	/*
@@ -187,7 +187,7 @@ public class Function implements Serializable {
 		boolean prevWasNan = false;
 		
 		// first iteration is skipped
-		for(double x = Math.floor(minCoord); x <= maxCoord; x = MathFunctions.roundToDecimalPlaces(x+searchStep, searchDecimalPlaces)) {
+		for(double x = Math.floor(minCoord); x <= maxCoord; x = RoundingUtils.roundToDecimalPlaces(x+searchStep, searchDecimalPlaces)) {
 			double currY = h(x);
 			
 			if(Double.isNaN(currY))  {
@@ -211,7 +211,7 @@ public class Function implements Serializable {
 		}
 		
 		for(Entry<Double, Double> rootArea : rootAreas.entrySet()) {
-			double x = MathFunctions.roundToDecimalPlaces(computeRoot(rootArea.getKey(), rootArea.getValue()), resultdecimalPlaces);
+			double x = RoundingUtils.roundToDecimalPlaces(computeRoot(rootArea.getKey(), rootArea.getValue()), resultdecimalPlaces);
 			roots.add(createPoint(x, 0));
 		}
 		
@@ -243,7 +243,7 @@ public class Function implements Serializable {
 		int iterationsSinceNan = 0;
 		
 		// first two iterations are skipped
-		for(double x = Math.floor(minCoord); x <= maxCoord; x = MathFunctions.roundToDecimalPlaces(x+searchStep, searchDecimalPlaces)) {
+		for(double x = Math.floor(minCoord); x <= maxCoord; x = RoundingUtils.roundToDecimalPlaces(x+searchStep, searchDecimalPlaces)) {
 			double currY = h(x);
 			if(Double.isNaN(currY))  {
 				iterationsSinceNan = 1;
@@ -270,12 +270,12 @@ public class Function implements Serializable {
 		
 		
 		// the rounding guarantees the accuracy of the extreme's y values when used in other functions
-		int calculationDecimalPlaces = MathFunctions.numberOfDecimalPlaces(TOLERANCE)-1;
+		int calculationDecimalPlaces = RoundingUtils.numberOfDecimalPlaces(TOLERANCE)-1;
 		
 		double x, y;
 		for(Entry<Double, Double> localMinimumArea : localExtremeAreas.entrySet()) {
 			x = computeExtreme(localMinimumArea.getKey(), localMinimumArea.getValue(), findMax);
-			y = MathFunctions.roundToDecimalPlaces(h(x), calculationDecimalPlaces);
+			y = RoundingUtils.roundToDecimalPlaces(h(x), calculationDecimalPlaces);
 			localExtremes.add(createPoint(x, y));
 		}
 		

@@ -30,6 +30,8 @@ import javax.swing.JMenuItem;
 
 import functionComponents.Point;
 import functionComponents.ReferentialLimits;
+import graphingCalculator.gSolveState.GSolveState;
+import graphingCalculator.gSolveState.GSolveStateWrapper;
 import graphingCalculator.graphics.GraphicsDrawer;
 import graphingCalculator.popupWindows.AddFunctionWindow;
 import graphingCalculator.popupWindows.GSolveXYValueWindow;
@@ -40,6 +42,7 @@ import graphingCalculator.popupWindows.SaveImageWindow;
 import graphingCalculator.popupWindows.SetReferentialLimitsWindow;
 import graphingCalculator.saver.GraphingCalculatorProjectFileFilter;
 import graphingCalculator.saver.GraphingCalculatorProjectSave;
+import graphingCalculator.utils.SwingUtils;
 
 @SuppressWarnings("serial")
 public class GraphingCalculatorFrame extends JFrame implements ActionListener, KeyListener, MouseListener {
@@ -203,7 +206,7 @@ public class GraphingCalculatorFrame extends JFrame implements ActionListener, K
 	}
 	
 	private void saveProject() throws IOException {
-		String filePath = SwingFunctions.showSaveFileDialog(this, "gpp", new GraphingCalculatorProjectFileFilter());
+		String filePath = SwingUtils.showSaveFileDialog(this, "gpp", new GraphingCalculatorProjectFileFilter());
 		if(filePath == null) return;
 		
 		GraphingCalculatorProjectSave save = new GraphingCalculatorProjectSave(graphicsDrawer);
@@ -215,7 +218,7 @@ public class GraphingCalculatorFrame extends JFrame implements ActionListener, K
 	}
 	
 	private void loadProject() throws ClassNotFoundException, IOException {
-		File file = SwingFunctions.showLoadFileDialog(this);
+		File file = SwingUtils.showLoadFileDialog(this);
 		if(file == null) return;
 		
 		FileInputStream fileInputStream = new FileInputStream(file);
@@ -229,7 +232,7 @@ public class GraphingCalculatorFrame extends JFrame implements ActionListener, K
 			colorStack.pop();
 		
 		graphicsDrawer.loadProject(save);
-		SwingFunctions.updateFrameContents(this);
+		SwingUtils.updateFrameContents(this);
 	}
 
 	@Override
@@ -240,7 +243,7 @@ public class GraphingCalculatorFrame extends JFrame implements ActionListener, K
 			for(int i = 0; i < menuGS.getMenuComponentCount(); i++)
 				if(e.getSource() == menuGS.getMenuComponent(i))
 					if(graphicsDrawer.getFunctionCount() == 0) {
-						SwingFunctions.showErrorMessageDialog(this, "There are no functions to G-Solve");
+						SwingUtils.showErrorMessageDialog(this, "There are no functions to G-Solve");
 						return;
 					}
 		
@@ -249,7 +252,7 @@ public class GraphingCalculatorFrame extends JFrame implements ActionListener, K
 					saveProject();
 				} catch (IOException e1) {
 					e1.printStackTrace();
-					SwingFunctions.showErrorMessageDialog(this, "There was a problem saving the project.");
+					SwingUtils.showErrorMessageDialog(this, "There was a problem saving the project.");
 				}
 			}
 
@@ -262,34 +265,34 @@ public class GraphingCalculatorFrame extends JFrame implements ActionListener, K
 					loadProject();
 				} catch (ClassNotFoundException | IOException e1) {
 					e1.printStackTrace();
-					SwingFunctions.showErrorMessageDialog(this, "There was a problem loading the project.");
+					SwingUtils.showErrorMessageDialog(this, "There was a problem loading the project.");
 				}
 			}
 
 			if(e.getSource() == mfuncAdd) {		//TODO: verify if function is not duplicate
 				if(graphicsDrawer.getFunctionCount() >= MAX_FUNCTIONS)
-					SwingFunctions.showErrorMessageDialog(this, "Maximum functions limit reached. Remove a function before adding a new one.");
+					SwingUtils.showErrorMessageDialog(this, "Maximum functions limit reached. Remove a function before adding a new one.");
 				else
 					addFunctionWindow.showWindow();
 			}
 
 			if(e.getSource() == mfuncRemove) {
 				if(graphicsDrawer.getFunctionCount() == 0)
-					SwingFunctions.showErrorMessageDialog(this, "There are no functions to remove.");
+					SwingUtils.showErrorMessageDialog(this, "There are no functions to remove.");
 				else
 					removeFunctionWindow.showWindow();
 			}
 
 			if(e.getSource() == mfuncList) {
 				if(graphicsDrawer.getFunctionCount() == 0)
-					SwingFunctions.showErrorMessageDialog(this, "There are no functions to list.");
+					SwingUtils.showErrorMessageDialog(this, "There are no functions to list.");
 				else
 					listFunctionsWindow.showWindow();
 			}
 
 			if(e.getSource() == vwDefault) {
 				graphicsDrawer.setReferentialLimits(DEFAULT_MINX, DEFAULT_MAXX, DEFAULT_MINY, DEFAULT_MAXY);
-				SwingFunctions.updateFrameContents(this);
+				SwingUtils.updateFrameContents(this);
 			}
 
 			if(e.getSource() == vwSetValues) {
@@ -298,61 +301,61 @@ public class GraphingCalculatorFrame extends JFrame implements ActionListener, K
 
 			if(e.getSource() == vwZoomIn) {
 				graphicsDrawer.halveReferentialLimits();
-				SwingFunctions.updateFrameContents(this);
+				SwingUtils.updateFrameContents(this);
 			}
 
 			if(e.getSource() == vwZoomOut) {
 				graphicsDrawer.doubleReferentialLimits();
-				SwingFunctions.updateFrameContents(this);
+				SwingUtils.updateFrameContents(this);
 			}
 
 			if(e.getSource() == gsRoot) {
 				if(graphicsDrawer.gSolveRoot()) {
 					gSolveState.state = GSolveState.ROOT;
-					SwingFunctions.updateFrameContents(this);
+					SwingUtils.updateFrameContents(this);
 				}
 				else
-					SwingFunctions.showErrorMessageDialog(this, "No roots were found");
+					SwingUtils.showErrorMessageDialog(this, "No roots were found");
 			}
 
 			if(e.getSource() == gsMax) {
 				if(graphicsDrawer.gSolveMaximum()) {
 					gSolveState.state = GSolveState.MAXIMUM;
-					SwingFunctions.updateFrameContents(this);
+					SwingUtils.updateFrameContents(this);
 				}
 				else
-					SwingFunctions.showErrorMessageDialog(this, "No maximums were found");
+					SwingUtils.showErrorMessageDialog(this, "No maximums were found");
 			}
 
 			if(e.getSource() == gsMin) {
 				if(graphicsDrawer.gSolveMaximum()) {
 					gSolveState.state = GSolveState.MINIMUM;
-					SwingFunctions.updateFrameContents(this);
+					SwingUtils.updateFrameContents(this);
 				}
 				else
-					SwingFunctions.showErrorMessageDialog(this, "No minimum were found");
+					SwingUtils.showErrorMessageDialog(this, "No minimum were found");
 			}
 
 			if(e.getSource() == gsYIntersect) {
 				if(graphicsDrawer.gSolveYAxisIntersection()) {
 					gSolveState.state = GSolveState.Y_AXIS_INTERSECTION;
-					SwingFunctions.updateFrameContents(this);
+					SwingUtils.updateFrameContents(this);
 				}
 				else
-					SwingFunctions.showErrorMessageDialog(this, "No intersection was found");
+					SwingUtils.showErrorMessageDialog(this, "No intersection was found");
 			}
 
 			if(e.getSource() == gsFuncIntersect) {
 				if(graphicsDrawer.getFunctionCount() < 2) {
-					SwingFunctions.showErrorMessageDialog(this, "There is no function to intersect with");
+					SwingUtils.showErrorMessageDialog(this, "There is no function to intersect with");
 					return;
 				}
 				if(graphicsDrawer.gSolveFunctionIntersection()) {
 					gSolveState.state = GSolveState.FUNCTION_INTERSECTION;
-					SwingFunctions.updateFrameContents(this);
+					SwingUtils.updateFrameContents(this);
 				}
 				else
-					SwingFunctions.showErrorMessageDialog(this, "No intersections were found");
+					SwingUtils.showErrorMessageDialog(this, "No intersections were found");
 			}
 
 			if(e.getSource() == gsYVal) {
@@ -389,12 +392,12 @@ public class GraphingCalculatorFrame extends JFrame implements ActionListener, K
 		
 		else if(keyVal == KeyEvent.VK_RIGHT) {
 			graphicsDrawer.nextGSolveSolution();
-			SwingFunctions.updateFrameContents(this);
+			SwingUtils.updateFrameContents(this);
 		}
 		
 		else if(keyVal == KeyEvent.VK_LEFT) {
 			graphicsDrawer.prevGSolveSolution();
-			SwingFunctions.updateFrameContents(this);
+			SwingUtils.updateFrameContents(this);
 		}
 	}
 	
@@ -412,7 +415,7 @@ public class GraphingCalculatorFrame extends JFrame implements ActionListener, K
 		double yDiff = mousePressedPoint.getY()-mouseReleasedPoint.getY();
 		
 		graphicsDrawer.moveOriginLocation(xDiff, yDiff);
-		SwingFunctions.updateFrameContents(this);
+		SwingUtils.updateFrameContents(this);
 	}
 	
 	@Override
@@ -450,8 +453,8 @@ public class GraphingCalculatorFrame extends JFrame implements ActionListener, K
 		screenResizeScheduled = false;
 		this.addComponentListener(new ComponentAdapter() {
 			public void componentResized(ComponentEvent componentEvent) {
-				if(SwingFunctions.resizeUpdateState > 0) {
-				    SwingFunctions.resizeUpdateState--;
+				if(SwingUtils.resizeUpdateState > 0) {
+				    SwingUtils.resizeUpdateState--;
 				    return;
 				}
 				    	
@@ -465,7 +468,7 @@ public class GraphingCalculatorFrame extends JFrame implements ActionListener, K
 					@Override
 					public void run() {
 						graphicsDrawer.setFrameSize(drawingAreaSize());
-						SwingFunctions.updateFrameContents(GraphingCalculatorFrame.this);
+						SwingUtils.updateFrameContents(GraphingCalculatorFrame.this);
 						screenResizeScheduled = false;
 					}
 				}, ACTION_DELAY);
@@ -489,7 +492,7 @@ public class GraphingCalculatorFrame extends JFrame implements ActionListener, K
 					@Override
 					public void run() {
 						graphicsDrawer.zoomReferentialLimitsBy(-referentialZoomsScheduledCount);
-						SwingFunctions.updateFrameContents(GraphingCalculatorFrame.this);
+						SwingUtils.updateFrameContents(GraphingCalculatorFrame.this);
 						referentialZoomScheduled = false;
 						referentialZoomsScheduledCount = 0;
 					}

@@ -17,8 +17,8 @@ import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 
 import functionComponents.Function;
-import graphingCalculator.SwingFunctions;
 import graphingCalculator.graphics.GraphicsDrawer;
+import graphingCalculator.utils.SwingUtils;
 import net.objecthunter.exp4j.tokenizer.UnknownFunctionOrVariableException;
 
 @SuppressWarnings("serial")
@@ -74,7 +74,7 @@ public class EditFunctionWindow extends PopupWindow {
 		contentPane.add(inputPane, BorderLayout.CENTER);
 		contentPane.add(buttonPane, BorderLayout.PAGE_END);
 		
-		SwingFunctions.evenButtonsWidth(changeButton, cancelButton);
+		SwingUtils.evenButtonsWidth(changeButton, cancelButton);
 	}
 	
 	@Override
@@ -83,19 +83,19 @@ public class EditFunctionWindow extends PopupWindow {
 			try {
 				function.setExpression(textField.getText().trim());
 			} catch(UnknownFunctionOrVariableException e1) {
-				SwingFunctions.showErrorMessageDialog(this, "Invalid function");
+				SwingUtils.showErrorMessageDialog(this, "Invalid function");
 				return;
 			}	catch(EmptyStackException e2) {
-				SwingFunctions.showErrorMessageDialog(this, "Check the number of parentheses");
+				SwingUtils.showErrorMessageDialog(this, "Check the number of parentheses");
 				return;
 			} catch(IllegalArgumentException e3) {
-				SwingFunctions.showErrorMessageDialog(this, "Please enter a function");
+				SwingUtils.showErrorMessageDialog(this, "Please enter a function");
 				return;
 			}
 		}
 		
 		graphicsDrawer.updateGraphics();
-		SwingFunctions.updateFrameContents(grandparent);
+		SwingUtils.updateFrameContents(grandparent);
 		((ListFunctionsWindow) parent).resetLabels();
 		parent.setEnabled(true);
 		this.dispose();

@@ -1,9 +1,9 @@
-package graphingCalculator;
+package graphingCalculator.utils;
 
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
 
-public class MathFunctions {
+public class RoundingUtils {
 
 	public static String roundToDecimalPlacesStr(double number, int decimalPlaces) {
 		if(decimalPlaces <= 0) return String.valueOf(Math.round(number));

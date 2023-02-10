@@ -1,4 +1,4 @@
-package graphingCalculator;
+package graphingCalculator.gSolveState;
 
 public enum GSolveState {
 	NONE (false),

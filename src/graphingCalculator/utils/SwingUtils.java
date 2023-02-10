@@ -1,4 +1,4 @@
-package graphingCalculator;
+package graphingCalculator.utils;
 
 import java.awt.Dimension;
 import java.io.File;
@@ -9,9 +9,10 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileFilter;
 
+import graphingCalculator.GraphingCalculatorFrame;
 import graphingCalculator.saver.GraphingCalculatorProjectFileFilter;
 
-public class SwingFunctions {
+public class SwingUtils {
 	
 	/*
 	 * GraphPlotterFrame has a window resize listener.

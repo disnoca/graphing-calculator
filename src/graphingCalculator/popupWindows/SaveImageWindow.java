@@ -23,9 +23,9 @@ import javax.swing.JRadioButton;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import graphingCalculator.SwingFunctions;
 import graphingCalculator.graphics.GraphicsDrawer;
 import graphingCalculator.saver.ImageFileFilter;
+import graphingCalculator.utils.SwingUtils;
 
 @SuppressWarnings("serial")
 public class SaveImageWindow extends PopupWindow {
@@ -103,11 +103,11 @@ public class SaveImageWindow extends PopupWindow {
 		contentPane.add(optionsPane, BorderLayout.EAST);
 		contentPane.add(buttonPane, BorderLayout.PAGE_END);
 		
-		SwingFunctions.evenButtonsWidth(saveButton, cancelButton);
+		SwingUtils.evenButtonsWidth(saveButton, cancelButton);
 	}
 	
 	private boolean saveImage(boolean transparent, String format) throws IOException {
-		String filePath = SwingFunctions.showSaveFileDialog(this, format, new ImageFileFilter("."+format));
+		String filePath = SwingUtils.showSaveFileDialog(this, format, new ImageFileFilter("."+format));
 		if(filePath == null) return false;
 		
 		//if(format.equals("jpg")) format = "jpeg";		// to test if this line matters
@@ -123,7 +123,7 @@ public class SaveImageWindow extends PopupWindow {
 				if(!saveImage(transparentCheckbox.isSelected(), getSelectedButtonText(buttonGroup)))
 					return;
 			} catch (IOException e1) {
-				SwingFunctions.showErrorMessageDialog(this, "There was a problem saving the image.");
+				SwingUtils.showErrorMessageDialog(this, "There was a problem saving the image.");
 			}
 		}
 		

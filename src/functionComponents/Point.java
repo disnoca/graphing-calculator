@@ -3,7 +3,7 @@ package functionComponents;
 import java.awt.Dimension;
 import java.io.Serializable;
 
-import graphingCalculator.MathFunctions;
+import graphingCalculator.utils.RoundingUtils;
 
 public class Point implements Serializable, Comparable<Point> {
 
@@ -52,8 +52,8 @@ public class Point implements Serializable, Comparable<Point> {
 	}
 	
 	public void roundCoords(int decimalPlaces) {
-		x = MathFunctions.roundToDecimalPlaces(x, decimalPlaces);
-		y = MathFunctions.roundToDecimalPlaces(y, decimalPlaces);
+		x = RoundingUtils.roundToDecimalPlaces(x, decimalPlaces);
+		y = RoundingUtils.roundToDecimalPlaces(y, decimalPlaces);
 	}
 	
 	private void calculateFrameCoords(double xMin, double xMax, double yMin, double yMax) {

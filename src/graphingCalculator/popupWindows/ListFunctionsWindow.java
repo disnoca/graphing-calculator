@@ -18,8 +18,8 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import graphingCalculator.SwingFunctions;
 import graphingCalculator.graphics.GraphicsDrawer;
+import graphingCalculator.utils.SwingUtils;
 
 @SuppressWarnings("serial")
 public class ListFunctionsWindow extends PopupWindow {
@@ -177,13 +177,13 @@ public class ListFunctionsWindow extends PopupWindow {
 		if(upButtons.contains(e.getSource())) {
 			int pos = graphicsDrawer.getFunctionCount()-upButtons.indexOf(e.getSource())-1;
 			swapFunctions(pos, pos+1);
-			SwingFunctions.updateFrameContents(parent);
+			SwingUtils.updateFrameContents(parent);
 		}
 		
 		if(downButtons.contains(e.getSource())) {
 			int pos = graphicsDrawer.getFunctionCount()-downButtons.indexOf(e.getSource())-1;
 			swapFunctions(pos, pos-1);
-			SwingFunctions.updateFrameContents(parent);
+			SwingUtils.updateFrameContents(parent);
 		}
 		
 		if(editButtons.contains(e.getSource())) {

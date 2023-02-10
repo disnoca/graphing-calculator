@@ -14,8 +14,8 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 
-import graphingCalculator.SwingFunctions;
 import graphingCalculator.graphics.GraphicsDrawer;
+import graphingCalculator.utils.SwingUtils;
 
 @SuppressWarnings("serial")
 public class SetReferentialLimitsWindow extends PopupWindow {
@@ -74,13 +74,13 @@ public class SetReferentialLimitsWindow extends PopupWindow {
 		contentPane.add(yTextFieldsPane, BorderLayout.CENTER);
 		contentPane.add(buttonPane, BorderLayout.PAGE_END);
 		
-		SwingFunctions.evenButtonsWidth(changeButton, cancelButton);
+		SwingUtils.evenButtonsWidth(changeButton, cancelButton);
 		
 	}
 	
 	private void setReferentialLimits(double xMin, double xMax, double yMin, double yMax) {
 		graphicsDrawer.setReferentialLimits(xMin, xMax, yMin, yMax);
-		SwingFunctions.updateFrameContents(parent);
+		SwingUtils.updateFrameContents(parent);
 	}
 	
 	@Override
@@ -92,16 +92,16 @@ public class SetReferentialLimitsWindow extends PopupWindow {
 				for(int i = 0; i < referentialLimitsTF.length; i++)
 					limits[i] = Double.parseDouble(referentialLimitsTF[i].getText());
 		    } catch (NumberFormatException ignore) {
-		        SwingFunctions.showErrorMessageDialog(this, "Invalid Values.");
+		        SwingUtils.showErrorMessageDialog(this, "Invalid Values.");
 		        return;
 		    }
 			
 			if(limits[0] >= limits[1]) {
-				SwingFunctions.showErrorMessageDialog(this, "max X must be greater than min X.");
+				SwingUtils.showErrorMessageDialog(this, "max X must be greater than min X.");
 				return;
 			}
 			else if(limits[2] >= limits[3]) {
-				SwingFunctions.showErrorMessageDialog(this, "max Y must be greater than min Y.");
+				SwingUtils.showErrorMessageDialog(this, "max Y must be greater than min Y.");
 				return;
 			}
 				

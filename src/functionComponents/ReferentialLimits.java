@@ -4,7 +4,7 @@ import java.awt.Dimension;
 import java.io.Serializable;
 import java.util.HashMap;
 
-import graphingCalculator.MathFunctions;
+import graphingCalculator.utils.RoundingUtils;
 
 public class ReferentialLimits implements Serializable {
 
@@ -50,7 +50,7 @@ public class ReferentialLimits implements Serializable {
 			maxLength = Math.pow(10, Math.abs(decimalPlaces)+1)*2;
 		else {
 			maxLength = Math.pow(10, -decimalPlaces+1)*2;
-			min = MathFunctions.roundToDecimalPlaces(min, decimalPlaces);
+			min = RoundingUtils.roundToDecimalPlaces(min, decimalPlaces);
 		}
 		
 		double step = maxLength/20;
@@ -70,10 +70,10 @@ public class ReferentialLimits implements Serializable {
 			for(double current = start+currStep/2; current <= max; current += currStep) {
 				if(i == 0 && current == start+currStep/2) current = start;
 				
-				current = MathFunctions.roundToDecimalPlaces(current, decimalPlaces+i);
+				current = RoundingUtils.roundToDecimalPlaces(current, decimalPlaces+i);
 				if(current == 0 || current < min || current > max) continue;
 				
-				String label = MathFunctions.roundToDecimalPlacesStr(current, decimalPlaces+i);
+				String label = RoundingUtils.roundToDecimalPlacesStr(current, decimalPlaces+i);
 				
 				if(!referentialMarks.containsValue(label)) {
 					if(xLine)
