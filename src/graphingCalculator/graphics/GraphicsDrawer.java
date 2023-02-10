@@ -10,7 +10,6 @@ import java.util.Collections;
 import java.util.Map.Entry;
 
 import javax.swing.JComponent;
-import javax.swing.JFrame;
 
 import functionComponents.Function;
 import functionComponents.Point;
@@ -29,7 +28,7 @@ public class GraphicsDrawer extends JComponent {
 	private int currGSolveSolutionPos;
 	
 
-	public GraphicsDrawer(JFrame parent, Dimension size, ReferentialLimits referentialLimits) {
+	public GraphicsDrawer(Dimension size, ReferentialLimits referentialLimits) {
 		this.size = size;
 		this.referentialLimits = referentialLimits;
 		functionGraphics = new ArrayList<>();
@@ -248,9 +247,48 @@ public class GraphicsDrawer extends JComponent {
 		return true;
 	}
 	
-	public void gSolveYValue(double x) {
-		Point p = functionGraphics.get(0).getFunction().getYValue(x);
+	public boolean gSolveMaximum() {
+		lastGSolveResults = getCurrentWorkingFunction().getMaximum();
+		if(lastGSolveResults.isEmpty()) return false;
+		
+		Point mainSolution = getMainSolution();
+		setOriginLocation(mainSolution.getX(), mainSolution.getY());
+		return true;
+	}
+	
+	public boolean gSolveMinimum() {
+		lastGSolveResults = getCurrentWorkingFunction().getMinimum();
+		if(lastGSolveResults.isEmpty()) return false;
+		
+		Point mainSolution = getMainSolution();
+		setOriginLocation(mainSolution.getX(), mainSolution.getY());
+		return true;
+	}
+	
+	public boolean gSolveYAxisIntersection() {
+		Point p = functionGraphics.get(0).getFunction().getYAxisIntersection();
+		if(p == null) return false;
+		
 		setOriginLocation(p.getX(), p.getY());
+		return true;
+	}
+	
+	public boolean gSolveFunctionIntersection() {
+		Function intersectionFuntion = functionGraphics.get(functionGraphics.size()-2).getFunction();
+		lastGSolveResults = getCurrentWorkingFunction().getFunctionIntersections(intersectionFuntion);
+		if(lastGSolveResults.isEmpty()) return false;
+		
+		Point mainSolution = getMainSolution();
+		setOriginLocation(mainSolution.getX(), mainSolution.getY());
+		return true;
+	}
+	
+	public boolean gSolveYValue(double x) {
+		Point p = getCurrentWorkingFunction().getYValue(x);
+		if(p == null) return false;
+		
+		setOriginLocation(p.getX(), p.getY());
+		return true;
 	}
 
 	// returns true if any value was found, false otherwise

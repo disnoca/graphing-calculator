@@ -51,6 +51,10 @@ public class Function implements Serializable {
 		return expression;
 	}
 	
+	public Expression getParsedExpression() {
+		return function;
+	}
+	
 	public void setExpression(String expression) {
 		this.expression = expression;
 		this.function = new ExpressionBuilder(expression).variable("x").build();
@@ -121,8 +125,40 @@ public class Function implements Serializable {
 		return findRoots(searchLimits[0], searchLimits[1]);
 	}
 	
+	public ArrayList<Point> getMaximum() {
+		secondaryFunction = null;
+		double searchLimits[] = getSearchLimitCoords();
+		return findFunctionMaximums(searchLimits[0], searchLimits[1]);
+	}
+	
+	public ArrayList<Point> getMinimum() {
+		secondaryFunction = null;
+		double searchLimits[] = getSearchLimitCoords();
+		return findFunctionMinimums(searchLimits[0], searchLimits[1]);
+	}
+	
+	public Point getYAxisIntersection() {
+		double y = f(0);
+		if(!Double.isFinite(y)) return null;
+		
+		Point p = createPoint(0, y);
+		p.roundCoords(resultdecimalPlaces);
+		return p;
+	}
+	
+	public ArrayList<Point> getFunctionIntersections(Function g) {
+		secondaryFunction = g.getParsedExpression();
+		double searchLimits[] = getSearchLimitCoords();
+		return findRoots(searchLimits[0], searchLimits[1]);
+	}
+	
 	public Point getYValue(double x) {
-		return createPoint(x, f(x));
+		double y = f(x);
+		if(!Double.isFinite(y)) return null;
+		
+		Point p = createPoint(x, y);
+		p.roundCoords(resultdecimalPlaces);
+		return p;
 	}
 	
 	public ArrayList<Point> getXValue(double x) {
@@ -246,7 +282,7 @@ public class Function implements Serializable {
 		return localExtremes;
 	}
 	
-	private ArrayList<Point> findFunctionsMaximums(double minCoord, double maxCoord) {
+	private ArrayList<Point> findFunctionMaximums(double minCoord, double maxCoord) {
 		ArrayList<Point> localMaximums = findLocalExtremes(minCoord, maxCoord, FIND_MAX);
 		ArrayList<Point> functionMaximums = new ArrayList<>();
 		
@@ -263,6 +299,7 @@ public class Function implements Serializable {
 			}
 		}
 
+		Collections.sort(functionMaximums);
 		return functionMaximums;
 	}
 	

@@ -77,7 +77,12 @@ public class GSolveXYValueWindow extends PopupWindow {
 	
 	private void executeGSolve(double var) {
 		switch(gSolveState.state) {
-		case Y_VALUE: graphicsDrawer.gSolveYValue(var); break;
+		case Y_VALUE: 
+			if(!graphicsDrawer.gSolveYValue(var)) {
+				gSolveState.state = GSolveState.NONE;
+				SwingFunctions.showErrorMessageDialog(this, "No solution found");
+			}
+			break;
 		case X_VALUE: 
 			if(!graphicsDrawer.gSolveXValue(var)) {
 				gSolveState.state = GSolveState.NONE;

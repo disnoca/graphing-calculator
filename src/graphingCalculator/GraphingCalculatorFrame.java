@@ -188,7 +188,7 @@ public class GraphingCalculatorFrame extends JFrame implements ActionListener, K
 	
 	private void initGraphics() {
 		ReferentialLimits referentialLimits = new ReferentialLimits(drawingAreaSize(), DEFAULT_MINX, DEFAULT_MAXX, DEFAULT_MINY, DEFAULT_MAXY);
-		graphicsDrawer = new GraphicsDrawer(this, drawingAreaSize(), referentialLimits);
+		graphicsDrawer = new GraphicsDrawer(drawingAreaSize(), referentialLimits);
 		graphicsDrawer.setReferentialGraphic();
 		this.add(graphicsDrawer);
 	}
@@ -234,122 +234,142 @@ public class GraphingCalculatorFrame extends JFrame implements ActionListener, K
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		if(e.getSource() instanceof JMenuItem)
+		if(e.getSource() instanceof JMenuItem) {
 			gSolveState.state = GSolveState.NONE;
+
+			for(int i = 0; i < menuGS.getMenuComponentCount(); i++)
+				if(e.getSource() == menuGS.getMenuComponent(i))
+					if(graphicsDrawer.getFunctionCount() == 0) {
+						SwingFunctions.showErrorMessageDialog(this, "There are no functions to G-Solve");
+						return;
+					}
 		
-		
-		if(e.getSource() == mfilesaveProject) {
-			try {
-				saveProject();
-			} catch (IOException e1) {
-				e1.printStackTrace();
-				SwingFunctions.showErrorMessageDialog(this, "There was a problem saving the project.");
+			if(e.getSource() == mfilesaveProject) {
+				try {
+					saveProject();
+				} catch (IOException e1) {
+					e1.printStackTrace();
+					SwingFunctions.showErrorMessageDialog(this, "There was a problem saving the project.");
+				}
 			}
-		}
-		
-		if(e.getSource() == mfilesaveImage) {
-			saveImageWindow.showWindow();
-		}
-		
-		if(e.getSource() == mfileloadProject) {
-			try {
-				loadProject();
-			} catch (ClassNotFoundException | IOException e1) {
-				e1.printStackTrace();
-				SwingFunctions.showErrorMessageDialog(this, "There was a problem loading the project.");
+
+			if(e.getSource() == mfilesaveImage) {
+				saveImageWindow.showWindow();
 			}
-		}
-		
-		if(e.getSource() == mfuncAdd) {		//TODO: verify if function is not duplicate
-			if(graphicsDrawer.getFunctionCount() >= MAX_FUNCTIONS)
-				SwingFunctions.showErrorMessageDialog(this, "Maximum functions limit reached. Remove a function before adding a new one.");
-			else
-				addFunctionWindow.showWindow();
-		}
-		
-		if(e.getSource() == mfuncRemove) {
-			if(graphicsDrawer.getFunctionCount() == 0)
-				SwingFunctions.showErrorMessageDialog(this, "There are no functions to remove.");
-			else
-				removeFunctionWindow.showWindow();
-		}
-		
-		if(e.getSource() == mfuncList) {
-			if(graphicsDrawer.getFunctionCount() == 0)
-				SwingFunctions.showErrorMessageDialog(this, "There are no functions to list.");
-			else
-				listFunctionsWindow.showWindow();
-		}
-		
-		if(e.getSource() == vwDefault) {
-			graphicsDrawer.setReferentialLimits(DEFAULT_MINX, DEFAULT_MAXX, DEFAULT_MINY, DEFAULT_MAXY);
-			SwingFunctions.updateFrameContents(this);
-		}
-		
-		if(e.getSource() == vwSetValues) {
-			setReferentialLimitsWindow.showWindow();
-		}
-		
-		if(e.getSource() == vwZoomIn) {
-			graphicsDrawer.halveReferentialLimits();
-			SwingFunctions.updateFrameContents(this);
-		}
-		
-		if(e.getSource() == vwZoomOut) {
-			graphicsDrawer.doubleReferentialLimits();
-			SwingFunctions.updateFrameContents(this);
-		}
-		
-		if(e.getSource() == gsRoot) {
-			if(graphicsDrawer.getFunctionCount() == 0) {
-				SwingFunctions.showErrorMessageDialog(this, "There are no functions to G-Solve");
-				return;
+
+			if(e.getSource() == mfileloadProject) {
+				try {
+					loadProject();
+				} catch (ClassNotFoundException | IOException e1) {
+					e1.printStackTrace();
+					SwingFunctions.showErrorMessageDialog(this, "There was a problem loading the project.");
+				}
 			}
-			
-			if(graphicsDrawer.gSolveRoot())
-				gSolveState.state = GSolveState.ROOT;
-			else
-				SwingFunctions.showErrorMessageDialog(this, "No roots were found");
-		}
-		
-		if(e.getSource() == gsMax) {
-			
-		}
-		
-		if(e.getSource() == gsMin) {
-			
-		}
-		
-		if(e.getSource() == gsYIntersect) {
-			
-		}
-		
-		if(e.getSource() == gsFuncIntersect) {
-			
-		}
-		
-		if(e.getSource() == gsYVal) {
-			if(graphicsDrawer.getFunctionCount() == 0)
-				SwingFunctions.showErrorMessageDialog(this, "There are no functions to G-Solve");
-			else {
+
+			if(e.getSource() == mfuncAdd) {		//TODO: verify if function is not duplicate
+				if(graphicsDrawer.getFunctionCount() >= MAX_FUNCTIONS)
+					SwingFunctions.showErrorMessageDialog(this, "Maximum functions limit reached. Remove a function before adding a new one.");
+				else
+					addFunctionWindow.showWindow();
+			}
+
+			if(e.getSource() == mfuncRemove) {
+				if(graphicsDrawer.getFunctionCount() == 0)
+					SwingFunctions.showErrorMessageDialog(this, "There are no functions to remove.");
+				else
+					removeFunctionWindow.showWindow();
+			}
+
+			if(e.getSource() == mfuncList) {
+				if(graphicsDrawer.getFunctionCount() == 0)
+					SwingFunctions.showErrorMessageDialog(this, "There are no functions to list.");
+				else
+					listFunctionsWindow.showWindow();
+			}
+
+			if(e.getSource() == vwDefault) {
+				graphicsDrawer.setReferentialLimits(DEFAULT_MINX, DEFAULT_MAXX, DEFAULT_MINY, DEFAULT_MAXY);
+				SwingFunctions.updateFrameContents(this);
+			}
+
+			if(e.getSource() == vwSetValues) {
+				setReferentialLimitsWindow.showWindow();
+			}
+
+			if(e.getSource() == vwZoomIn) {
+				graphicsDrawer.halveReferentialLimits();
+				SwingFunctions.updateFrameContents(this);
+			}
+
+			if(e.getSource() == vwZoomOut) {
+				graphicsDrawer.doubleReferentialLimits();
+				SwingFunctions.updateFrameContents(this);
+			}
+
+			if(e.getSource() == gsRoot) {
+				if(graphicsDrawer.gSolveRoot()) {
+					gSolveState.state = GSolveState.ROOT;
+					SwingFunctions.updateFrameContents(this);
+				}
+				else
+					SwingFunctions.showErrorMessageDialog(this, "No roots were found");
+			}
+
+			if(e.getSource() == gsMax) {
+				if(graphicsDrawer.gSolveMaximum()) {
+					gSolveState.state = GSolveState.MAXIMUM;
+					SwingFunctions.updateFrameContents(this);
+				}
+				else
+					SwingFunctions.showErrorMessageDialog(this, "No maximums were found");
+			}
+
+			if(e.getSource() == gsMin) {
+				if(graphicsDrawer.gSolveMaximum()) {
+					gSolveState.state = GSolveState.MINIMUM;
+					SwingFunctions.updateFrameContents(this);
+				}
+				else
+					SwingFunctions.showErrorMessageDialog(this, "No minimum were found");
+			}
+
+			if(e.getSource() == gsYIntersect) {
+				if(graphicsDrawer.gSolveYAxisIntersection()) {
+					gSolveState.state = GSolveState.Y_AXIS_INTERSECTION;
+					SwingFunctions.updateFrameContents(this);
+				}
+				else
+					SwingFunctions.showErrorMessageDialog(this, "No intersection was found");
+			}
+
+			if(e.getSource() == gsFuncIntersect) {
+				if(graphicsDrawer.getFunctionCount() < 2) {
+					SwingFunctions.showErrorMessageDialog(this, "There is no function to intersect with");
+					return;
+				}
+				if(graphicsDrawer.gSolveFunctionIntersection()) {
+					gSolveState.state = GSolveState.FUNCTION_INTERSECTION;
+					SwingFunctions.updateFrameContents(this);
+				}
+				else
+					SwingFunctions.showErrorMessageDialog(this, "No intersections were found");
+			}
+
+			if(e.getSource() == gsYVal) {
 				gSolveState.state = GSolveState.Y_VALUE;
 				gSolveXYValueWindow.showWindow();
 			}
-		}
-		
-		if(e.getSource() == gsXVal) {
-			if(graphicsDrawer.getFunctionCount() == 0)
-				SwingFunctions.showErrorMessageDialog(this, "There are no functions to G-Solve");
-			else {
+
+			if(e.getSource() == gsXVal) {
 				gSolveState.state = GSolveState.X_VALUE;
 				gSolveXYValueWindow.showWindow();
 			}
+
+			if(e.getSource() == gsIntegral) {
+
+			}
+
 		}
-		
-		if(e.getSource() == gsIntegral) {
-			
-		}
-		
 	}
 	
 	private Dimension drawingAreaSize() {
