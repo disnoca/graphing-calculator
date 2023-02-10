@@ -10,6 +10,7 @@ import java.util.Collections;
 import java.util.Map.Entry;
 
 import javax.swing.JComponent;
+import javax.swing.JFrame;
 
 import functionComponents.Function;
 import functionComponents.Point;
@@ -24,8 +25,11 @@ public class GraphicsDrawer extends JComponent {
 	private BufferedImage referentialGraphic;
 	private ArrayList<FunctionGraphic> functionGraphics;
 	
+	private ArrayList<Point> lastGSolveResults;
+	private int currGSolveSolutionPos;
+	
 
-	public GraphicsDrawer(Dimension size, ReferentialLimits referentialLimits) {
+	public GraphicsDrawer(JFrame parent, Dimension size, ReferentialLimits referentialLimits) {
 		this.size = size;
 		this.referentialLimits = referentialLimits;
 		functionGraphics = new ArrayList<>();
@@ -192,13 +196,52 @@ public class GraphicsDrawer extends JComponent {
 	
 	// G-Solve functions
 	
+	private Function getCurrentWorkingFunction() {
+		return functionGraphics.get(functionGraphics.size()-1).getFunction();
+	}
+	
+	public void nextGSolveSolution() {
+		if(currGSolveSolutionPos < lastGSolveResults.size()-1) {
+			Point p = lastGSolveResults.get(++currGSolveSolutionPos);
+			setOriginLocation(p.getX(), p.getY());
+		}
+	}
+	
+	public void prevGSolveSolution() {
+		if(currGSolveSolutionPos > 0) {
+			Point p = lastGSolveResults.get(--currGSolveSolutionPos);
+			setOriginLocation(p.getX(), p.getY());
+		}
+	}
+	
 	public void gSolveYValue(double x) {
 		Point p = functionGraphics.get(0).getFunction().getYValue(x);
 		setOriginLocation(p.getX(), p.getY());
 	}
 
-	public void gSolveXValue(double var) {
-		// TODO Auto-generated method stub
+	// returns true if any value was found, false otherwise
+	public boolean gSolveXValue(double y) {
+		lastGSolveResults = getCurrentWorkingFunction().getXValue(y);
+		if(lastGSolveResults.isEmpty()) return false;
 		
+		currGSolveSolutionPos = 0;
+		double currOrigin = referentialLimits.getXMin() + referentialLimits.getXLength()/2;
+		Point mainSolution = lastGSolveResults.get(0);
+		double mainSolutionDist = mainSolution.getX()-currOrigin;
+		
+		Point p;
+		for(int i = 1; i < lastGSolveResults.size(); i++) {
+			p = lastGSolveResults.get(i);
+			double currDist = p.getX()-currOrigin;
+			
+			if((mainSolutionDist < 0 && currDist > mainSolutionDist) || (mainSolutionDist > 0 && currDist < mainSolutionDist)) {
+				currGSolveSolutionPos = i;
+				mainSolution = p;
+				mainSolutionDist = mainSolution.getX()-currOrigin;
+			}
+		}
+		
+		setOriginLocation(mainSolution.getX(), mainSolution.getY());
+		return true;
 	}
 }

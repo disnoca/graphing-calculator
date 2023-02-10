@@ -3,7 +3,9 @@ package functionComponents;
 import java.awt.Dimension;
 import java.io.Serializable;
 
-public class Point implements Serializable {
+import graphingCalculator.MathFunctions;
+
+public class Point implements Serializable, Comparable<Point> {
 
 	private static final long serialVersionUID = 1L;
 	
@@ -49,6 +51,11 @@ public class Point implements Serializable {
 		return yFrameCoord;
 	}
 	
+	public void roundCoords(int decimalPlaces) {
+		x = MathFunctions.roundToDecimalPlaces(x, decimalPlaces);
+		y = MathFunctions.roundToDecimalPlaces(y, decimalPlaces);
+	}
+	
 	private void calculateFrameCoords(double xMin, double xMax, double yMin, double yMax) {
 		double xCoordsRange = xMax-xMin;
 		double yCoordsRange = yMax-yMin;
@@ -67,6 +74,13 @@ public class Point implements Serializable {
 
 		x = xMin + xFrameCoord*xCoordsPerPixel;
 		y = yMin + (frameHeight-yFrameCoord)*yCoordsPerPixel;
+	}
+
+	@Override
+	public int compareTo(Point p2) {
+		if(this.getX() > p2.getX()) return 1;
+		if(this.getX() < p2.getX()) return -1;
+		return 0;
 	}
 		
 }

@@ -3,6 +3,7 @@ package functionComponents;
 import java.awt.Dimension;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map.Entry;
 
@@ -34,7 +35,7 @@ public class Function implements Serializable {
 	// setting it any higher than this can cause significant loading times
 	private final double DRAWING_ACCURACY = 20000;
 	
-	private ArrayList<Double> roots, maximums, minimums;
+	private final double SEARCH_AREA = 2000;
 	
 
 	public Function(Dimension size, ReferentialLimits referentialLimits, String expression) {
@@ -42,27 +43,8 @@ public class Function implements Serializable {
 		this.height = size.height;
 		this.referentialLimits = referentialLimits;
 		
-		roots = new ArrayList<>();
-		maximums = new ArrayList<>();
-		minimums = new ArrayList<>();
-		
 		setExpression(expression);
 		secondaryFunction = null;
-		
-		findRoots(-100, 100);
-		findExtremes(-100, 100);
-		
-		System.out.println("root");
-		for(double root : roots)
-			System.out.println(root);
-		
-		System.out.println("max");
-		for(double maximum : maximums)
-			System.out.println(maximum);
-		
-		System.out.println("min");
-		for(double minimum : minimums)
-			System.out.println(minimum);
 	}
 
 	public String getExpression() {
@@ -92,6 +74,20 @@ public class Function implements Serializable {
 		}
 	}
 	
+	public ArrayList<Point> getPoints() {
+		return points;
+	}
+	
+	private Point createPoint(double x, double y) {
+		return new Point(x, y, width, height, referentialLimits.getLimits());
+	}
+	
+	public void recalculateFrameSize(Dimension size) {
+		this.width = size.width;
+		this.height = size.height;
+		computeFunctionPoints();
+	}
+	
 	private double f(double x) {
 		try {
 			return function.setVariable("x", x).evaluate();
@@ -111,27 +107,27 @@ public class Function implements Serializable {
 		}
 	}
 	
-	public ArrayList<Point> getPoints() {
-		return points;
-	}
-	
-	public void recalculateFrameSize(Dimension size) {
-		this.width = size.width;
-		this.height = size.height;
-		computeFunctionPoints();
-	}
-	
 	// G-Solve functions
 	
 	public Point getYValue(double x) {
-		return new Point(x, f(x),  width, height, referentialLimits.getLimits());
+		return createPoint(x, f(x));
+	}
+	
+	public ArrayList<Point> getXValue(double x) {
+		secondaryFunction = new ExpressionBuilder(String.valueOf(x)).variable("").build();
+		double limits[] = referentialLimits.getLimits();
+		
+		ArrayList<Point> xValues = findRoots(limits[0] - SEARCH_AREA/2, limits[1] + SEARCH_AREA/2);
+		secondaryFunction = null;
+		
+		return xValues;
 	}
 	
 	
 	// G-Solve function helpers
 	private double searchStep = 0.1;
 	private int searchDecimalPlaces = MathFunctions.numberOfDecimalPlaces(searchStep);
-	private int resultdecimalPlaces = 2;
+	private int resultdecimalPlaces = 3;
 	
 	/*
 	 * How this method works:
@@ -139,7 +135,8 @@ public class Function implements Serializable {
 	 * Two consecutive xs are kept at a time. If the first x's evaluation value happens to 0, it's saved as a root.
 	 * Otherwise, if the two xs signs differ it means there's a root in the area between them. All root areas are saved and later their respective roots calculated
 	 */
-	private void findRoots(double minCoord, double maxCoord) {
+	private ArrayList<Point> findRoots(double minCoord, double maxCoord) {
+		ArrayList<Point> roots = new ArrayList<>();
 		HashMap<Double, Double> rootAreas = new HashMap<>();
 		
 		double prevY = 0;
@@ -161,7 +158,7 @@ public class Function implements Serializable {
 			}
 			
 			if(currY == 0) {
-				roots.add(x);
+				roots.add(createPoint(x, 0));
 			}
 			else if(currY*prevY < 0)
 				rootAreas.put(x-searchStep, x);
@@ -169,29 +166,41 @@ public class Function implements Serializable {
 			prevY = currY;
 		}
 		
-		secondaryFunction = null;
-		for(Entry<Double, Double> rootArea : rootAreas.entrySet())
-			roots.add(MathFunctions.roundToDecimalPlaces(computeRoot(rootArea.getKey(), rootArea.getValue()), resultdecimalPlaces));
+		for(Entry<Double, Double> rootArea : rootAreas.entrySet()) {
+			double x = MathFunctions.roundToDecimalPlaces(computeRoot(rootArea.getKey(), rootArea.getValue()), resultdecimalPlaces);
+			roots.add(createPoint(x, 0));
+		}
+		
+		ArrayList<Point> localExtremes = findLocalExtremes(minCoord, maxCoord, FIND_MAX);
+		localExtremes.addAll(findLocalExtremes(minCoord, maxCoord, FIND_MIN));
+		
+		for(Point localExtreme : localExtremes)
+			if(localExtreme.getY() == 0) {
+				localExtreme.roundCoords(resultdecimalPlaces);
+				roots.add(localExtreme);
+			}
+		
+		Collections.sort(roots);
+		return roots;
 	}
 	
 	/*
 	 * How this method works:
-	 * 
-	 * 1. Three consecutive xs are kept at time. If the middle x is evaluated higher/lower than the other variables, it means there's a local extreme in the area between the outer xs.
+	 * Three consecutive xs are kept at time. If the middle x is evaluated higher/lower than the other variables, it means there's a local extreme in the area between the outer xs.
 	 * All local extremes areas are saved and their extremes calculated.
 	 * 
-	 * 2. The minimum/maximum of the local extremes is calculated and only the local extremes that have that value as y are saved as function extremes
-	 */
-	private void findExtremes(double minCoord, double maxCoord) {
-		HashMap<Double, Double> possibleMinimumAreas = new HashMap<>();
-		HashMap<Double, Double> possibleMaximumAreas = new HashMap<>();
+	 * The returned ArrayList Points aren't rounded to the usual amount or sorted since this is only used as an intermediate step in other functions
+	 */ 
+	private ArrayList<Point> findLocalExtremes(double minCoord, double maxCoord, boolean findMax) {
+		ArrayList<Point> localExtremes = new ArrayList<>();
+		HashMap<Double, Double> localExtremeAreas = new HashMap<>();
 		
 		double pprevY = 0, prevY = 0;
 		int iterationsSinceNan = 0;
 		
 		// first two iterations are skipped
 		for(double x = Math.floor(minCoord); x <= maxCoord; x = MathFunctions.roundToDecimalPlaces(x+searchStep, searchDecimalPlaces)) {
-			double currY = f(x);
+			double currY = h(x);
 			if(Double.isNaN(currY))  {
 				iterationsSinceNan = 1;
 				continue;
@@ -202,47 +211,72 @@ public class Function implements Serializable {
 			if(iterationsSinceNan >= 0) {
 				iterationsSinceNan--;
 				prevY = currY;
-				pprevY = f(x-1);
+				pprevY = h(x-1);
 				continue;
 			}
 
-			if(prevY < pprevY && prevY < currY)
-				possibleMinimumAreas.put(x-2, x);
-			else if(prevY > pprevY && prevY > currY)
-				possibleMaximumAreas.put(x-2, x);
+			if(findMax && prevY > pprevY && prevY > currY)
+				localExtremeAreas.put(x-2, x);
+			else if(!findMax && prevY < pprevY && prevY < currY)
+				localExtremeAreas.put(x-2, x);
 			
 			pprevY = prevY;
 			prevY = currY;
 		}
 		
-		// this affects up to how many decimal places are used when compared when comparing extremes' y values
-		int extremeComparisonDecimalPlaces = MathFunctions.numberOfDecimalPlaces(TOLERANCE)-1;
 		
-		double possibleMinimum, possibleMinimumY, actualMinimumY = Double.MAX_VALUE;
-		for(Entry<Double, Double> possibleMinimumArea : possibleMinimumAreas.entrySet()) {
-			possibleMinimum = computeExtreme(possibleMinimumArea.getKey(), possibleMinimumArea.getValue(), FIND_MIN);
-			possibleMinimumY = MathFunctions.roundToDecimalPlaces(f(possibleMinimum), extremeComparisonDecimalPlaces);
-			if(possibleMinimumY <= actualMinimumY) {
-				if(possibleMinimumY < actualMinimumY && !minimums.isEmpty()) {
-					actualMinimumY = possibleMinimumY;
-					minimums.clear();
+		// the rounding guarantees the accuracy of the extreme's y values when used in other functions
+		int calculationDecimalPlaces = MathFunctions.numberOfDecimalPlaces(TOLERANCE)-1;
+		
+		double x, y;
+		for(Entry<Double, Double> localMinimumArea : localExtremeAreas.entrySet()) {
+			x = computeExtreme(localMinimumArea.getKey(), localMinimumArea.getValue(), findMax);
+			y = MathFunctions.roundToDecimalPlaces(h(x), calculationDecimalPlaces);
+			localExtremes.add(createPoint(x, y));
+		}
+		
+		return localExtremes;
+	}
+	
+	private ArrayList<Point> findFunctionsMaximums(double minCoord, double maxCoord) {
+		ArrayList<Point> localMaximums = findLocalExtremes(minCoord, maxCoord, FIND_MAX);
+		ArrayList<Point> functionMaximums = new ArrayList<>();
+		
+		double y, maxY = Double.MIN_VALUE;
+		for(Point localMaximum : localMaximums) {
+			y = localMaximum.getY();
+			if(y >= maxY) {
+				if(y > maxY && !localMaximums.isEmpty()) {
+					maxY = y;
+					functionMaximums.clear();
 				}
-				minimums.add(MathFunctions.roundToDecimalPlaces(possibleMinimum, resultdecimalPlaces));
+				localMaximum.roundCoords(resultdecimalPlaces);
+				functionMaximums.add(localMaximum);
+			}
+		}
+
+		return functionMaximums;
+	}
+	
+	private ArrayList<Point> findFunctionMinimums(double minCoord, double maxCoord) {
+		ArrayList<Point> localMinimums = findLocalExtremes(minCoord, maxCoord, FIND_MIN);
+		ArrayList<Point> functionMinimums = new ArrayList<>();
+		
+		double y, minY = Double.MAX_VALUE;
+		for(Point localMinimum : localMinimums) {
+			y = localMinimum.getY();
+			if(y <= minY) {
+				if(y < minY && !functionMinimums.isEmpty()) {
+					minY = y;
+					functionMinimums.clear();
+				}
+				localMinimum.roundCoords(resultdecimalPlaces);
+				functionMinimums.add(localMinimum);
 			}
 		}
 		
-		double possibleMaximum, possibleMaximumY, actualMaximumY = Double.MIN_VALUE;
-		for(Entry<Double, Double> possibleMaximumArea : possibleMaximumAreas.entrySet()) {
-			possibleMaximum = computeExtreme(possibleMaximumArea.getKey(), possibleMaximumArea.getValue(), FIND_MAX);
-			possibleMaximumY = MathFunctions.roundToDecimalPlaces(f(possibleMaximum), extremeComparisonDecimalPlaces);
-			if(possibleMaximumY >= actualMaximumY) {
-				if(possibleMaximumY > actualMaximumY && !maximums.isEmpty()) {
-					actualMaximumY = possibleMaximumY;
-					maximums.clear();
-				}
-				maximums.add(MathFunctions.roundToDecimalPlaces(possibleMaximum, resultdecimalPlaces));
-			}
-		}
+		Collections.sort(functionMinimums);
+		return functionMinimums;
 	}
 	
 	
@@ -288,9 +322,9 @@ public class Function implements Serializable {
 			x2 = b-d;
 			
 			if(findMaximum)
-				cond = f(x1) > f(x2);
+				cond = h(x1) > h(x2);
 			else
-				cond = f(x1) < f(x2);
+				cond = h(x1) < h(x2);
 		
 			if(cond)
 				a = x2;

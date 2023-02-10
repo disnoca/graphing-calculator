@@ -12,18 +12,18 @@ public enum GSolveState {
 	INTEGRAL (false);
 	
 	private final String title, inputMessage;
-	private final boolean hasMultipleAnswers;
+	private final boolean canHaveMultipleSolutions;
 	
-	GSolveState(String title, String inputMessage, boolean hasMultipleAnswers) {
+	GSolveState(String title, String inputMessage, boolean canHaveMultipleSolutions) {
 		this.title = title;
 		this.inputMessage = inputMessage;
-		this.hasMultipleAnswers = hasMultipleAnswers;
+		this.canHaveMultipleSolutions = canHaveMultipleSolutions;
 	}
 	
-	GSolveState(boolean hasMultipleAnswers) {
+	GSolveState(boolean canHaveMultipleSolutions) {
 		this.title = null;
 		this.inputMessage = null;
-		this.hasMultipleAnswers = hasMultipleAnswers;
+		this.canHaveMultipleSolutions = canHaveMultipleSolutions;
 	}
 	
 	public String getTitle() {
@@ -34,7 +34,7 @@ public enum GSolveState {
 		return inputMessage;
 	}
 	
-	public boolean hasMultipleAnswers() {
-		return hasMultipleAnswers;
+	public boolean canHaveMultipleSolutions() {
+		return canHaveMultipleSolutions;
 	}
 }

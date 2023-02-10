@@ -16,6 +16,7 @@ import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 
 import graphingCalculator.GSolveState;
+import graphingCalculator.GSolveStateWrapper;
 import graphingCalculator.SwingFunctions;
 import graphingCalculator.graphics.GraphicsDrawer;
 
@@ -25,19 +26,20 @@ public class GSolveXYValueWindow extends PopupWindow {
 	private JButton okButton;
 	private JTextField textField;
 
-	private GSolveState gSolveState;
+	private GSolveStateWrapper gSolveState;
 
-	public GSolveXYValueWindow(JFrame parent, GraphicsDrawer graphicsDrawer) {
+	public GSolveXYValueWindow(JFrame parent, GraphicsDrawer graphicsDrawer, GSolveStateWrapper gSolveState) {
 		super(parent, "", graphicsDrawer);
+		this.gSolveState = gSolveState;
 	}
 	
-	public void setGSolveState(GSolveState gSolveState) {
+	public void setGSolveState(GSolveStateWrapper gSolveState) {
 		this.gSolveState = gSolveState;
 	}
 	
 	@Override
 	protected void addComponents(Container contentPane) {
-		this.setTitle(gSolveState.getTitle());
+		this.setTitle(gSolveState.state.getTitle());
 		
 		okButton = new JButton("Ok");
 		okButton.setFocusable(false);
@@ -55,7 +57,7 @@ public class GSolveXYValueWindow extends PopupWindow {
 		JPanel inputPane = new JPanel();
 		inputPane.setLayout(new BoxLayout(inputPane, BoxLayout.PAGE_AXIS));
 		
-		JLabel label = new JLabel(gSolveState.getInputMessage());
+		JLabel label = new JLabel(gSolveState.state.getInputMessage());
 		inputPane.add(label);
 		inputPane.add(Box.createRigidArea(new Dimension(0,10)));
 		inputPane.add(textField);
@@ -74,9 +76,14 @@ public class GSolveXYValueWindow extends PopupWindow {
 	}
 	
 	private void executeGSolve(double var) {
-		switch(gSolveState) {
+		switch(gSolveState.state) {
 		case Y_VALUE: graphicsDrawer.gSolveYValue(var); break;
-		case X_VALUE: graphicsDrawer.gSolveXValue(var); break;
+		case X_VALUE: 
+			if(!graphicsDrawer.gSolveXValue(var)) {
+				gSolveState.state = GSolveState.NONE;
+				SwingFunctions.showErrorMessageDialog(this, "No solutions found");
+			}
+			break;
 		default: break;
 		}
 		SwingFunctions.updateFrameContents(parent);

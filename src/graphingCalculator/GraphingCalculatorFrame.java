@@ -74,7 +74,7 @@ public class GraphingCalculatorFrame extends JFrame implements ActionListener, K
 	private boolean screenResizeScheduled, referentialZoomScheduled;
 	private int referentialZoomsScheduledCount;
 	
-	private GSolveState gSolveState;
+	private GSolveStateWrapper gSolveState;
 	
 
 	public GraphingCalculatorFrame() {
@@ -84,6 +84,9 @@ public class GraphingCalculatorFrame extends JFrame implements ActionListener, K
 	    this.setResizable(true);	
 	    this.setSize(1000,1000);
 	    
+	    gSolveState = new GSolveStateWrapper();
+		gSolveState.state = GSolveState.NONE;
+	    
 	    initFunctionColors();
 		addMenuBar();
 		initGraphics();
@@ -92,8 +95,6 @@ public class GraphingCalculatorFrame extends JFrame implements ActionListener, K
 		
 		this.setLocationRelativeTo(null);
 		this.setVisible(true);
-		
-		gSolveState = GSolveState.NONE;
 	}
 	
 	private void initFunctionColors() {
@@ -187,7 +188,7 @@ public class GraphingCalculatorFrame extends JFrame implements ActionListener, K
 	
 	private void initGraphics() {
 		ReferentialLimits referentialLimits = new ReferentialLimits(drawingAreaSize(), DEFAULT_MINX, DEFAULT_MAXX, DEFAULT_MINY, DEFAULT_MAXY);
-		graphicsDrawer = new GraphicsDrawer(drawingAreaSize(), referentialLimits);
+		graphicsDrawer = new GraphicsDrawer(this, drawingAreaSize(), referentialLimits);
 		graphicsDrawer.setReferentialGraphic();
 		this.add(graphicsDrawer);
 	}
@@ -198,7 +199,7 @@ public class GraphingCalculatorFrame extends JFrame implements ActionListener, K
 		removeFunctionWindow = new RemoveFunctionWindow(this, "Remove Functions", graphicsDrawer, colorStack);
 		listFunctionsWindow = new ListFunctionsWindow(this, "Functions List", graphicsDrawer, colorIdsMap);
 		setReferentialLimitsWindow = new SetReferentialLimitsWindow(this, "Set Referential Limits", graphicsDrawer);
-		gSolveXYValueWindow = new GSolveXYValueWindow(this, graphicsDrawer);
+		gSolveXYValueWindow = new GSolveXYValueWindow(this, graphicsDrawer, gSolveState);
 	}
 	
 	private void saveProject() throws IOException {
@@ -317,18 +318,21 @@ public class GraphingCalculatorFrame extends JFrame implements ActionListener, K
 		}
 		
 		if(e.getSource() == gsYVal) {
-			if(graphicsDrawer.getFunctionCount() == 0) {
+			if(graphicsDrawer.getFunctionCount() == 0)
 				SwingFunctions.showErrorMessageDialog(this, "There are no functions to G-Solve");
-				return;
+			else {
+				gSolveState.state = GSolveState.Y_VALUE;
+				gSolveXYValueWindow.showWindow();
 			}
-			
-			gSolveState = GSolveState.Y_VALUE;
-			((GSolveXYValueWindow) gSolveXYValueWindow).setGSolveState(gSolveState);
-			gSolveXYValueWindow.showWindow();
 		}
 		
 		if(e.getSource() == gsXVal) {
-			
+			if(graphicsDrawer.getFunctionCount() == 0)
+				SwingFunctions.showErrorMessageDialog(this, "There are no functions to G-Solve");
+			else {
+				gSolveState.state = GSolveState.X_VALUE;
+				gSolveXYValueWindow.showWindow();
+			}
 		}
 		
 		if(e.getSource() == gsIntegral) {
@@ -346,14 +350,20 @@ public class GraphingCalculatorFrame extends JFrame implements ActionListener, K
 
 	@Override
 	public void keyPressed(KeyEvent e) {
-		if(gSolveState == GSolveState.NONE) return;
+		if(!gSolveState.state.canHaveMultipleSolutions()) return;
 		int keyVal = e.getKeyCode();
 		
-		if(keyVal == KeyEvent.VK_RIGHT) {
-			
-		}
+		if(keyVal == KeyEvent.VK_ESCAPE)
+			gSolveState.state = GSolveState.NONE;
+		
 		else if(keyVal == KeyEvent.VK_RIGHT) {
-			
+			graphicsDrawer.nextGSolveSolution();
+			SwingFunctions.updateFrameContents(this);
+		}
+		
+		else if(keyVal == KeyEvent.VK_LEFT) {
+			graphicsDrawer.prevGSolveSolution();
+			SwingFunctions.updateFrameContents(this);
 		}
 	}
 	
@@ -376,7 +386,7 @@ public class GraphingCalculatorFrame extends JFrame implements ActionListener, K
 	
 	@Override
 	public void mouseClicked(MouseEvent e) {
-		System.out.println("clicked"+mousePressedPoint.getX());
+		
 	}
 	
 	@Override
