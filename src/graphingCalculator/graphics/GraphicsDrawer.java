@@ -214,16 +214,11 @@ public class GraphicsDrawer extends JComponent {
 		}
 	}
 	
-	public void gSolveYValue(double x) {
-		Point p = functionGraphics.get(0).getFunction().getYValue(x);
-		setOriginLocation(p.getX(), p.getY());
-	}
-
-	// returns true if any value was found, false otherwise
-	public boolean gSolveXValue(double y) {
-		lastGSolveResults = getCurrentWorkingFunction().getXValue(y);
-		if(lastGSolveResults.isEmpty()) return false;
-		
+	/*
+	 * By main solution I mean the solution to the right of the current center of the screen's x
+	 * or, in case there are none to the right, the closest to the left.
+	 */
+	private Point getMainSolution() {
 		currGSolveSolutionPos = 0;
 		double currOrigin = referentialLimits.getXMin() + referentialLimits.getXLength()/2;
 		Point mainSolution = lastGSolveResults.get(0);
@@ -241,6 +236,29 @@ public class GraphicsDrawer extends JComponent {
 			}
 		}
 		
+		return mainSolution;
+	}
+	
+	public boolean gSolveRoot() {
+		lastGSolveResults = getCurrentWorkingFunction().getRoots();
+		if(lastGSolveResults.isEmpty()) return false;
+		
+		Point mainSolution = getMainSolution();
+		setOriginLocation(mainSolution.getX(), mainSolution.getY());
+		return true;
+	}
+	
+	public void gSolveYValue(double x) {
+		Point p = functionGraphics.get(0).getFunction().getYValue(x);
+		setOriginLocation(p.getX(), p.getY());
+	}
+
+	// returns true if any value was found, false otherwise
+	public boolean gSolveXValue(double y) {
+		lastGSolveResults = getCurrentWorkingFunction().getXValue(y);
+		if(lastGSolveResults.isEmpty()) return false;
+		
+		Point mainSolution = getMainSolution();
 		setOriginLocation(mainSolution.getX(), mainSolution.getY());
 		return true;
 	}

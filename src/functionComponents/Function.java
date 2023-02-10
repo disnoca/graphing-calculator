@@ -109,18 +109,26 @@ public class Function implements Serializable {
 	
 	// G-Solve functions
 	
+	private double[] getSearchLimitCoords() {
+		double limits[] = referentialLimits.getLimits();
+		double searchLimits[] = {limits[0] - SEARCH_AREA/2, limits[1] + SEARCH_AREA/2};
+		return searchLimits;
+	}
+	
+	public ArrayList<Point> getRoots() {
+		secondaryFunction = null;
+		double searchLimits[] = getSearchLimitCoords();
+		return findRoots(searchLimits[0], searchLimits[1]);
+	}
+	
 	public Point getYValue(double x) {
 		return createPoint(x, f(x));
 	}
 	
 	public ArrayList<Point> getXValue(double x) {
 		secondaryFunction = new ExpressionBuilder(String.valueOf(x)).variable("").build();
-		double limits[] = referentialLimits.getLimits();
-		
-		ArrayList<Point> xValues = findRoots(limits[0] - SEARCH_AREA/2, limits[1] + SEARCH_AREA/2);
-		secondaryFunction = null;
-		
-		return xValues;
+		double searchLimits[] = getSearchLimitCoords();
+		return findRoots(searchLimits[0], searchLimits[1]);
 	}
 	
 	

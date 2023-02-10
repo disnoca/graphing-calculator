@@ -234,6 +234,9 @@ public class GraphingCalculatorFrame extends JFrame implements ActionListener, K
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
+		if(e.getSource() instanceof JMenuItem)
+			gSolveState.state = GSolveState.NONE;
+		
 		
 		if(e.getSource() == mfilesaveProject) {
 			try {
@@ -298,7 +301,15 @@ public class GraphingCalculatorFrame extends JFrame implements ActionListener, K
 		}
 		
 		if(e.getSource() == gsRoot) {
+			if(graphicsDrawer.getFunctionCount() == 0) {
+				SwingFunctions.showErrorMessageDialog(this, "There are no functions to G-Solve");
+				return;
+			}
 			
+			if(graphicsDrawer.gSolveRoot())
+				gSolveState.state = GSolveState.ROOT;
+			else
+				SwingFunctions.showErrorMessageDialog(this, "No roots were found");
 		}
 		
 		if(e.getSource() == gsMax) {
