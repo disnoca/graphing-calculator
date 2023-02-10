@@ -1,4 +1,4 @@
-package graphplotter.popupWindows;
+package graphingCalculator.popupWindows;
 
 import java.awt.BorderLayout;
 import java.awt.Container;
@@ -23,9 +23,9 @@ import javax.swing.JRadioButton;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import graphplotter.SwingFunctions;
-import graphplotter.graphics.GraphicsDrawer;
-import graphplotter.saver.ImageFileFilter;
+import graphingCalculator.SwingFunctions;
+import graphingCalculator.graphics.GraphicsDrawer;
+import graphingCalculator.saver.ImageFileFilter;
 
 @SuppressWarnings("serial")
 public class SaveImageWindow extends PopupWindow {

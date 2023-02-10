@@ -1,4 +1,4 @@
-package graphplotter.popupWindows;
+package graphingCalculator.popupWindows;
 
 import java.awt.Container;
 import java.awt.Dimension;
@@ -8,7 +8,7 @@ import java.awt.event.WindowListener;
 
 import javax.swing.JFrame;
 
-import graphplotter.graphics.GraphicsDrawer;
+import graphingCalculator.graphics.GraphicsDrawer;
 
 @SuppressWarnings("serial")
 public abstract class PopupWindow extends JFrame implements ActionListener, WindowListener {

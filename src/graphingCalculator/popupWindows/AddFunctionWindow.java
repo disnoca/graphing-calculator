@@ -1,10 +1,12 @@
-package graphplotter.popupWindows;
+package graphingCalculator.popupWindows;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.util.EmptyStackException;
+import java.util.Stack;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -17,40 +19,34 @@ import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 
 import functionComponents.Function;
-import graphplotter.SwingFunctions;
-import graphplotter.graphics.GraphicsDrawer;
+import graphingCalculator.SwingFunctions;
+import graphingCalculator.graphics.GraphicsDrawer;
 import net.objecthunter.exp4j.tokenizer.UnknownFunctionOrVariableException;
 
 @SuppressWarnings("serial")
-public class EditFunctionWindow extends PopupWindow {
-	
-	private JFrame grandparent;
-	private Function function;
+public class AddFunctionWindow extends PopupWindow {
 	
 	private JTextField textField;
-	private JButton changeButton;
+	private JButton addButton;
 	
-
-	public EditFunctionWindow(JFrame parent, String title, GraphicsDrawer graphicsDrawer, JFrame grandparent) {
+	private Stack<Color> colorStack;
+	
+	
+	public AddFunctionWindow(JFrame parent, String title, GraphicsDrawer graphicsDrawer, Stack<Color> colorStack) {
 		super(parent, title, graphicsDrawer);
-		this.grandparent = grandparent;
-	}
-	
-	public void showWindow(Function function) {
-		this.function = function;
-		super.showWindow();
+		this.colorStack = colorStack;
 	}
 	
 	@Override
 	protected void addComponents(Container contentPane) {
-		changeButton = new JButton("Change");
-		changeButton.setFocusable(false);
-		changeButton.addActionListener(this);
+		addButton = new JButton("Add");
+		addButton.setFocusable(false);
+		addButton.addActionListener(this);
 		
 		textField = new JTextField();
+		// when textField is selected and user presses enter, Add button is automatically clicked
 		textField.getInputMap().put(KeyStroke.getKeyStroke("pressed ENTER"), "enter");
-		textField.getActionMap().put("enter", new SimulateButtonPressAction(changeButton));
-		textField.setText(function.getExpression());
+		textField.getActionMap().put("enter", new SimulateButtonPressAction(addButton));
 		
 		JButton cancelButton = new JButton("Cancel");
 		cancelButton.setFocusable(false);
@@ -59,7 +55,7 @@ public class EditFunctionWindow extends PopupWindow {
 		JPanel inputPane = new JPanel();
 		inputPane.setLayout(new BoxLayout(inputPane, BoxLayout.PAGE_AXIS));
 		
-		JLabel label = new JLabel("Edit the function's expression:");
+		JLabel label = new JLabel("Enter the function's expression:");
 		inputPane.add(label);
 		inputPane.add(Box.createRigidArea(new Dimension(0,10)));
 		inputPane.add(textField);
@@ -67,21 +63,31 @@ public class EditFunctionWindow extends PopupWindow {
 		
 		JPanel buttonPane = new JPanel();
 		buttonPane.setBorder(BorderFactory.createEmptyBorder(0, 10, 10, 10));
-		buttonPane.add(changeButton);
+		buttonPane.add(addButton);
 		buttonPane.add(Box.createRigidArea(new Dimension(10, 0)));
 		buttonPane.add(cancelButton);
 		
 		contentPane.add(inputPane, BorderLayout.CENTER);
 		contentPane.add(buttonPane, BorderLayout.PAGE_END);
 		
-		SwingFunctions.evenButtonsWidth(changeButton, cancelButton);
+		SwingFunctions.evenButtonsWidth(addButton, cancelButton);
 	}
+	
+	
+	private void addFunction(String expression) {
+		Function function = new Function(graphicsDrawer.getSize(), graphicsDrawer.getReferentialLimits(), expression);
+		graphicsDrawer.addFunction(function, colorStack.pop());
+		SwingFunctions.updateFrameContents(parent);
+	}
+	
 	
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		if(e.getSource() == changeButton) {
+		// always closes window after a button is pressed unless user tried to add nothing or an invalid function
+		// in which case exits this method and window remains open
+		if(e.getSource() == addButton) {
 			try {
-				function.setExpression(textField.getText().trim());
+				addFunction(textField.getText().trim());
 			} catch(UnknownFunctionOrVariableException e1) {
 				SwingFunctions.showErrorMessageDialog(this, "Invalid function");
 				return;
@@ -94,9 +100,6 @@ public class EditFunctionWindow extends PopupWindow {
 			}
 		}
 		
-		graphicsDrawer.updateGraphics();
-		SwingFunctions.updateFrameContents(grandparent);
-		((ListFunctionsWindow) parent).resetLabels();
 		parent.setEnabled(true);
 		this.dispose();
 	}

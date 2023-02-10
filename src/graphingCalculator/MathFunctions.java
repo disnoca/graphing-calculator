@@ -1,4 +1,4 @@
-package graphplotter;
+package graphingCalculator;
 
 import java.math.RoundingMode;
 import java.text.DecimalFormat;

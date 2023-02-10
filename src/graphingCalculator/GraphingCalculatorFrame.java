@@ -1,4 +1,4 @@
-package graphplotter;
+package graphingCalculator;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -30,19 +30,19 @@ import javax.swing.JMenuItem;
 
 import functionComponents.Point;
 import functionComponents.ReferentialLimits;
-import graphplotter.graphics.GraphicsDrawer;
-import graphplotter.popupWindows.AddFunctionWindow;
-import graphplotter.popupWindows.GSolveXYValueWindow;
-import graphplotter.popupWindows.ListFunctionsWindow;
-import graphplotter.popupWindows.PopupWindow;
-import graphplotter.popupWindows.RemoveFunctionWindow;
-import graphplotter.popupWindows.SaveImageWindow;
-import graphplotter.popupWindows.SetReferentialLimitsWindow;
-import graphplotter.saver.GraphPlotterProjectFileFilter;
-import graphplotter.saver.GraphPlotterProjectSave;
+import graphingCalculator.graphics.GraphicsDrawer;
+import graphingCalculator.popupWindows.AddFunctionWindow;
+import graphingCalculator.popupWindows.GSolveXYValueWindow;
+import graphingCalculator.popupWindows.ListFunctionsWindow;
+import graphingCalculator.popupWindows.PopupWindow;
+import graphingCalculator.popupWindows.RemoveFunctionWindow;
+import graphingCalculator.popupWindows.SaveImageWindow;
+import graphingCalculator.popupWindows.SetReferentialLimitsWindow;
+import graphingCalculator.saver.GraphingCalculatorProjectFileFilter;
+import graphingCalculator.saver.GraphingCalculatorProjectSave;
 
 @SuppressWarnings("serial")
-public class GraphPlotterFrame extends JFrame implements ActionListener, KeyListener, MouseListener {
+public class GraphingCalculatorFrame extends JFrame implements ActionListener, KeyListener, MouseListener {
 	
 	private JMenuBar menubar;
 	private JMenu menuFile, menuFileSave, menuFileLoad;
@@ -77,7 +77,7 @@ public class GraphPlotterFrame extends JFrame implements ActionListener, KeyList
 	private GSolveState gSolveState;
 	
 
-	public GraphPlotterFrame() {
+	public GraphingCalculatorFrame() {
 		super("Graph Plotter");
 	    this.setTitle("Graph Plotter");
 	    this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -202,10 +202,10 @@ public class GraphPlotterFrame extends JFrame implements ActionListener, KeyList
 	}
 	
 	private void saveProject() throws IOException {
-		String filePath = SwingFunctions.showSaveFileDialog(this, "gpp", new GraphPlotterProjectFileFilter());
+		String filePath = SwingFunctions.showSaveFileDialog(this, "gpp", new GraphingCalculatorProjectFileFilter());
 		if(filePath == null) return;
 		
-		GraphPlotterProjectSave save = new GraphPlotterProjectSave(graphicsDrawer);
+		GraphingCalculatorProjectSave save = new GraphingCalculatorProjectSave(graphicsDrawer);
 		FileOutputStream fileOutputStream = new FileOutputStream(filePath);
 	    ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream);
 	    objectOutputStream.writeObject(save);
@@ -219,7 +219,7 @@ public class GraphPlotterFrame extends JFrame implements ActionListener, KeyList
 		
 		FileInputStream fileInputStream = new FileInputStream(file);
 	    ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
-	    GraphPlotterProjectSave save = (GraphPlotterProjectSave) objectInputStream.readObject();
+	    GraphingCalculatorProjectSave save = (GraphingCalculatorProjectSave) objectInputStream.readObject();
 	    objectInputStream.close();
 		
 		initFunctionColors();
@@ -375,11 +375,14 @@ public class GraphPlotterFrame extends JFrame implements ActionListener, KeyList
 	}
 	
 	@Override
+	public void mouseClicked(MouseEvent e) {
+		System.out.println("clicked"+mousePressedPoint.getX());
+	}
+	
+	@Override
 	public void keyTyped(KeyEvent e) {}
 	@Override
 	public void keyReleased(KeyEvent e) {}
-	@Override
-	public void mouseClicked(MouseEvent e) {}
 	@Override
 	public void mouseEntered(MouseEvent e) {}
 	@Override
@@ -421,7 +424,7 @@ public class GraphPlotterFrame extends JFrame implements ActionListener, KeyList
 					@Override
 					public void run() {
 						graphicsDrawer.setFrameSize(drawingAreaSize());
-						SwingFunctions.updateFrameContents(GraphPlotterFrame.this);
+						SwingFunctions.updateFrameContents(GraphingCalculatorFrame.this);
 						screenResizeScheduled = false;
 					}
 				}, ACTION_DELAY);
@@ -445,7 +448,7 @@ public class GraphPlotterFrame extends JFrame implements ActionListener, KeyList
 					@Override
 					public void run() {
 						graphicsDrawer.zoomReferentialLimitsBy(-referentialZoomsScheduledCount);
-						SwingFunctions.updateFrameContents(GraphPlotterFrame.this);
+						SwingFunctions.updateFrameContents(GraphingCalculatorFrame.this);
 						referentialZoomScheduled = false;
 						referentialZoomsScheduledCount = 0;
 					}
@@ -456,7 +459,7 @@ public class GraphPlotterFrame extends JFrame implements ActionListener, KeyList
 	
 	
 	public static void main(String[] args) {
-		new GraphPlotterFrame();
+		new GraphingCalculatorFrame();
 	}
 	
 	// TODO:

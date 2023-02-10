@@ -1,4 +1,4 @@
-package graphplotter;
+package graphingCalculator;
 
 import java.awt.Dimension;
 import java.io.File;
@@ -9,7 +9,7 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileFilter;
 
-import graphplotter.saver.GraphPlotterProjectFileFilter;
+import graphingCalculator.saver.GraphingCalculatorProjectFileFilter;
 
 public class SwingFunctions {
 	
@@ -42,7 +42,7 @@ public class SwingFunctions {
 		int height = size.height;
 		Dimension tempSize = new Dimension(width+1, height+1);
 		
-		if(frame instanceof GraphPlotterFrame)
+		if(frame instanceof GraphingCalculatorFrame)
 			resizeUpdateState = 2;
 		frame.setSize(tempSize);
 		frame.setSize(size);
@@ -56,14 +56,14 @@ public class SwingFunctions {
 		if (choice != JFileChooser.APPROVE_OPTION) return null;
 		File chosenFile = fileSaver.getSelectedFile();
 		String filePath = chosenFile.getAbsolutePath();
-		if(GraphPlotterProjectFileFilter.getExtension(chosenFile) == null)
+		if(GraphingCalculatorProjectFileFilter.getExtension(chosenFile) == null)
 			filePath += "."+fileExtension;
 		return filePath;
 	}
 	
 	public static File showLoadFileDialog(JFrame parent) {
 		JFileChooser fileChooser = new JFileChooser();
-		fileChooser.addChoosableFileFilter(new GraphPlotterProjectFileFilter());
+		fileChooser.addChoosableFileFilter(new GraphingCalculatorProjectFileFilter());
 		fileChooser.setAcceptAllFileFilterUsed(false);
 		int choice = fileChooser.showOpenDialog(parent);
 		if (choice != JFileChooser.APPROVE_OPTION) return null;

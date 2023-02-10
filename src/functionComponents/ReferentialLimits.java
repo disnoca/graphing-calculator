@@ -4,7 +4,7 @@ import java.awt.Dimension;
 import java.io.Serializable;
 import java.util.HashMap;
 
-import graphplotter.MathFunctions;
+import graphingCalculator.MathFunctions;
 
 public class ReferentialLimits implements Serializable {
 

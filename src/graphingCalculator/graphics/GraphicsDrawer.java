@@ -1,4 +1,4 @@
-package graphplotter.graphics;
+package graphingCalculator.graphics;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -14,7 +14,7 @@ import javax.swing.JComponent;
 import functionComponents.Function;
 import functionComponents.Point;
 import functionComponents.ReferentialLimits;
-import graphplotter.saver.GraphPlotterProjectSave;
+import graphingCalculator.saver.GraphingCalculatorProjectSave;
 
 @SuppressWarnings("serial")
 public class GraphicsDrawer extends JComponent {
@@ -178,7 +178,7 @@ public class GraphicsDrawer extends JComponent {
 	    return bImg;
 	}
 	
-	public void loadProject(GraphPlotterProjectSave save) {
+	public void loadProject(GraphingCalculatorProjectSave save) {
 		referentialLimits = save.getReferentiaLimits();
 		setReferentialGraphic();
 		

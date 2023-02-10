@@ -1,4 +1,4 @@
-package graphplotter.popupWindows;
+package graphingCalculator.popupWindows;
 
 import java.awt.BorderLayout;
 import java.awt.Container;
@@ -14,8 +14,8 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 
-import graphplotter.SwingFunctions;
-import graphplotter.graphics.GraphicsDrawer;
+import graphingCalculator.SwingFunctions;
+import graphingCalculator.graphics.GraphicsDrawer;
 
 @SuppressWarnings("serial")
 public class SetReferentialLimitsWindow extends PopupWindow {

@@ -1,13 +1,13 @@
-package graphplotter.saver;
+package graphingCalculator.saver;
 
 import java.awt.Color;
 import java.io.Serializable;
 import java.util.HashMap;
 
 import functionComponents.ReferentialLimits;
-import graphplotter.graphics.GraphicsDrawer;
+import graphingCalculator.graphics.GraphicsDrawer;
 
-public class GraphPlotterProjectSave implements Serializable {
+public class GraphingCalculatorProjectSave implements Serializable {
 	
 	private static final long serialVersionUID = 1L;
 	
@@ -15,7 +15,7 @@ public class GraphPlotterProjectSave implements Serializable {
 	private HashMap<Color, String> functions;
 	
 	
-	public GraphPlotterProjectSave(GraphicsDrawer graphicsDrawer) {
+	public GraphingCalculatorProjectSave(GraphicsDrawer graphicsDrawer) {
 		referentialLimits = graphicsDrawer.getReferentialLimits();
 		
 		int functionCount = graphicsDrawer.getFunctionCount();

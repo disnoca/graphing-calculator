@@ -1,4 +1,4 @@
-package graphplotter.popupWindows;
+package graphingCalculator.popupWindows;
 
 import java.awt.event.ActionEvent;
 

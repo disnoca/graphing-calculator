@@ -5,9 +5,11 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map.Entry;
+
+import graphingCalculator.MathFunctions;
+
 import java.util.Random;
 
-import graphplotter.MathFunctions;
 import net.objecthunter.exp4j.Expression;
 import net.objecthunter.exp4j.ExpressionBuilder;
 

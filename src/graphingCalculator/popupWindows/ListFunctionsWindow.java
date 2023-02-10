@@ -1,4 +1,4 @@
-package graphplotter.popupWindows;
+package graphingCalculator.popupWindows;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -18,8 +18,8 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import graphplotter.SwingFunctions;
-import graphplotter.graphics.GraphicsDrawer;
+import graphingCalculator.SwingFunctions;
+import graphingCalculator.graphics.GraphicsDrawer;
 
 @SuppressWarnings("serial")
 public class ListFunctionsWindow extends PopupWindow {

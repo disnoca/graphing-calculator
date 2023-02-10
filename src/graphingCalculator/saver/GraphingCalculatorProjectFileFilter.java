@@ -1,17 +1,11 @@
-package graphplotter.saver;
+package graphingCalculator.saver;
 
 import java.io.File;
 
 import javax.swing.filechooser.FileFilter;
 
-public class ImageFileFilter extends FileFilter {
+public class GraphingCalculatorProjectFileFilter extends FileFilter {
 
-	private String fileDescription;
-	
-	public ImageFileFilter(String fileDescription) {
-		this.fileDescription = fileDescription;
-	}
-	
 	@Override
 	public boolean accept(File f) {
 		if (f.isDirectory())
@@ -35,6 +29,7 @@ public class ImageFileFilter extends FileFilter {
 
 	@Override
 	public String getDescription() {
-		return fileDescription;
+		return "Graph Plotter Project Files (.gpp)";
 	}
+
 }

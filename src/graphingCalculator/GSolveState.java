@@ -1,4 +1,4 @@
-package graphplotter;
+package graphingCalculator;
 
 public enum GSolveState {
 	NONE (false),
