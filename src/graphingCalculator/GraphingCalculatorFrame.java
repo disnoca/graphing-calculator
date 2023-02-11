@@ -510,6 +510,7 @@ public class GraphingCalculatorFrame extends JFrame implements ActionListener, K
 	// mark point where mouse clicked and show its coordinates
 	
 	// Issues:
+	// can't refactor utils classes
 	// non-existent points/lines in functions like tan(x) and 1/x are being drawn 
 	// functions like tan(x) and 1/x produce wrong results when applied the mathematical algorithms
 	// functions that have y values tending to infinity are only drawn to a certain extent
