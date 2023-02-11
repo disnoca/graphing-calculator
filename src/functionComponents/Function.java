@@ -202,7 +202,7 @@ public class Function implements Serializable {
 			}
 			
 			if(currY == 0) {
-				roots.add(createPoint(x, 0));
+				roots.add(createPoint(x, f(x)));
 			}
 			else if(currY*prevY < 0)
 				rootAreas.put(x-searchStep, x);
@@ -212,7 +212,7 @@ public class Function implements Serializable {
 		
 		for(Entry<Double, Double> rootArea : rootAreas.entrySet()) {
 			double x = RoundingUtils.roundToDecimalPlaces(computeRoot(rootArea.getKey(), rootArea.getValue()), resultdecimalPlaces);
-			roots.add(createPoint(x, 0));
+			roots.add(createPoint(x, f(x)));
 		}
 		
 		ArrayList<Point> localExtremes = findLocalExtremes(minCoord, maxCoord, FIND_MAX);
@@ -275,7 +275,7 @@ public class Function implements Serializable {
 		double x, y;
 		for(Entry<Double, Double> localMinimumArea : localExtremeAreas.entrySet()) {
 			x = computeExtreme(localMinimumArea.getKey(), localMinimumArea.getValue(), findMax);
-			y = RoundingUtils.roundToDecimalPlaces(h(x), calculationDecimalPlaces);
+			y = RoundingUtils.roundToDecimalPlaces(f(x), calculationDecimalPlaces);
 			localExtremes.add(createPoint(x, y));
 		}
 		

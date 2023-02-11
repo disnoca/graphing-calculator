@@ -192,7 +192,6 @@ public class GraphingCalculatorFrame extends JFrame implements ActionListener, K
 	private void initGraphics() {
 		ReferentialLimits referentialLimits = new ReferentialLimits(drawingAreaSize(), DEFAULT_MINX, DEFAULT_MAXX, DEFAULT_MINY, DEFAULT_MAXY);
 		graphicsDrawer = new GraphicsDrawer(drawingAreaSize(), referentialLimits);
-		graphicsDrawer.setReferentialGraphic();
 		this.add(graphicsDrawer);
 	}
 	
@@ -239,6 +238,8 @@ public class GraphingCalculatorFrame extends JFrame implements ActionListener, K
 	public void actionPerformed(ActionEvent e) {
 		if(e.getSource() instanceof JMenuItem) {
 			gSolveState.state = GSolveState.NONE;
+			graphicsDrawer.clearHighlights();
+			SwingUtils.updateFrameContents(this);
 
 			for(int i = 0; i < menuGS.getMenuComponentCount(); i++)
 				if(e.getSource() == menuGS.getMenuComponent(i))
@@ -387,8 +388,11 @@ public class GraphingCalculatorFrame extends JFrame implements ActionListener, K
 		if(!gSolveState.state.canHaveMultipleSolutions()) return;
 		int keyVal = e.getKeyCode();
 		
-		if(keyVal == KeyEvent.VK_ESCAPE)
+		if(keyVal == KeyEvent.VK_ESCAPE) {
 			gSolveState.state = GSolveState.NONE;
+			graphicsDrawer.clearHighlights();
+			SwingUtils.updateFrameContents(this);
+		}
 		
 		else if(keyVal == KeyEvent.VK_RIGHT) {
 			graphicsDrawer.nextGSolveSolution();

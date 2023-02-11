@@ -6,7 +6,9 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map.Entry;
 
 import javax.swing.JComponent;
@@ -23,6 +25,7 @@ public class GraphicsDrawer extends JComponent {
 	private ReferentialLimits referentialLimits;
 	private BufferedImage referentialGraphic;
 	private ArrayList<FunctionGraphic> functionGraphics;
+	private HighlightGraphic highlightGraphic;
 	
 	private ArrayList<Point> lastGSolveResults;
 	private int currGSolveSolutionPos;
@@ -31,6 +34,8 @@ public class GraphicsDrawer extends JComponent {
 	public GraphicsDrawer(Dimension size, ReferentialLimits referentialLimits) {
 		this.size = size;
 		this.referentialLimits = referentialLimits;
+		
+		setReferentialGraphic();
 		functionGraphics = new ArrayList<>();
 	}
 	
@@ -42,10 +47,25 @@ public class GraphicsDrawer extends JComponent {
 		
         for(FunctionGraphic layer : functionGraphics)
             g.drawImage(layer, 0, 0, size.width, size.height, null);
+        
+        if(highlightGraphic != null)
+        	g.drawImage(highlightGraphic, 0, 0, size.width, size.height, null);
     }
 	
-	public void setReferentialGraphic() {
+	private void setReferentialGraphic() {
 		referentialGraphic = new ReferentialGraphic(size, referentialLimits);
+	}
+	
+	private void setPointHighlightsGraphic(List<Point> pointHighlights) {
+		highlightGraphic = new HighlightGraphic(size, pointHighlights);
+	}
+	
+	private void setIntegralHighlightGraphic() {
+		
+	}
+	
+	public void clearHighlights() {
+		highlightGraphic = null;
 	}
 	
 	public void addFunction(Function function, Color color) {
@@ -199,25 +219,19 @@ public class GraphicsDrawer extends JComponent {
 		return functionGraphics.get(functionGraphics.size()-1).getFunction();
 	}
 	
-	public void nextGSolveSolution() {
-		if(currGSolveSolutionPos < lastGSolveResults.size()-1) {
-			Point p = lastGSolveResults.get(++currGSolveSolutionPos);
-			setOriginLocation(p.getX(), p.getY());
-		}
+	private ArrayList<Point> getVisiblePoints(ArrayList<Point> allPoints) {
+		ArrayList<Point> visiblePoints = new ArrayList<>();
+		double limits[] = referentialLimits.getLimits();
+		
+		for(Point p : allPoints)
+			if(referentialLimits.pointIsVisible(p))
+				// a new point must be created in the case the referential has moved since when it was created
+				visiblePoints.add(new Point(p.getX(), p.getY(), size.width, size.height, limits));
+		
+		return visiblePoints;
 	}
 	
-	public void prevGSolveSolution() {
-		if(currGSolveSolutionPos > 0) {
-			Point p = lastGSolveResults.get(--currGSolveSolutionPos);
-			setOriginLocation(p.getX(), p.getY());
-		}
-	}
-	
-	/*
-	 * By main solution I mean the solution to the right of the current center of the screen's x
-	 * or, in case there are none to the right, the closest to the left.
-	 */
-	private Point getMainSolution() {
+	private void startGSolveSolution() {
 		currGSolveSolutionPos = 0;
 		double currOrigin = referentialLimits.getXMin() + referentialLimits.getXLength()/2;
 		Point mainSolution = lastGSolveResults.get(0);
@@ -235,15 +249,31 @@ public class GraphicsDrawer extends JComponent {
 			}
 		}
 		
-		return mainSolution;
+		setOriginLocation(mainSolution.getX(), mainSolution.getY());
+		setPointHighlightsGraphic(getVisiblePoints(lastGSolveResults));
+	}
+	
+	public void nextGSolveSolution() {
+		if(currGSolveSolutionPos >= lastGSolveResults.size()-1) return;
+		
+		Point p = lastGSolveResults.get(++currGSolveSolutionPos);
+		setOriginLocation(p.getX(), p.getY());
+		setPointHighlightsGraphic(getVisiblePoints(lastGSolveResults));
+	}
+	
+	public void prevGSolveSolution() {
+		if(currGSolveSolutionPos <= 0) return;
+		
+		Point p = lastGSolveResults.get(--currGSolveSolutionPos);
+		setOriginLocation(p.getX(), p.getY());
+		setPointHighlightsGraphic(getVisiblePoints(lastGSolveResults));
 	}
 	
 	public boolean gSolveRoot() {
 		lastGSolveResults = getCurrentWorkingFunction().getRoots();
 		if(lastGSolveResults.isEmpty()) return false;
 		
-		Point mainSolution = getMainSolution();
-		setOriginLocation(mainSolution.getX(), mainSolution.getY());
+		startGSolveSolution();
 		return true;
 	}
 	
@@ -251,8 +281,7 @@ public class GraphicsDrawer extends JComponent {
 		lastGSolveResults = getCurrentWorkingFunction().getMaximum();
 		if(lastGSolveResults.isEmpty()) return false;
 		
-		Point mainSolution = getMainSolution();
-		setOriginLocation(mainSolution.getX(), mainSolution.getY());
+		startGSolveSolution();
 		return true;
 	}
 	
@@ -260,16 +289,16 @@ public class GraphicsDrawer extends JComponent {
 		lastGSolveResults = getCurrentWorkingFunction().getMinimum();
 		if(lastGSolveResults.isEmpty()) return false;
 		
-		Point mainSolution = getMainSolution();
-		setOriginLocation(mainSolution.getX(), mainSolution.getY());
+		startGSolveSolution();
 		return true;
 	}
 	
 	public boolean gSolveYAxisIntersection() {
-		Point p = functionGraphics.get(0).getFunction().getYAxisIntersection();
-		if(p == null) return false;
+		Point[] solution = {getCurrentWorkingFunction().getYAxisIntersection()};
+		if(solution[0] == null) return false;
 		
-		setOriginLocation(p.getX(), p.getY());
+		lastGSolveResults = new ArrayList<>(Arrays.asList(solution));
+		startGSolveSolution();
 		return true;
 	}
 	
@@ -278,16 +307,16 @@ public class GraphicsDrawer extends JComponent {
 		lastGSolveResults = getCurrentWorkingFunction().getFunctionIntersections(intersectionFuntion);
 		if(lastGSolveResults.isEmpty()) return false;
 		
-		Point mainSolution = getMainSolution();
-		setOriginLocation(mainSolution.getX(), mainSolution.getY());
+		startGSolveSolution();
 		return true;
 	}
 	
 	public boolean gSolveYValue(double x) {
-		Point p = getCurrentWorkingFunction().getYValue(x);
-		if(p == null) return false;
+		Point[] solution = {getCurrentWorkingFunction().getYValue(x)};
+		if(solution[0] == null) return false;
 		
-		setOriginLocation(p.getX(), p.getY());
+		lastGSolveResults = new ArrayList<>(Arrays.asList(solution));
+		startGSolveSolution();
 		return true;
 	}
 
@@ -296,8 +325,7 @@ public class GraphicsDrawer extends JComponent {
 		lastGSolveResults = getCurrentWorkingFunction().getXValue(y);
 		if(lastGSolveResults.isEmpty()) return false;
 		
-		Point mainSolution = getMainSolution();
-		setOriginLocation(mainSolution.getX(), mainSolution.getY());
+		startGSolveSolution();
 		return true;
 	}
 }

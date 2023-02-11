@@ -180,4 +180,8 @@ public class ReferentialLimits implements Serializable {
 		yReferentialMarks = calculateReferentialMarks(Y_LINE);
 	}
 	
+	public boolean pointIsVisible(Point p) {
+		return p.getX() >= xMin && p.getX() <= xMax && p.getY() >= yMin && p.getY() <= yMax;
+	}
+	
 }
