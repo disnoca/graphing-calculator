@@ -46,7 +46,6 @@ public class GSolveXYValueWindow extends PopupWindow {
 		okButton.addActionListener(this);
 		
 		textField = new JTextField();
-		// when textField is selected and user presses enter, Ok button is automatically clicked
 		textField.getInputMap().put(KeyStroke.getKeyStroke("pressed ENTER"), "enter");
 		textField.getActionMap().put("enter", new SimulateButtonPressAction(okButton));
 		
@@ -91,13 +90,12 @@ public class GSolveXYValueWindow extends PopupWindow {
 			break;
 		default: break;
 		}
+		
 		SwingUtils.updateFrameContents(parent);
 	}
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		// always closes window after a button is pressed unless user tried to add nothing or an invalid function
-		// in which case exits this method and window remains open
 		if(e.getSource() == okButton) {
 			try {
 				executeGSolve(Double.parseDouble(textField.getText().trim()));

@@ -16,6 +16,9 @@ import javax.swing.JComponent;
 import functionComponents.Function;
 import functionComponents.Point;
 import functionComponents.ReferentialLimits;
+import graphingCalculator.gSolveState.GSolveState;
+import graphingCalculator.gSolveState.GSolveStateWrapper;
+import graphingCalculator.popupWindows.GSolveIntegralWindow;
 import graphingCalculator.saver.GraphingCalculatorProjectSave;
 
 @SuppressWarnings("serial")
@@ -28,15 +31,20 @@ public class GraphicsDrawer extends JComponent {
 	private HighlightGraphic highlightGraphic;
 	
 	private ArrayList<Point> lastGSolveResults;
+	private Point lastIntegralLowerBound, lastIntegralUpperBound;
 	private int currGSolveSolutionPos;
 	
+	private GSolveStateWrapper gSolveState;
+	
 
-	public GraphicsDrawer(Dimension size, ReferentialLimits referentialLimits) {
+	public GraphicsDrawer(Dimension size, ReferentialLimits referentialLimits, GSolveStateWrapper gSolveState) {
 		this.size = size;
 		this.referentialLimits = referentialLimits;
 		
 		setReferentialGraphic();
 		functionGraphics = new ArrayList<>();
+		
+		this.gSolveState = gSolveState;
 	}
 	
 	@Override
@@ -60,12 +68,19 @@ public class GraphicsDrawer extends JComponent {
 		highlightGraphic = new HighlightGraphic(size, pointHighlights);
 	}
 	
-	private void setIntegralHighlightGraphic() {
+	private void setIntegralHighlightGraphic(List<Point> integralPoints) {		
+		double limits[] = referentialLimits.getLimits();
+		Point integralAreaStartRoot = new Point(lastIntegralLowerBound.getX(), 0, size.width, size.height, limits);
+		Point integralAreaEndRoot = new Point(lastIntegralUpperBound.getX(), 0, size.width, size.height, limits);
 		
+		highlightGraphic = new HighlightGraphic(size, integralAreaStartRoot, integralAreaEndRoot, integralPoints, 0);
 	}
 	
 	public void clearHighlights() {
 		highlightGraphic = null;
+		lastGSolveResults = null;
+		lastIntegralLowerBound = null;
+		lastIntegralUpperBound = null;
 	}
 	
 	public void addFunction(Function function, Color color) {
@@ -172,6 +187,7 @@ public class GraphicsDrawer extends JComponent {
 	
 	public void updateGraphics() {
 		setReferentialGraphic();
+		
 		ArrayList<FunctionGraphic> temp = new ArrayList<>(functionGraphics.size());
 		for(FunctionGraphic fg: functionGraphics) {
 			Function f = fg.getFunction();
@@ -181,6 +197,17 @@ public class GraphicsDrawer extends JComponent {
 		}
 		
 		functionGraphics = temp;
+		
+		updateHighlights();
+	}
+	
+	private void updateHighlights() {
+		if(gSolveState.state == GSolveState.NONE) return;
+		
+		if(gSolveState.state == GSolveState.INTEGRAL)
+			setIntegralHighlightGraphic(getAndUpdateVisiblePoints(lastGSolveResults));
+		else
+			setPointHighlightsGraphic(getAndUpdateVisiblePoints(lastGSolveResults));
 	}
 	
 	public BufferedImage getBufferedImage(boolean transparent) {
@@ -219,7 +246,7 @@ public class GraphicsDrawer extends JComponent {
 		return functionGraphics.get(functionGraphics.size()-1).getFunction();
 	}
 	
-	private ArrayList<Point> getVisiblePoints(ArrayList<Point> allPoints) {
+	private ArrayList<Point> getAndUpdateVisiblePoints(ArrayList<Point> allPoints) {
 		ArrayList<Point> visiblePoints = new ArrayList<>();
 		double limits[] = referentialLimits.getLimits();
 		
@@ -250,7 +277,7 @@ public class GraphicsDrawer extends JComponent {
 		}
 		
 		setOriginLocation(mainSolution.getX(), mainSolution.getY());
-		setPointHighlightsGraphic(getVisiblePoints(lastGSolveResults));
+		setPointHighlightsGraphic(getAndUpdateVisiblePoints(lastGSolveResults));
 	}
 	
 	public void nextGSolveSolution() {
@@ -258,7 +285,7 @@ public class GraphicsDrawer extends JComponent {
 		
 		Point p = lastGSolveResults.get(++currGSolveSolutionPos);
 		setOriginLocation(p.getX(), p.getY());
-		setPointHighlightsGraphic(getVisiblePoints(lastGSolveResults));
+		setPointHighlightsGraphic(getAndUpdateVisiblePoints(lastGSolveResults));
 	}
 	
 	public void prevGSolveSolution() {
@@ -266,7 +293,7 @@ public class GraphicsDrawer extends JComponent {
 		
 		Point p = lastGSolveResults.get(--currGSolveSolutionPos);
 		setOriginLocation(p.getX(), p.getY());
-		setPointHighlightsGraphic(getVisiblePoints(lastGSolveResults));
+		setPointHighlightsGraphic(getAndUpdateVisiblePoints(lastGSolveResults));
 	}
 	
 	public boolean gSolveRoot() {
@@ -327,5 +354,28 @@ public class GraphicsDrawer extends JComponent {
 		
 		startGSolveSolution();
 		return true;
+	}
+	
+	public int gSolveIntegral(double lowerBound, double upperBound) {
+		Function f = getCurrentWorkingFunction();
+		if(f.getYValue(lowerBound) == null) return GSolveIntegralWindow.INTEGRAL_LOWER_BOUND_ERROR;
+		if(f.getYValue(upperBound) == null) return GSolveIntegralWindow.INTEGRAL_UPPER_BOUND_ERROR;
+		
+		double integral = getCurrentWorkingFunction().getIntegral(lowerBound, upperBound);
+		if(integral == Double.NaN) return GSolveIntegralWindow.INTEGRAL_CALCULATION_ERROR;
+		
+		lastGSolveResults = f.getPointsInInterval(lowerBound, upperBound);
+		lastIntegralLowerBound = lastGSolveResults.get(0);
+		lastIntegralUpperBound = lastGSolveResults.get(lastGSolveResults.size()-1);
+		
+		double xIntegralRange = upperBound-lowerBound;
+		double yIntegralRange = f.getMaxValueInInterval(lowerBound, upperBound) - f.getMinValueInInterval(lowerBound, upperBound);
+		double maxIntegralRange = Math.max(xIntegralRange, yIntegralRange);
+		double limits[] = referentialLimits.getLimits();
+		
+		setReferentialLimits(limits[0]-maxIntegralRange/2, limits[1]+maxIntegralRange/2, limits[2]-maxIntegralRange/2, limits[3]+maxIntegralRange/2);
+		doubleReferentialLimits();
+		setIntegralHighlightGraphic(getAndUpdateVisiblePoints(lastGSolveResults));
+		return 0;
 	}
 }

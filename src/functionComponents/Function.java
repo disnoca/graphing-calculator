@@ -72,13 +72,26 @@ public class Function implements Serializable {
 		for(double i=referentialLimits.getXMin(); i<=referentialLimits.getXMax(); i+=step) {
 			y = f(i);
 			if(Double.isFinite(y))
-				points.add(new Point(i, f(i), width, height, referentialLimits.getLimits()));
+				points.add(new Point(i, y, width, height, referentialLimits.getLimits()));
 			else
 				points.add(null);
 		}
 	}
 	
 	public ArrayList<Point> getPoints() {
+		return points;
+	}
+	
+	public ArrayList<Point> getPointsInInterval(double lowerBound, double upperBound) {
+		double xLength = upperBound-lowerBound;
+		double step = xLength/DRAWING_ACCURACY;
+		int pointCount = (int) Math.ceil(xLength/step);
+		
+		points = new ArrayList<>(pointCount);
+		
+		for(double i=lowerBound; i<=upperBound; i+=step)
+			points.add(new Point(i, f(i), width, height, referentialLimits.getLimits()));
+		
 		return points;
 	}
 	
@@ -109,6 +122,28 @@ public class Function implements Serializable {
 		} catch(Exception e) {
 			return Double.NaN;
 		}
+	}
+	
+	public double getMaxValueInInterval(double lowerBound, double upperBound) {
+		double maxValue = Double.MIN_VALUE;
+		for(double i = lowerBound; i < upperBound; i += SEARCH_STEP) {
+			double y = f(i);
+			if(y > maxValue)
+				maxValue = y;
+		}
+		
+		return maxValue;
+	}
+	
+	public double getMinValueInInterval(double lowerBound, double upperBound) {
+		double minValue = Double.MAX_VALUE;
+		for(double i = lowerBound; i < upperBound; i += SEARCH_STEP) {
+			double y = f(i);
+			if(y < minValue)
+				minValue = y;
+		}
+		
+		return minValue;
 	}
 	
 	// G-Solve functions
@@ -142,7 +177,6 @@ public class Function implements Serializable {
 		if(!Double.isFinite(y)) return null;
 		
 		Point p = createPoint(0, y);
-		p.roundCoords(resultdecimalPlaces);
 		return p;
 	}
 	
@@ -157,7 +191,6 @@ public class Function implements Serializable {
 		if(!Double.isFinite(y)) return null;
 		
 		Point p = createPoint(x, y);
-		p.roundCoords(resultdecimalPlaces);
 		return p;
 	}
 	
@@ -167,11 +200,14 @@ public class Function implements Serializable {
 		return findRoots(searchLimits[0], searchLimits[1]);
 	}
 	
+	public double getIntegral(double lowerBound, double upperBound) {
+		return computeIntegral(lowerBound, upperBound);
+	}
+	
 	
 	// G-Solve function helpers
-	private double searchStep = 0.1;
-	private int searchDecimalPlaces = RoundingUtils.numberOfDecimalPlaces(searchStep);
-	private int resultdecimalPlaces = 3;
+	private final double SEARCH_STEP = 0.1;
+	private final int SEARCH_DECIMAL_PLACES = RoundingUtils.numberOfDecimalPlaces(SEARCH_STEP);
 	
 	/*
 	 * How this method works:
@@ -187,7 +223,7 @@ public class Function implements Serializable {
 		boolean prevWasNan = false;
 		
 		// first iteration is skipped
-		for(double x = Math.floor(minCoord); x <= maxCoord; x = RoundingUtils.roundToDecimalPlaces(x+searchStep, searchDecimalPlaces)) {
+		for(double x = Math.floor(minCoord); x <= maxCoord; x = RoundingUtils.roundToDecimalPlaces(x+SEARCH_STEP, SEARCH_DECIMAL_PLACES)) {
 			double currY = h(x);
 			
 			if(Double.isNaN(currY))  {
@@ -205,13 +241,13 @@ public class Function implements Serializable {
 				roots.add(createPoint(x, f(x)));
 			}
 			else if(currY*prevY < 0)
-				rootAreas.put(x-searchStep, x);
+				rootAreas.put(x-SEARCH_STEP, x);
 			
 			prevY = currY;
 		}
 		
 		for(Entry<Double, Double> rootArea : rootAreas.entrySet()) {
-			double x = RoundingUtils.roundToDecimalPlaces(computeRoot(rootArea.getKey(), rootArea.getValue()), resultdecimalPlaces);
+			double x = computeRoot(rootArea.getKey(), rootArea.getValue());
 			roots.add(createPoint(x, f(x)));
 		}
 		
@@ -220,7 +256,6 @@ public class Function implements Serializable {
 		
 		for(Point localExtreme : localExtremes)
 			if(localExtreme.getY() == 0) {
-				localExtreme.roundCoords(resultdecimalPlaces);
 				roots.add(localExtreme);
 			}
 		
@@ -243,7 +278,7 @@ public class Function implements Serializable {
 		int iterationsSinceNan = 0;
 		
 		// first two iterations are skipped
-		for(double x = Math.floor(minCoord); x <= maxCoord; x = RoundingUtils.roundToDecimalPlaces(x+searchStep, searchDecimalPlaces)) {
+		for(double x = Math.floor(minCoord); x <= maxCoord; x = RoundingUtils.roundToDecimalPlaces(x+SEARCH_STEP, SEARCH_DECIMAL_PLACES)) {
 			double currY = h(x);
 			if(Double.isNaN(currY))  {
 				iterationsSinceNan = 1;
@@ -294,7 +329,6 @@ public class Function implements Serializable {
 					maxY = y;
 					functionMaximums.clear();
 				}
-				localMaximum.roundCoords(resultdecimalPlaces);
 				functionMaximums.add(localMaximum);
 			}
 		}
@@ -315,7 +349,6 @@ public class Function implements Serializable {
 					minY = y;
 					functionMinimums.clear();
 				}
-				localMinimum.roundCoords(resultdecimalPlaces);
 				functionMinimums.add(localMinimum);
 			}
 		}

@@ -48,10 +48,6 @@ public abstract class PopupWindow extends JFrame implements ActionListener, Wind
 		size.width = Math.max(size.width, width);
 		this.setSize(size);
 	}
-	
-	
-	@Override
-	public void windowOpened(WindowEvent e) {}
 
 	@Override
 	public void windowClosing(WindowEvent e) {
@@ -59,17 +55,15 @@ public abstract class PopupWindow extends JFrame implements ActionListener, Wind
 	}
 
 	@Override
+	public void windowOpened(WindowEvent e) {}
+	@Override
 	public void windowClosed(WindowEvent e) {}
-
 	@Override
 	public void windowIconified(WindowEvent e) {}
-
 	@Override
 	public void windowDeiconified(WindowEvent e) {}
-
 	@Override
 	public void windowActivated(WindowEvent e) {}
-
 	@Override
 	public void windowDeactivated(WindowEvent e) {}
 	

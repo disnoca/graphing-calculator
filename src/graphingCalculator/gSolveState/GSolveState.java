@@ -9,7 +9,7 @@ public enum GSolveState {
 	FUNCTION_INTERSECTION (true),
 	Y_VALUE ("Y-Value", "Enter the x coordinate:", false),
 	X_VALUE ("X-Value", "Enter the y coordinate:", true),
-	INTEGRAL (false);
+	INTEGRAL ("Integral", "Enter the integral bounds:", false);
 	
 	private final String title, inputMessage;
 	private final boolean canHaveMultipleSolutions;

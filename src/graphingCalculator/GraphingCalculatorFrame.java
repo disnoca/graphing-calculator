@@ -34,6 +34,7 @@ import graphingCalculator.gSolveState.GSolveState;
 import graphingCalculator.gSolveState.GSolveStateWrapper;
 import graphingCalculator.graphics.GraphicsDrawer;
 import graphingCalculator.popupWindows.AddFunctionWindow;
+import graphingCalculator.popupWindows.GSolveIntegralWindow;
 import graphingCalculator.popupWindows.GSolveXYValueWindow;
 import graphingCalculator.popupWindows.ListFunctionsWindow;
 import graphingCalculator.popupWindows.PopupWindow;
@@ -60,7 +61,7 @@ public class GraphingCalculatorFrame extends JFrame implements ActionListener, K
 	private PopupWindow saveImageWindow;
 	private PopupWindow addFunctionWindow, removeFunctionWindow, listFunctionsWindow;
 	private PopupWindow setReferentialLimitsWindow;
-	private PopupWindow gSolveXYValueWindow;
+	private PopupWindow gSolveXYValueWindow, gSolveIntegralWindow;
 	
 	private final int MAX_FUNCTIONS = 6;
 	
@@ -191,7 +192,7 @@ public class GraphingCalculatorFrame extends JFrame implements ActionListener, K
 	
 	private void initGraphics() {
 		ReferentialLimits referentialLimits = new ReferentialLimits(drawingAreaSize(), DEFAULT_MINX, DEFAULT_MAXX, DEFAULT_MINY, DEFAULT_MAXY);
-		graphicsDrawer = new GraphicsDrawer(drawingAreaSize(), referentialLimits);
+		graphicsDrawer = new GraphicsDrawer(drawingAreaSize(), referentialLimits, gSolveState);
 		this.add(graphicsDrawer);
 	}
 	
@@ -202,6 +203,7 @@ public class GraphingCalculatorFrame extends JFrame implements ActionListener, K
 		listFunctionsWindow = new ListFunctionsWindow(this, "Functions List", graphicsDrawer, colorIdsMap);
 		setReferentialLimitsWindow = new SetReferentialLimitsWindow(this, "Set Referential Limits", graphicsDrawer);
 		gSolveXYValueWindow = new GSolveXYValueWindow(this, graphicsDrawer, gSolveState);
+		gSolveIntegralWindow = new GSolveIntegralWindow(this, graphicsDrawer, gSolveState);
 	}
 	
 	private void saveProject() throws IOException {
@@ -370,7 +372,8 @@ public class GraphingCalculatorFrame extends JFrame implements ActionListener, K
 			}
 
 			if(e.getSource() == gsIntegral) {
-
+				gSolveState.state = GSolveState.INTEGRAL;
+				gSolveIntegralWindow.showWindow();
 			}
 
 		}
@@ -511,12 +514,13 @@ public class GraphingCalculatorFrame extends JFrame implements ActionListener, K
 	}
 	
 	// TODO:
-	// mark point where mouse clicked and show its coordinates
+	// couple every integral related result and points needed for drawing into a new class
 	
 	// Issues:
 	// can't refactor utils classes
 	// non-existent points/lines in functions like tan(x) and 1/x are being drawn 
 	// functions like tan(x) and 1/x produce wrong results when applied the mathematical algorithms
 	// functions that have y values tending to infinity are only drawn to a certain extent
+	// too much of a zoom out freezes the program
 	
 }
