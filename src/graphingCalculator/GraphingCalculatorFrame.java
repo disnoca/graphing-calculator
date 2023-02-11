@@ -192,7 +192,7 @@ public class GraphingCalculatorFrame extends JFrame implements ActionListener, K
 	
 	private void initGraphics() {
 		ReferentialLimits referentialLimits = new ReferentialLimits(drawingAreaSize(), DEFAULT_MINX, DEFAULT_MAXX, DEFAULT_MINY, DEFAULT_MAXY);
-		graphicsDrawer = new GraphicsDrawer(drawingAreaSize(), referentialLimits, gSolveState);
+		graphicsDrawer = new GraphicsDrawer(drawingAreaSize(), referentialLimits);
 		this.add(graphicsDrawer);
 	}
 	
@@ -331,7 +331,7 @@ public class GraphingCalculatorFrame extends JFrame implements ActionListener, K
 			}
 
 			if(e.getSource() == gsMin) {
-				if(graphicsDrawer.gSolveMaximum()) {
+				if(graphicsDrawer.gSolveMinimum()) {
 					gSolveState.state = GSolveState.MINIMUM;
 					SwingUtils.updateFrameContents(this);
 				}
@@ -512,9 +512,6 @@ public class GraphingCalculatorFrame extends JFrame implements ActionListener, K
 	public static void main(String[] args) {
 		new GraphingCalculatorFrame();
 	}
-	
-	// TODO:
-	// couple every integral related result and points needed for drawing into a new class
 	
 	// Issues:
 	// can't refactor utils classes

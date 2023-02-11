@@ -6,10 +6,11 @@ import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.Polygon;
 import java.awt.image.BufferedImage;
-import java.util.Arrays;
 import java.util.List;
 
+import functionComponents.IntegralInformation;
 import functionComponents.Point;
+import graphingCalculator.utils.RoundingUtils;
 
 public class HighlightGraphic extends BufferedImage {
 	
@@ -23,53 +24,65 @@ public class HighlightGraphic extends BufferedImage {
 		
 		g2d = this.createGraphics();
 		
-		drawPointHighlights(pointHighlights);
+		g2d.setStroke(new BasicStroke(POINT_THICKNESS));
+		g2d.setColor(Color.BLACK);
+		for(Point p : pointHighlights)
+			drawPointHighlight(p);
 	}
 	
-	public HighlightGraphic(Dimension size, Point integralAreaStartRoot, Point integralAreaEndRoot, List<Point> integralPoints, double integralResult) {
+	public HighlightGraphic(Dimension size, IntegralInformation integralInformation) {
 		super(size.width, size.height, BufferedImage.TYPE_INT_ARGB);
 		
 		g2d = this.createGraphics();
 		
-		drawIntegralHighlight(integralAreaStartRoot, integralAreaEndRoot, integralPoints);
+		drawIntegralHighlight(integralInformation);
 	}
 	
-	private void drawPointHighlights(List<Point> pointHighlights) {
-		g2d.setStroke(new BasicStroke(POINT_THICKNESS));
-		g2d.setColor(Color.BLACK);
+	private void drawPointHighlight(Point p) {
+		p.roundCoords(LABEL_DECIMAL_PLACES);
 		
-		for(Point p : pointHighlights) {
-			p.roundCoords(LABEL_DECIMAL_PLACES);
-			
-			int pointX = p.getXFrameCoord() - POINT_THICKNESS/2;
-			int pointY = p.getYFrameCoord() - POINT_THICKNESS/2;
-			g2d.drawOval(pointX, pointY, POINT_THICKNESS, POINT_THICKNESS);
-			
-			String label = "(" + p.getX() + ", " + p.getY() + ")";
-			int labelX = p.getXFrameCoord() - label.length()*3 + 4;
-			int labelY = p.getYFrameCoord() - POINT_THICKNESS*2;
-			g2d.drawString(label, labelX, labelY);
-		}
+		int pointX = p.getXFrameCoord() - POINT_THICKNESS/2;
+		int pointY = p.getYFrameCoord() - POINT_THICKNESS/2;
+		g2d.drawOval(pointX, pointY, POINT_THICKNESS, POINT_THICKNESS);
+		
+		String label = "(" + p.getX() + ", " + p.getY() + ")";
+		int labelX = p.getXFrameCoord() - label.length()*3 + 4;
+		int labelY = p.getYFrameCoord() - POINT_THICKNESS*2;
+		g2d.drawString(label, labelX, labelY);
 	}
 	
-	private void drawIntegralHighlight(Point integralAreaStartRoot, Point integralAreaEndRoot, List<Point> integralPoints) {
+	private void drawIntegralHighlight(IntegralInformation integralInformation) {
 		g2d.setStroke(new BasicStroke(2));
 		g2d.setColor(Color.LIGHT_GRAY);
 		
-		Polygon integralPol = new Polygon();
-		for(Point p : integralPoints)
-			integralPol.addPoint(p.getXFrameCoord(), p.getYFrameCoord());
+		Polygon integralPointsPol = new Polygon();
+		List<Point> pointsToDraw = integralInformation.getVisiblePoints();
 		
-		integralPol.addPoint(integralAreaEndRoot.getXFrameCoord(), integralAreaEndRoot.getYFrameCoord());
-		integralPol.addPoint(integralAreaStartRoot.getXFrameCoord(), integralAreaStartRoot.getYFrameCoord());
+		for(Point p : pointsToDraw)
+			integralPointsPol.addPoint(p.getXFrameCoord(), p.getYFrameCoord());
 		
-		g2d.fill(integralPol);
+		Point firstDrawnPoint = integralInformation.getFirstDrawnPoint();
+		Point lastDrawnPoint = integralInformation.getLastDrawnPoint();
+		integralPointsPol.addPoint(lastDrawnPoint.getXFrameCoord(), lastDrawnPoint.getYFrameCoord());
+		integralPointsPol.addPoint(firstDrawnPoint.getXFrameCoord(), firstDrawnPoint.getYFrameCoord());
 		
-		// this if shouldn't be here, fix later
-		if(integralPoints.size() > 2) {
-			Point boundPoints[] = {integralPoints.get(0), integralPoints.get(integralPoints.size()-1)};
-			drawPointHighlights(Arrays.asList(boundPoints));
-		}
+		g2d.fill(integralPointsPol);
+		
+		g2d.setStroke(new BasicStroke(POINT_THICKNESS));
+		g2d.setColor(Color.BLACK);
+		if(integralInformation.lowerBoundIsVisible())
+			drawPointHighlight(integralInformation.getLowerBoundPoint());
+		if(integralInformation.upperBoundIsVisible())
+			drawPointHighlight(integralInformation.getUpperBoundPoint());
+		
+		String integralResult = RoundingUtils.roundToDecimalPlacesStr(integralInformation.getResult(), LABEL_DECIMAL_PLACES);
+		if(integralResult.equals("-0")) integralResult = "0";
+		
+		g2d.setStroke(new BasicStroke(2));
+		g2d.setColor(Color.WHITE);
+		g2d.fillRect(0, 0, integralResult.length()*7, 20);
+		g2d.setColor(Color.BLACK);
+		g2d.drawString(integralResult , 2, 15);
 	}
 
 }

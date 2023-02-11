@@ -37,6 +37,13 @@ public class Function implements Serializable {
 	
 	private final double SEARCH_AREA = 2000;
 	
+	private final double TOLERANCE = 0.000001;
+	private final double GOLDEN_RATIO = (Math.sqrt(5)-1)/2;
+	
+	private final double SEARCH_STEP = 0.1;
+	private final int SEARCH_DECIMAL_PLACES = RoundingUtils.numberOfDecimalPlaces(SEARCH_STEP);
+	private final int CALCULATION_DECIMAL_PLACES = RoundingUtils.numberOfDecimalPlaces(TOLERANCE)-1;
+	
 
 	public Function(Dimension size, ReferentialLimits referentialLimits, String expression) {
 		this.width = size.width;
@@ -206,8 +213,6 @@ public class Function implements Serializable {
 	
 	
 	// G-Solve function helpers
-	private final double SEARCH_STEP = 0.1;
-	private final int SEARCH_DECIMAL_PLACES = RoundingUtils.numberOfDecimalPlaces(SEARCH_STEP);
 	
 	/*
 	 * How this method works:
@@ -255,9 +260,8 @@ public class Function implements Serializable {
 		localExtremes.addAll(findLocalExtremes(minCoord, maxCoord, FIND_MIN));
 		
 		for(Point localExtreme : localExtremes)
-			if(localExtreme.getY() == 0) {
+			if(RoundingUtils.roundToDecimalPlaces(h(localExtreme.getX()), CALCULATION_DECIMAL_PLACES) == 0)
 				roots.add(localExtreme);
-			}
 		
 		Collections.sort(roots);
 		return roots;
@@ -303,14 +307,10 @@ public class Function implements Serializable {
 			prevY = currY;
 		}
 		
-		
-		// the rounding guarantees the accuracy of the extreme's y values when used in other functions
-		int calculationDecimalPlaces = RoundingUtils.numberOfDecimalPlaces(TOLERANCE)-1;
-		
 		double x, y;
-		for(Entry<Double, Double> localMinimumArea : localExtremeAreas.entrySet()) {
-			x = computeExtreme(localMinimumArea.getKey(), localMinimumArea.getValue(), findMax);
-			y = RoundingUtils.roundToDecimalPlaces(f(x), calculationDecimalPlaces);
+		for(Entry<Double, Double> localExtremeArea : localExtremeAreas.entrySet()) {
+			x = computeExtreme(localExtremeArea.getKey(), localExtremeArea.getValue(), findMax);
+			y = RoundingUtils.roundToDecimalPlaces(f(x), CALCULATION_DECIMAL_PLACES);
 			localExtremes.add(createPoint(x, y));
 		}
 		
@@ -359,8 +359,6 @@ public class Function implements Serializable {
 	
 	
 	// Mathematical Algorithms
-	private final double TOLERANCE = 0.000001;
-	private final double GR = (Math.sqrt(5)-1)/2; 	// golden ratio
 	
 	// Root Finding Algorithm
 	// Bissection Method
@@ -395,7 +393,7 @@ public class Function implements Serializable {
 		boolean cond;
 		
 		while(b-a > TOLERANCE) {
-			d = GR*(b-a);
+			d = GOLDEN_RATIO*(b-a);
 			x1 = a+d;
 			x2 = b-d;
 			
