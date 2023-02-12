@@ -20,9 +20,10 @@ import graphingCalculator.utils.SwingUtils;
 @SuppressWarnings("serial")
 public class SetReferentialLimitsWindow extends PopupWindow {
 	
+	private final int LIMITS_DECIMAL_PLACES = 3;
+	
 	private JTextField[] referentialLimitsTF;	// xMin, xMax, yMin, yMax textfields respectively
 	private JButton changeButton;
-	
 
 	public SetReferentialLimitsWindow(JFrame parent, String title, GraphicsDrawer graphicsDrawer) {
 		super(parent, title, graphicsDrawer);
@@ -35,7 +36,7 @@ public class SetReferentialLimitsWindow extends PopupWindow {
 		changeButton.setFocusable(false);
 		changeButton.addActionListener(this);
 		
-		String[] limits = graphicsDrawer.getReferentialLimits().getFormattedLimits();
+		String[] limits = graphicsDrawer.getReferentialLimits().getFormattedLimits(LIMITS_DECIMAL_PLACES);
 		
 		for(int i = 0; i < referentialLimitsTF.length; i++) {
 			referentialLimitsTF[i] = new JTextField(5);

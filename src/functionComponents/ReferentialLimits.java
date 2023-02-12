@@ -119,8 +119,11 @@ public class ReferentialLimits implements Serializable {
 		return limits;
 	}
 	
-	public String[] getFormattedLimits() {
-		String[] limitStrs = {Double.toString(xMin), Double.toString(xMax), Double.toString(yMin), Double.toString(yMax)};
+	public String[] getFormattedLimits(int decimalPlaces) {
+		String[] limitStrs = {RoundingUtils.roundToDecimalPlacesStr(xMin, decimalPlaces), 
+				RoundingUtils.roundToDecimalPlacesStr(xMax, decimalPlaces), 
+				RoundingUtils.roundToDecimalPlacesStr(yMin, decimalPlaces), 
+				RoundingUtils.roundToDecimalPlacesStr(yMax, decimalPlaces)};
 		
 		// integer values (coded as doubles) have a trailing .0 when turned into a String. This gets rid of that
 		for(int i = 0; i < limitStrs.length; i++)

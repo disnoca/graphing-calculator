@@ -13,7 +13,7 @@ public class TestReferentialLimits {
 	@Test
 	void testFormattedLimits() {
 		ReferentialLimits referentialLimits = new ReferentialLimits(new Dimension(1000, 1000), -0.005, 0.1, 1, 5000);
-		String[] formatedLimits = referentialLimits.getFormattedLimits();
+		String[] formatedLimits = referentialLimits.getFormattedLimits(3);
 		
 		assertEquals("-0.005", formatedLimits[0]);
 		assertEquals("0.1", formatedLimits[1]);
