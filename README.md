@@ -32,3 +32,6 @@ Functions that have no solutions on certain points and tend towards positive and
 If the referential is zoomed out too much the program will freeze.
 
 As a byproduct of these two issues, using the G-Solve Intersection function on the above mentioned functions may cause the program to crash.
+
+## Disclaimer
+This project was done in a time where I didn't care much about comments or documentation and was "finished" in a rush so the code is kind of a mess and very difficult to understand unless you dive deep into it. I apologise in advance if anyone wants to use it or learn from it. I might refactor it in the future if I feel like it.
